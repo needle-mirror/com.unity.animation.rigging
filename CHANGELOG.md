@@ -2,9 +2,32 @@
 All notable changes to this package will be documented in this file.
 
 <!--
-## [0.1.5] - 2019-01-XX
+## [0.2.2] - 2019-02-XX
 ### Patch Update of *Unity Package Animation Rigging*.
+- Added dependency on Burst package to optimize all rigging constraint jobs.
 -->
+
+## [0.2.1] - 2019-02-28
+### Patch Update of *Unity Package Animation Rigging*.
+- Added Burst support to existing constraints.  The Animation Rigging package now depends on com.unity.burst.
+- Upgraded weighted transform arrays in order for weights to be animatable.  The following constraints were modified and will require a manual update:
+	- MultiAimConstraint
+	- MultiParentConstraint
+	- MultiPositionConstraint
+	- MultiReferentialConstraint
+	- TwistCorrection
+
+## [0.2.0] - 2019-02-12
+
+### Keyframing support for *Unity Package Animation Rigging*.
+- Changed RigBuilder to build and update the PlayableGraph for Animation Window.
+- Added attribute [NotKeyable] to properties that shouldn't be animated.
+- Removed 'sync' property flag on transform fields for constraints. Syncing scene data to the animation stream is now performed by marking a constraint field with [SyncSceneToStream].
+- Fixed issue where constraint parameters were evaluated one frame late when animated.
+- Added attribute [DisallowMultipleComponent] to constraints to avoid use of multiple constraints per Game Object.
+- Updated constraints to use new AnimationStream API to reduce engine to script conversion.
+- Added IAnimatableProperty helpers for Bool/Int/Float/Vector2/Vector3/Vector4 properties. 
+- Added ReadOnlyTransformHandle and ReadWriteTransformHandle.
 
 ## [0.1.4] - 2018-12-21
 
