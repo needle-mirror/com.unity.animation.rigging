@@ -4,6 +4,9 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 
+using UnityEditor.Experimental.SceneManagement;
+using UnityEditor.SceneManagement;
+
 namespace UnityEngine.Animations.Rigging
 {
     using Rendering;
@@ -106,7 +109,7 @@ namespace UnityEngine.Animations.Rigging
 
         static BoneRendererUtil()
         {
-            SceneView.onSceneGUIDelegate += DrawSkeletons;
+            SceneView.duringSceneGui += DrawSkeletons;
         }
 
         private static Material material
@@ -275,6 +278,13 @@ namespace UnityEngine.Animations.Rigging
                 if (boneRenderer.bones == null)
                     continue;
 
+                PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+                if (prefabStage != null)
+                {
+                    StageHandle stageHandle = prefabStage.stageHandle;
+                    if (stageHandle.IsValid() && !stageHandle.Contains(boneRenderer.gameObject))
+                        continue;
+                }
 
                 if (boneRenderer.drawBones)
                 {

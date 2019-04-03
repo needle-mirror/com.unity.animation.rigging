@@ -31,4 +31,23 @@ namespace UnityEditor.Animations.Rigging
             return list;
         }
     }
+
+    public static class MaintainOffsetHelper
+    {
+        static readonly string[] k_MaintainOffsetTypeLables = { "None", "Position and Rotation", "Position", "Rotation"};
+        static readonly int[] k_BitsToIndex = new int[] {0, 2, 3, 1};
+        static readonly int[] k_IndexToBits = new int[] {0, 3, 1, 2};
+
+        public static void DoDropdown(GUIContent label, SerializedProperty maintainPosition, SerializedProperty maintainRotation)
+        {
+            int currIndex = k_BitsToIndex[System.Convert.ToInt32(maintainPosition.boolValue) | (System.Convert.ToInt32(maintainRotation.boolValue) << 1)];
+            int newIndex = EditorGUILayout.Popup(label, currIndex, k_MaintainOffsetTypeLables);
+            if (newIndex == currIndex)
+                return;
+
+            var bits = k_IndexToBits[newIndex];
+            maintainPosition.boolValue = (bits & 0x1) != 0;
+            maintainRotation.boolValue = (bits & 0x2) != 0;
+        }
+    }
 }
