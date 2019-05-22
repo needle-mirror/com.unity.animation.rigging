@@ -42,6 +42,19 @@ The user can choose from one of the default looks; Pyramid, Line or Box.
 
 ![Bone Look Pyramid](images/bone_renderer/bone_looks.png)
 
+### Rig Effectors
+
+Similarly to bones, Rig Effectors allow the user to add visual gizmos to transforms for visualization and selection.  These can be added to any transform
+in the same hierarchy as the **Rig Builder** or **Rig** component.  Effectors are not visible in the Game view.  A special Scene View overlay has been added
+to manage and customize effectors in the Rig hierarchy.
+
+![Rig Effector Overlay](images/rig_effector/rig_effector_setup.gif)
+
+The look of the effectors can also be customized.  The Effector Size, Shape, Color, Offset Position and Offset Rotation can be modified.
+The shape can be any **Mesh** asset available in the project.  Multiple effectors can be created, deleted and edited at once.
+
+![Rig Effector Shapes](images/rig_effector/rig_effector_shapes.png)
+
 ### Rig Component
 
 The Rig component is the main entry point to all rig constraints for a given Rig. This component is assigned to a Rig Builder component under the Rig Layer field.
@@ -67,6 +80,16 @@ it should not be in the skeleton hierarchy, but rather live beside it.
 
 Rig components, like all Constraint components, have a Weight property that can be used, animated, and scripted to enable/disable
 or ease-in/ease-out an entire control rig hierarchy.
+
+
+### Rig Transform
+
+When a specific GameObject part of your rig hierarchy is important for manipulation but not referenced by any rig constraints, you'll want to add the **RigTransform** component which is found under _Animation Rigging/Setup_.
+As shown in the video below, in order to manipulate both the left and right foot IK targets (_lfik_ and _rfik_) of the _2BoneIK_ sample using
+their parent transform (_ik_ ), we need to add this component to get the expected behaviour.
+
+![Rig Transform](images/rig_transform/rig_transform_manipulation.gif)
+
 
 ## Defining an Animation Rig
 
@@ -106,14 +129,6 @@ The Animation Rigging package contains a few predefined constraints that you can
 - [Override Transform](./constraints/OverrideTransform.md)
 - [Twist Correction](./constraints/TwistCorrection.md)
 - [Two Bone IK Constraint](./constraints/TwoBoneIKConstraint.md)
-
-## Scene Synchronisation to the Animation Stream
-
-All constraint sources expose property transform fields with a synchronisation to stream checkbox. Any valid references living under the **Animator** component root
-specified in those fields will be declared as *TransformStreamHandles*. This means that we expect these transforms to be animated. However, if they are not
-you can enable the toggle in order to populate the values of that stream with what is currently defined in the scene at the beginning of the constraint pipeline.
-For example, if you declare a Two Bone IK Constraint with *Target* and *Hint* transform fields which are not animated, then enabling a sync operation will make these transforms editable.
-Note however that if animation was present for these transforms and the sync operation enabled, the orignal animated values would be ignored.
 
 # Technical details
 

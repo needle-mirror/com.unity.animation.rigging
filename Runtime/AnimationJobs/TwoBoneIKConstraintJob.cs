@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     using Experimental.Animations;
 
@@ -25,7 +25,7 @@
 
         public void ProcessAnimation(AnimationStream stream)
         {
-            float w = jobWeight.Get(stream); 
+            float w = jobWeight.Get(stream);
             if (w > 0f)
             {
                 AnimationRuntimeUtils.SolveTwoBoneIK(

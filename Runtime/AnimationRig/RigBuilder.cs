@@ -9,7 +9,7 @@ namespace UnityEngine.Animations.Rigging
 
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    public class RigBuilder : MonoBehaviour, IAnimationWindowPreview
+    public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [Serializable]
         public class RigLayer
@@ -124,11 +124,24 @@ namespace UnityEngine.Animations.Rigging
         private List<LayerData> m_PreviewRigLayerData;
         private SyncSceneToStreamLayer m_SyncSceneToStreamLayer;
 
+#if UNITY_EDITOR
+        [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
+        public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
+#endif
+
+        public delegate void OnAddRigBuilderCallback(RigBuilder rigBuilder);
+        public delegate void OnRemoveRigBuilderCallback(RigBuilder rigBuilder);
+
+        public static OnAddRigBuilderCallback onAddRigBuilder;
+        public static OnRemoveRigBuilderCallback onRemoveRigBuilder;
+
         void OnEnable()
         {
             // Build runtime data.
             if (Application.isPlaying)
                 Build();
+
+            onAddRigBuilder?.Invoke(this);
         }
 
         void OnDisable()
@@ -136,6 +149,8 @@ namespace UnityEngine.Animations.Rigging
             // Clear runtime data.
             if (Application.isPlaying)
                 Clear();
+
+            onRemoveRigBuilder?.Invoke(this);
         }
 
         void OnDestroy()
@@ -244,6 +259,14 @@ namespace UnityEngine.Animations.Rigging
 
         public void StartPreview()
         {
+            var animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                foreach (var layer in layers)
+                {
+                    layer.Initialize(animator);
+                }
+            }
         }
 
         public void StopPreview()
@@ -310,6 +333,26 @@ namespace UnityEngine.Animations.Rigging
 
             return inputPlayable;
         }
+
+#if UNITY_EDITOR
+        public void AddEffector(Transform transform)
+        {
+            var effector = new RigEffectorData();
+            effector.Initialize(transform, RigEffectorData.defaultStyle);
+
+            m_Effectors.Add(effector);
+        }
+
+        public void RemoveEffector(Transform transform)
+        {
+            m_Effectors.RemoveAll((RigEffectorData data) => data.transform == transform);
+        }
+
+        public bool ContainsEffector(Transform transform)
+        {
+            return m_Effectors.Exists((RigEffectorData data) => data.transform == transform);
+        }
+#endif
 
         public List<RigLayer> layers
         {

@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using UnityEditor;
-
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 
-namespace UnityEngine.Animations.Rigging
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Animations.Rigging;
+
+namespace UnityEditor.Animations.Rigging
 {
     using Rendering;
 
@@ -33,17 +34,20 @@ namespace UnityEngine.Animations.Rigging
 
             private List<Matrix4x4> m_Matrices = new List<Matrix4x4>();
             private List<Vector4> m_Colors = new List<Vector4>();
+            private List<Vector4> m_Highlights = new List<Vector4>();
 
-            public void AddInstance(Matrix4x4 matrix, Color color)
+            public void AddInstance(Matrix4x4 matrix, Color color, Color highlight)
             {
                 m_Matrices.Add(matrix);
                 m_Colors.Add(color);
+                m_Highlights.Add(highlight);
             }
 
             public void Clear()
             {
                 m_Matrices.Clear();
                 m_Colors.Clear();
+                m_Highlights.Clear();
             }
 
             private static int RenderChunkCount(int totalCount)
@@ -61,10 +65,10 @@ namespace UnityEngine.Animations.Rigging
 
             public void Render()
             {
-                if (m_Matrices.Count == 0 || m_Colors.Count == 0)
+                if (m_Matrices.Count == 0 || m_Colors.Count == 0 || m_Highlights.Count == 0)
                     return;
 
-                int count = System.Math.Min(m_Matrices.Count, m_Colors.Count);
+                int count = System.Math.Min(m_Matrices.Count, System.Math.Min(m_Colors.Count, m_Highlights.Count));
 
                 Material mat = material;
                 mat.SetPass(0);
@@ -86,6 +90,8 @@ namespace UnityEngine.Animations.Rigging
                     Graphics.ExecuteCommandBuffer(cb);
 
                     cb.Clear();
+                    propertyBlock.SetVectorArray("_Color", GetRenderChunk(m_Highlights, i));
+
                     material.EnableKeyword("WIRE_ON");
                     cb.DrawMeshInstanced(mesh, (int)SubMeshType.BoneWire, material, 0, matrices, matrices.Length, propertyBlock);
                     Graphics.ExecuteCommandBuffer(cb);
@@ -109,6 +115,9 @@ namespace UnityEngine.Animations.Rigging
 
         static BoneRendererUtil()
         {
+            BoneRenderer.onAddBoneRenderer += OnAddBoneRenderer;
+            BoneRenderer.onRemoveBoneRenderer += OnRemoveBoneRenderer;
+
             SceneView.duringSceneGui += DrawSkeletons;
         }
 
@@ -374,38 +383,7 @@ namespace UnityEngine.Animations.Rigging
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
                             GUIUtility.hotControl = id; // Grab mouse focus
-                            if (evt.shift || EditorGUI.actionKey)
-                            {
-                                UnityObject[] existingSelection = Selection.objects;
-
-                                // For shift, we check if EXACTLY the active GO is hovered by mouse and then subtract. Otherwise additive.
-                                // For control/cmd, we check if ANY of the selected GO is hovered by mouse and then subtract. Otherwise additive.
-                                // Control/cmd takes priority over shift.
-                                if (EditorGUI.actionKey ? Selection.Contains(boneGO) : Selection.activeGameObject == boneGO)
-                                {
-                                    // subtract from selection
-                                    var newSelection = new UnityObject[existingSelection.Length - 1];
-
-                                    int index = Array.IndexOf(existingSelection, boneGO);
-
-                                    System.Array.Copy(existingSelection, newSelection, index);
-                                    System.Array.Copy(existingSelection, index + 1, newSelection, index, newSelection.Length - index);
-
-                                    Selection.objects = newSelection;
-                                }
-                                else
-                                {
-                                    // add to selection
-                                    var newSelection = new UnityObject[existingSelection.Length + 1];
-                                    System.Array.Copy(existingSelection, newSelection, existingSelection.Length);
-                                    newSelection[existingSelection.Length] = boneGO;
-
-                                    Selection.objects = newSelection;
-                                }
-                            }
-                            else
-                                Selection.activeObject = boneGO;
-
+                            EditorHelper.HandleClickSelection(boneGO, evt);
                             evt.Use();
                         }
                         break;
@@ -418,9 +396,6 @@ namespace UnityEngine.Animations.Rigging
                             DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
                             DragAndDrop.StartDrag(ObjectNames.GetDragAndDropTitle(transform));
 
-                            // having a hot control set during drag makes the control eat the drag events
-                            // and dragging of bones no longer works over the avatar configure window
-                            // see case 912016
                             GUIUtility.hotControl = 0;
 
                             evt.Use();
@@ -438,31 +413,32 @@ namespace UnityEngine.Animations.Rigging
                     }
                 case EventType.Repaint:
                     {
+                        Color highlight = color;
                         if (GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id)
                         {
-                            color = Handles.preselectionColor;
+                            highlight = Handles.preselectionColor;
                         }
                         else if (Selection.Contains(boneGO) || Selection.activeObject == boneGO)
                         {
-                            color = Handles.selectedColor;
+                            highlight = Handles.selectedColor;
                         }
 
                         if (tipBone)
                         {
-                            Handles.color = color;
+                            Handles.color = highlight;
                             Handles.SphereHandleCap(0, start, Quaternion.identity, k_BoneTipSize * size, EventType.Repaint);
                         }
                         else if (shape == BoneShape.Line)
                         {
-                            Handles.color = color;
+                            Handles.color = highlight;
                             Handles.DrawLine(start, end);
                         }
                         else
                         {
                             if (shape == BoneShape.Pyramid)
-                                pyramidMeshRenderer.AddInstance(ComputeBoneMatrix(start, end, length, size), color);
+                                pyramidMeshRenderer.AddInstance(ComputeBoneMatrix(start, end, length, size), color, highlight);
                             else // if (shape == BoneShape.Box)
-                                boxMeshRenderer.AddInstance(ComputeBoneMatrix(start, end, length, size), color);
+                                boxMeshRenderer.AddInstance(ComputeBoneMatrix(start, end, length, size), color, highlight);
                         }
 
                     }
@@ -470,15 +446,14 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
-        public static void OnBoneRendererEnabled(BoneRenderer obj)
+        public static void OnAddBoneRenderer(BoneRenderer obj)
         {
             s_BoneRendererComponents.Add(obj);
         }
 
-        public static void OnBoneRendererDisabled(BoneRenderer obj)
+        public static void OnRemoveBoneRenderer(BoneRenderer obj)
         {
             s_BoneRendererComponents.Remove(obj);
         }
     }
 }
-#endif // UNITY_EDITOR

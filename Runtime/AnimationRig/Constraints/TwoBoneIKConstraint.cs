@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
     public struct TwoBoneIKConstraintData : IAnimationJobData, ITwoBoneIKConstraintData

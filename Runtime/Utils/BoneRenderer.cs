@@ -31,7 +31,7 @@ namespace UnityEngine.Animations.Rigging
         [Range(0.01f, 5.0f)]
         public float tripodSize = 1.0f;
 
-        public Color boneColor = new Color(0f, 1.0f, 0f, 0.5f);
+        public Color boneColor = new Color(0f, 0f, 1f, 0.5f);
 
         [SerializeField]
         private Transform[] m_Transforms;
@@ -54,15 +54,21 @@ namespace UnityEngine.Animations.Rigging
 
         public Transform[] tips { get => m_Tips; }
 
+        public delegate void OnAddBoneRendererCallback(BoneRenderer boneRenderer);
+        public delegate void OnRemoveBoneRendererCallback(BoneRenderer boneRenderer);
+
+        public static OnAddBoneRendererCallback onAddBoneRenderer;
+        public static OnRemoveBoneRendererCallback onRemoveBoneRenderer;
+
         void OnEnable()
         {
             ExtractBones();
-            BoneRendererUtil.OnBoneRendererEnabled(this);
+            onAddBoneRenderer?.Invoke(this);
         }
 
         void OnDisable()
         {
-            BoneRendererUtil.OnBoneRendererDisabled(this);
+            onRemoveBoneRenderer?.Invoke(this);
         }
 
         void Reset()

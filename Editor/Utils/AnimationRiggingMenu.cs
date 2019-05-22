@@ -8,16 +8,23 @@ namespace UnityEditor.Animations.Rigging
     {
         static bool FilterSourceAndDestinationFromSelection(out Transform source, out Transform destination)
         {
-            var selected = Selection.transforms;
+            var selected = Selection.instanceIDs;
             if (selected == null || selected.Length != 2)
             {
                 source = destination = null;
                 return false;
             }
 
-            int index = Convert.ToInt32(selected[0] == Selection.activeTransform);
-            source = selected[index];
-            destination = selected[index ^ 1];
+            var srcGameObject = EditorUtility.InstanceIDToObject(selected[1]) as GameObject;
+            var dstGameObject = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+            if (srcGameObject == null || dstGameObject == null)
+            {
+                source = destination = null;
+                return false;
+            }
+
+            source = srcGameObject.transform;
+            destination = dstGameObject.transform;
 
             return true;
         }

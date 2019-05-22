@@ -89,12 +89,16 @@ class DampedTransformTests
     {
         var data = SetupConstraintRig();
         var constraint = data.constraint;
+        var rigBuilder = data.rigData.rootGO.GetComponent<RigBuilder>();
+        var playableGraph = rigBuilder.graph;
+        playableGraph.Stop();
 
         // no position damping, full rotation damp
         constraint.data.dampPosition = 0f;
         constraint.data.dampRotation = 1f;
 
         data.constraint.weight = 0f;
+
         yield return null;
 
         var constrainedTransform = constraint.data.constrainedObject;
@@ -112,6 +116,10 @@ class DampedTransformTests
             float w = i / 5.0f;
 
             data.constraint.weight = w;
+
+            // DampedTransform has a damp factor of 40.  This means it'll take 1/40 second for source to reach its target.
+            // Evaluate with a large enough deltaTime to make sure source reaches its target.
+            playableGraph.Evaluate(1f);
             yield return null;
 
             Vector3 weightedConstrainedPos = Vector3.Lerp(constrainedPos1, constrainedPos2, w);

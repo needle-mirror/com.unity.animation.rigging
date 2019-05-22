@@ -2,10 +2,15 @@
 All notable changes to this package will be documented in this file.
 
 <!--
-## [0.2.2] - 2019-02-XX
+## [0.2.3] - 2019-XX-XX
 ### Patch Update of *Unity Package Animation Rigging*.
-- Added dependency on Burst package to optimize all rigging constraint jobs.
 -->
+
+## [0.2.2] - 2019-04-29
+### Patch Update of *Unity Package Animation Rigging*.
+- Added Rig Effector visualization toolkit for Animation Rigging.
+- Fixed Animation Rigging align operations not using the same selection order in Scene View and Hierarchy.
+- Updated Burst to version 1.0.4.
 
 ## [0.2.1] - 2019-02-28
 ### Patch Update of *Unity Package Animation Rigging*.

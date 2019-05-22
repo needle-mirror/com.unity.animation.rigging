@@ -1,15 +1,22 @@
-﻿namespace UnityEngine.Animations.Rigging
+using System.Collections.Generic;
+
+namespace UnityEngine.Animations.Rigging
 {
     using Experimental.Animations;
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Setup/Rig")]
-    public class Rig : MonoBehaviour
+    public class Rig : MonoBehaviour, IRigEffectorHolder
     {
         [SerializeField, Range(0f, 1f)]
         protected float m_Weight = 1f;
 
         private IRigConstraint[] m_Constraints;
         private IAnimationJob[]  m_Jobs;
+
+#if UNITY_EDITOR
+        [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
+        public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
+#endif
 
         public bool Initialize(Animator animator)
         {
@@ -45,6 +52,26 @@
             for (int i = 0, count = m_Constraints.Length; i < count; ++i)
                 m_Constraints[i].UpdateJob(m_Jobs[i]);
         }
+
+#if UNITY_EDITOR
+        public void AddEffector(Transform transform)
+        {
+            var effector = new RigEffectorData();
+            effector.Initialize(transform, RigEffectorData.defaultStyle);
+
+            m_Effectors.Add(effector);
+        }
+
+        public void RemoveEffector(Transform transform)
+        {
+            m_Effectors.RemoveAll((RigEffectorData data) => data.transform == transform);
+        }
+
+        public bool ContainsEffector(Transform transform)
+        {
+            return m_Effectors.Exists((RigEffectorData data) => data.transform == transform);
+        }
+#endif
 
         public bool isInitialized { get; private set; }
 

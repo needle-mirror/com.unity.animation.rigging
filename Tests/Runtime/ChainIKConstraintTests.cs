@@ -57,13 +57,13 @@ class ChainIKConstraintTests {
         var constraint = data.constraint;
 
         var target = constraint.data.target;
-        var tip = constraint.data.target;
+        var tip = constraint.data.tip;
         var root = constraint.data.root;
 
         for (int i = 0; i < 5; ++i)
         {
             target.position += new Vector3(0f, 0.1f, 0f);
-            yield return null;
+            yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
             Vector3 rootToTip = (tip.position - root.position).normalized;
             Vector3 rootToTarget = (target.position - root.position).normalized;
@@ -126,7 +126,7 @@ class ChainIKConstraintTests {
                 Vector2 dir3 = nextChain[j + 1] - nextChain[j];
 
                 float maxAngle = Vector2.Angle(dir1, dir3);
-                float angle = Vector2.Angle(dir1, dir3);
+                float angle = Vector2.Angle(dir1, dir2);
 
                 Assert.GreaterOrEqual(angle, 0f);
                 Assert.LessOrEqual(angle, maxAngle);
