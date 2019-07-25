@@ -37,9 +37,9 @@ namespace UnityEngine.Animations.Rigging
             return tmp.Count == 0 ? null : tmp.ToArray();
         }
 
-        private static Transform[] GetSyncableRigTransforms(Rig rig)
+        private static Transform[] GetSyncableRigTransforms(Animator animator)
         {
-            RigTransform[] rigTransforms = rig.GetComponentsInChildren<RigTransform>();
+            RigTransform[] rigTransforms = animator.GetComponentsInChildren<RigTransform>();
             if (rigTransforms.Length == 0)
                 return null;
 
@@ -188,10 +188,6 @@ namespace UnityEngine.Animations.Rigging
                     );
                 }
 
-                var extraTransforms = GetSyncableRigTransforms(rig);
-                if (extraTransforms != null)
-                    syncableTransforms.AddRange(extraTransforms);
-
                 syncableProperties.Add(
                     new SyncableProperties {
                         rig = new RigProperties { component = rig as Component },
@@ -199,6 +195,10 @@ namespace UnityEngine.Animations.Rigging
                     }
                 );
             }
+
+            var extraTransforms = GetSyncableRigTransforms(animator);
+            if (extraTransforms != null)
+                syncableTransforms.AddRange(extraTransforms);
         }
 
         public static IAnimationJob[] CreateAnimationJobs(Animator animator, IRigConstraint[] constraints)

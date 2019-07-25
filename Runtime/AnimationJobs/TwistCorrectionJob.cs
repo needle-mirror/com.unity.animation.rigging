@@ -103,9 +103,5 @@ namespace UnityEngine.Animations.Rigging
             job.twistBindRotations.Dispose();
             job.weightBuffer.Dispose();
         }
-
-        public override void Update(TwistCorrectionJob job, ref T data)
-        {
-        }
     }
 }

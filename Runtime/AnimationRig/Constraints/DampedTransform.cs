@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
     public struct DampedTransformData : IAnimationJobData, IDampedTransformData
@@ -33,6 +33,7 @@
     }
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Damped Transform")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/DampedTransform.html")]
     public class DampedTransform : RigConstraint<
         DampedTransformJob,
         DampedTransformData,

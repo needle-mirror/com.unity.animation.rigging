@@ -5,6 +5,7 @@ namespace UnityEngine.Animations.Rigging
     using Experimental.Animations;
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Setup/Rig")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
     public class Rig : MonoBehaviour, IRigEffectorHolder
     {
         [SerializeField, Range(0f, 1f)]

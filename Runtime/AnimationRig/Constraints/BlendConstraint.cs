@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
     public struct BlendConstraintData : IAnimationJobData, IBlendConstraintData
@@ -47,6 +47,7 @@
     }
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Blend Constraint")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/BlendConstraint.html")]
     public class BlendConstraint : RigConstraint<
         BlendConstraintJob,
         BlendConstraintData,

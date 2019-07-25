@@ -2,9 +2,22 @@
 All notable changes to this package will be documented in this file.
 
 <!--
-## [0.2.3] - 2019-XX-XX
+## [0.2.4] - 2019-XX-XX
 ### Patch Update of *Unity Package Animation Rigging*.
 -->
+
+## [0.2.3] - 2019-07-24
+### Patch Update of *Unity Package Animation Rigging*.
+- Increased the priority index of AnimationPlayableOutput in order for Animation Rigging to always evaluate after State Machine and Timeline.
+- Fixed NullReferenceException in RigEffectorRenderer.
+- Fixed TwoBoneIK evaluation when used on straight limbs by using hint target to define a valid IK plane.
+- Fixed Multi-Parent, Multi-Rotation and Multi-Aim constraints to perform order independent rotation blending. [AAA-17]
+- Fixed RigTransform component to work on all objects of an animator hierarchy not only specific to sub rig hierarchies. [AAA-18] 
+- Fixed crash in RigSyncSceneToStreamJob when rebuilding jobs after having deleted all valid rigs (case 1167624).
+- Fixed undo/redo issues with Rig Effectors set on Prefab instances (case 1162002).
+- Fixed missing links to package documentation for MonoBehaviour scripts. [AAA-16]
+- Added Vector3IntProperty and Vector3BoolProperty helper structs.
+- Updated Burst to version 1.1.1.
 
 ## [0.2.2] - 2019-04-29
 ### Patch Update of *Unity Package Animation Rigging*.

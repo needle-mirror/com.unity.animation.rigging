@@ -52,9 +52,28 @@ namespace UnityEditor.Animations.Rigging
             m_ExpandOverlay = EditorPrefs.GetBool(s_ExpandOverlayPrefKey, true);
         }
 
+        private IRigEffectorHolder FetchRigEffectorHolder(Transform transform)
+        {
+            var rigBuilder = EditorHelper.GetClosestComponent<RigBuilder>(transform);
+            var rig = EditorHelper.GetClosestComponent<Rig>(transform, (rigBuilder != null) ? rigBuilder.transform : null);
+
+            if (rigBuilder.ContainsEffector(transform))
+            {
+                return rigBuilder;
+            }
+            else if (rig.ContainsEffector(transform))
+            {
+                return rig;
+            }
+
+            return null;
+        }
+
         public void OnSceneGUIOverlay()
         {
             GameObject targetGameObject = null;
+
+            m_SerializedObject.Update();
 
             if (!m_SerializedObject.isEditingMultipleObjects)
             {
@@ -88,18 +107,17 @@ namespace UnityEditor.Animations.Rigging
                     var effector = targetObject as IRigEffector;
                     Transform transform = effector.transform;
 
-                    var rigBuilder = EditorHelper.GetClosestComponent<RigBuilder>(transform);
-                    var rig = EditorHelper.GetClosestComponent<Rig>(transform, (rigBuilder != null) ? rigBuilder.transform : null);
+                    IRigEffectorHolder holder = FetchRigEffectorHolder(transform);
+                    if (holder != null)
+                    {
+                        var holderObject = holder as UnityEngine.Object;
 
-                    if (rigBuilder.ContainsEffector(transform))
-                    {
-                        Undo.RecordObject(rigBuilder, "Remove Effector");
-                        rigBuilder.RemoveEffector(transform);
-                    }
-                    else if (rig.ContainsEffector(transform))
-                    {
-                        Undo.RecordObject(rig, "Remove Effector");
-                        rig.RemoveEffector(transform);
+                        Undo.RecordObject(holderObject, "Remove Effector");
+
+                        if (PrefabUtility.IsPartOfPrefabInstance(holderObject))
+                            EditorUtility.SetDirty(holderObject);
+
+                        holder.RemoveEffector(transform);
                     }
                 }
             }
@@ -138,7 +156,27 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_Rotation, s_RotationLabel);
             }
 
-            m_SerializedObject.ApplyModifiedProperties();
+            if (m_SerializedObject.hasModifiedProperties)
+            {
+                UnityEngine.Object[] targetObjects = m_SerializedObject.targetObjects;
+                foreach(var targetObject in targetObjects)
+                {
+                    var effector = targetObject as IRigEffector;
+                    Transform transform = effector.transform;
+
+                    IRigEffectorHolder holder = FetchRigEffectorHolder(transform);
+                    if (holder != null)
+                    {
+                        var holderObject = holder as UnityEngine.Object;
+                        Undo.RecordObject(holderObject, "Edit Effector");
+
+                        if (PrefabUtility.IsPartOfPrefabInstance(holderObject))
+                            EditorUtility.SetDirty(holderObject);
+                    }
+                }
+
+                m_SerializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }

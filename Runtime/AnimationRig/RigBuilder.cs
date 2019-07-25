@@ -9,6 +9,7 @@ namespace UnityEngine.Animations.Rigging
 
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [Serializable]
@@ -73,10 +74,10 @@ namespace UnityEngine.Animations.Rigging
                 }
 
                 m_Data = RigUtils.CreateSyncSceneToStreamData(animator, rigs.ToArray());
-                if (m_Data.IsValid())
-                {
-                    job = RigUtils.syncSceneToStreamBinder.Create(animator, m_Data);
-                }
+                if (!m_Data.IsValid())
+                    return false;
+
+                job = RigUtils.syncSceneToStreamBinder.Create(animator, m_Data);
 
                 return (isInitialized = true);
             }
@@ -123,6 +124,10 @@ namespace UnityEngine.Animations.Rigging
 
         private List<LayerData> m_PreviewRigLayerData;
         private SyncSceneToStreamLayer m_SyncSceneToStreamLayer;
+
+#if UNITY_2019_3_OR_NEWER
+        private static readonly ushort k_AnimationOutputPriority = 1000;
+#endif
 
 #if UNITY_EDITOR
         [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
@@ -187,6 +192,10 @@ namespace UnityEngine.Animations.Rigging
             var syncLayerOutput = AnimationPlayableOutput.Create(graph, "syncSceneToStreamOutput", animator);
             syncLayerOutput.SetAnimationStreamSource(AnimationStreamSource.PreviousInputs);
 
+#if UNITY_2019_3_OR_NEWER
+            syncLayerOutput.SetSortingOrder(k_AnimationOutputPriority);
+#endif
+
             // Create all rig layers
             m_RigLayerData = new List<LayerData>(layers.Count);
             foreach (var layer in layers)
@@ -197,6 +206,11 @@ namespace UnityEngine.Animations.Rigging
                 LayerData data = new LayerData();
                 data.output = AnimationPlayableOutput.Create(graph, "rigOutput", animator);
                 data.output.SetAnimationStreamSource(AnimationStreamSource.PreviousInputs);
+
+#if UNITY_2019_3_OR_NEWER
+                data.output.SetSortingOrder(k_AnimationOutputPriority);
+#endif
+
                 data.playables = BuildRigPlayables(graph, layer.rig);
 
                 // Connect last rig playable to output

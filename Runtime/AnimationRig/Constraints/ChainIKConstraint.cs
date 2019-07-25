@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
     public struct ChainIKConstraintData : IAnimationJobData, IChainIKConstraintData
@@ -59,6 +59,7 @@
     }
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Chain IK Constraint")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/ChainIKConstraint.html")]
     public class ChainIKConstraint : RigConstraint<
         ChainIKConstraintJob,
         ChainIKConstraintData,

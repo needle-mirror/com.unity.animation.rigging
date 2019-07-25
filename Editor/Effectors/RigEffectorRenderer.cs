@@ -59,6 +59,9 @@ namespace UnityEditor.Animations.Rigging
             {
                 var rigBuilder = s_RigBuilders[i];
 
+                if (rigBuilder == null)
+                    continue;
+
                 if (prefabStage != null)
                 {
                     StageHandle stageHandle = prefabStage.stageHandle;

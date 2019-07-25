@@ -4,6 +4,7 @@ namespace UnityEngine.Animations.Rigging
 {
     [ExecuteInEditMode]
     [AddComponentMenu("Animation Rigging/Setup/Bone Renderer")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
     public class BoneRenderer : MonoBehaviour
     {
     #if UNITY_EDITOR

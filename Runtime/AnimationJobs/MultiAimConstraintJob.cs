@@ -45,7 +45,8 @@ namespace UnityEngine.Animations.Rigging
                 Vector2 minMaxAngles = new Vector2(minLimit.Get(stream), maxLimit.Get(stream));
                 driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
                 Vector3 currentDir = currentWRot * aimAxis;
-                Quaternion accumDeltaRot = Quaternion.identity;
+                Quaternion accumDeltaRot = QuaternionExt.zero;
+                float accumWeights = 0f;
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
                     var normalizedWeight = weightBuffer[i] * weightScale;
@@ -55,16 +56,28 @@ namespace UnityEngine.Animations.Rigging
                     ReadOnlyTransformHandle sourceTransform = sourceTransforms[i];
 
                     var toDir = sourceTransform.GetPosition(stream) - currentWPos;
+                    if (toDir.sqrMagnitude < k_Epsilon)
+                        continue;
+
                     var rotToSource = Quaternion.AngleAxis(
                         Mathf.Clamp(Vector3.Angle(currentDir, toDir), minMaxAngles.x, minMaxAngles.y),
                         Vector3.Cross(currentDir, toDir).normalized
                         );
 
-                    accumDeltaRot = Quaternion.Lerp(accumDeltaRot, sourceOffsets[i] * rotToSource, normalizedWeight);
+                    accumDeltaRot = QuaternionExt.Add(
+                        accumDeltaRot,
+                        QuaternionExt.Scale(sourceOffsets[i] * rotToSource, normalizedWeight)
+                        );
 
                     // Required to update handles with binding info.
                     sourceTransforms[i] = sourceTransform;
+                    accumWeights += normalizedWeight;
                 }
+
+                accumDeltaRot = QuaternionExt.NormalizeSafe(accumDeltaRot);
+                if (accumWeights < 1f)
+                    accumDeltaRot = Quaternion.Lerp(Quaternion.identity, accumDeltaRot, accumWeights);
+
                 Quaternion newRot = accumDeltaRot * currentWRot;
 
                 // Convert newRot to local space
@@ -156,10 +169,6 @@ namespace UnityEngine.Animations.Rigging
             job.sourceWeights.Dispose();
             job.sourceOffsets.Dispose();
             job.weightBuffer.Dispose();
-        }
-
-        public override void Update(MultiAimConstraintJob job, ref T data)
-        {
         }
     }
 }

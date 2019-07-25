@@ -38,8 +38,8 @@ namespace UnityEngine.Animations.Rigging
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
-                Quaternion currentWRot = driven.GetRotation(stream);
-                Quaternion accumRot = currentWRot;
+                float accumWeights = 0f;
+                Quaternion accumRot = QuaternionExt.zero;
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
                     var normalizedWeight = weightBuffer[i] * weightScale;
@@ -47,12 +47,16 @@ namespace UnityEngine.Animations.Rigging
                         continue;
 
                     ReadOnlyTransformHandle sourceTransform = sourceTransforms[i];
-
-                    accumRot = Quaternion.Lerp(accumRot, sourceTransform.GetRotation(stream) * sourceOffsets[i], normalizedWeight);
+                    accumRot = QuaternionExt.Add(accumRot, QuaternionExt.Scale(sourceTransform.GetRotation(stream) * sourceOffsets[i], normalizedWeight));
 
                     // Required to update handles with binding info.
                     sourceTransforms[i] = sourceTransform;
+                    accumWeights += normalizedWeight;
                 }
+
+                accumRot = QuaternionExt.NormalizeSafe(accumRot);
+                if (accumWeights < 1f)
+                    accumRot = Quaternion.Lerp(driven.GetRotation(stream), accumRot, accumWeights);
 
                 // Convert accumRot to local space
                 if (drivenParent.IsValid(stream))
@@ -129,10 +133,6 @@ namespace UnityEngine.Animations.Rigging
             job.sourceWeights.Dispose();
             job.sourceOffsets.Dispose();
             job.weightBuffer.Dispose();
-        }
-
-        public override void Update(MultiRotationConstraintJob job, ref T data)
-        {
         }
     }
 }

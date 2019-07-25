@@ -38,13 +38,12 @@ namespace UnityEngine.Animations.Rigging
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
-                driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
-                var accumTx = new AffineTransform(currentWPos, currentWRot);
+                float accumWeights = 0f;
+                var accumTx = new AffineTransform(Vector3.zero, QuaternionExt.zero);
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
                     ReadOnlyTransformHandle sourceTransform = sourceTransforms[i];
                     var normalizedWeight = weightBuffer[i] * weightScale;
-
                     if (normalizedWeight < k_Epsilon)
                         continue;
 
@@ -52,11 +51,20 @@ namespace UnityEngine.Animations.Rigging
                     var sourceTx = new AffineTransform(srcWPos, srcWRot);
                     sourceTx *= sourceOffsets[i];
 
-                    accumTx.rotation = Quaternion.Lerp(accumTx.rotation, sourceTx.rotation, normalizedWeight);
-                    accumTx.translation += (sourceTx.translation - currentWPos) * normalizedWeight;
-
+                    accumTx.translation += sourceTx.translation * normalizedWeight;
+                    accumTx.rotation = QuaternionExt.Add(accumTx.rotation, QuaternionExt.Scale(sourceTx.rotation, normalizedWeight));
+                    
                     // Required to update handles with binding info.
                     sourceTransforms[i] = sourceTransform;
+                    accumWeights += normalizedWeight;
+                }
+
+                accumTx.rotation = QuaternionExt.NormalizeSafe(accumTx.rotation);
+                if (accumWeights < 1f)
+                {
+                    driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
+                    accumTx.translation += currentWPos * (1f - accumWeights);
+                    accumTx.rotation = Quaternion.Lerp(currentWRot, accumTx.rotation, accumWeights);
                 }
 
                 // Convert accumTx to local space
@@ -158,10 +166,6 @@ namespace UnityEngine.Animations.Rigging
             job.sourceWeights.Dispose();
             job.sourceOffsets.Dispose();
             job.weightBuffer.Dispose();
-        }
-
-        public override void Update(MultiParentConstraintJob job, ref T data)
-        {
         }
     }
 }

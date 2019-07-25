@@ -49,7 +49,11 @@ namespace UnityEditor.Animations.Rigging
                 foreach (var pair in m_Transforms)
                 {
                     var targetObject = pair.holder as UnityEngine.Object;
+
                     Undo.RecordObject(targetObject, "Add Effector");
+
+                    if (PrefabUtility.IsPartOfPrefabInstance(targetObject))
+                        EditorUtility.SetDirty(targetObject);
 
                     pair.holder.AddEffector(pair.transform);
                 }

@@ -128,9 +128,5 @@ namespace UnityEngine.Animations.Rigging
             job.sourceOffsets.Dispose();
             job.weightBuffer.Dispose();
         }
-
-        public override void Update(MultiPositionConstraintJob job, ref T data)
-        {
-        }
     }
 }

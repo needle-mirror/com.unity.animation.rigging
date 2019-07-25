@@ -45,9 +45,13 @@ namespace UnityEngine.Animations.Rigging
             Vector3 axis = Vector3.Cross(ab, bc);
             if (axis.sqrMagnitude < k_SqrEpsilon)
             {
-                axis = Vector3.Cross(at, bc);
+                axis = hasHint ? Vector3.Cross(hint.GetPosition(stream) - aPosition, bc) : Vector3.zero;
+
                 if (axis.sqrMagnitude < k_SqrEpsilon)
-                    axis = hasHint ? Vector3.Cross(hint.GetPosition(stream) - aPosition, bc) : Vector3.up;
+                    axis = Vector3.Cross(at, bc);
+
+                if (axis.sqrMagnitude < k_SqrEpsilon)
+                    axis = Vector3.up;
             }
             axis = Vector3.Normalize(axis);
 
