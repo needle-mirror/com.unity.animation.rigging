@@ -17,7 +17,7 @@ namespace UnityEngine.Animations.Rigging
             { typeof(Vector3)    , new PropertyDescriptor{ size = 3, type = PropertyType.Float } },
             { typeof(Vector4)    , new PropertyDescriptor{ size = 4, type = PropertyType.Float } },
             { typeof(Quaternion) , new PropertyDescriptor{ size = 4, type = PropertyType.Float } },
-            { typeof(Vector3Int) , new PropertyDescriptor{ size = 1, type = PropertyType.Int   } },
+            { typeof(Vector3Int) , new PropertyDescriptor{ size = 3, type = PropertyType.Int   } },
             { typeof(Vector3Bool), new PropertyDescriptor{ size = 3, type = PropertyType.Bool  } }
         };
 

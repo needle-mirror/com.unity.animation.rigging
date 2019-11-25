@@ -170,6 +170,25 @@ namespace UnityEngine.Animations.Rigging
             return Vector3.Scale(a, Vector3.one - t) + Vector3.Scale(b, t);
         }
 
+        public static float Select(float a, float b, float c)
+        {
+            return (c > 0f) ? b : a;
+        }
+
+        public static Vector3 Select(Vector3 a, Vector3 b, Vector3 c)
+        {
+            return new Vector3(Select(a.x, b.x, c.x), Select(a.y, b.y, c.y), Select(a.z, b.z, c.z));
+        }
+
+        public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal)
+        {
+            float sqrMag = Vector3.Dot(planeNormal, planeNormal);
+            var dot = Vector3.Dot(vector, planeNormal);
+            return new Vector3(vector.x - planeNormal.x * dot / sqrMag,
+                    vector.y - planeNormal.y * dot / sqrMag,
+                    vector.z - planeNormal.z * dot / sqrMag);
+        }
+
         public static float Sum(AnimationJobCache cache, CacheIndex index, int count)
         {
             if (count == 0)

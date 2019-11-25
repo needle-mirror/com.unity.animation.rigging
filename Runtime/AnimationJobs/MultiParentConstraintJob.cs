@@ -34,7 +34,10 @@ namespace UnityEngine.Animations.Rigging
 
                 float sumWeights = AnimationRuntimeUtils.Sum(weightBuffer);
                 if (sumWeights < k_Epsilon)
+                {
+                    AnimationRuntimeUtils.PassThrough(stream, driven);
                     return;
+                }
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
@@ -53,7 +56,7 @@ namespace UnityEngine.Animations.Rigging
 
                     accumTx.translation += sourceTx.translation * normalizedWeight;
                     accumTx.rotation = QuaternionExt.Add(accumTx.rotation, QuaternionExt.Scale(sourceTx.rotation, normalizedWeight));
-                    
+
                     // Required to update handles with binding info.
                     sourceTransforms[i] = sourceTransform;
                     accumWeights += normalizedWeight;

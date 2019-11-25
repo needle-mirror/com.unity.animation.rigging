@@ -1,4 +1,6 @@
-namespace UnityEngine.Animations.Rigging
+using UnityEngine;
+
+namespace UnityEditor.Animations.Rigging
 {
     using System;
 

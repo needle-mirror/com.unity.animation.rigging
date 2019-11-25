@@ -1,5 +1,6 @@
+using UnityEngine;
 
-namespace UnityEngine.Animations.Rigging
+namespace UnityEditor.Animations.Rigging
 {
     public interface IRigEffector
     {

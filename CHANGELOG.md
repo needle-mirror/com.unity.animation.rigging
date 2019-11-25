@@ -2,9 +2,20 @@
 All notable changes to this package will be documented in this file.
 
 <!--
-## [0.2.4] - 2019-XX-XX
+## [0.2.6] - 2019-XX-XX
 ### Patch Update of *Unity Package Animation Rigging*.
 -->
+
+## [0.2.5] - 2019-11-20
+### Patch Update of *Unity Package Animation Rigging*.
+- Adjusted calculations on MultiAim constrained axes. [AAA-86]
+
+## [0.2.4] - 2019-11-06
+### Patch Update of *Unity Package Animation Rigging*.
+- Added support for scene visibility and picking flags on BoneRenderer component and Rig effectors. [AAA-65]
+- Fixed preview of disabled RigBuilder component in Animation Window and Timeline. [AAA-37]
+- Fixed constrained axes in MultiAim not properly constraining local rotation. [AAA-86]
+- Updated Animation Rigging samples and added a Readme file.
 
 ## [0.2.3] - 2019-07-24
 ### Patch Update of *Unity Package Animation Rigging*.

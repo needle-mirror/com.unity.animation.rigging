@@ -273,6 +273,9 @@ namespace UnityEngine.Animations.Rigging
 
         public void StartPreview()
         {
+            if (!enabled)
+                return;
+
             var animator = GetComponent<Animator>();
             if (animator != null)
             {
@@ -285,6 +288,9 @@ namespace UnityEngine.Animations.Rigging
 
         public void StopPreview()
         {
+            if (!enabled)
+                return;
+
             if (Application.isPlaying)
                 return;
 
@@ -293,6 +299,9 @@ namespace UnityEngine.Animations.Rigging
 
         public void UpdatePreviewGraph(PlayableGraph graph)
         {
+            if (!enabled)
+                return;
+
             if (!graph.IsValid())
                 return;
 
@@ -307,6 +316,9 @@ namespace UnityEngine.Animations.Rigging
 
         public Playable BuildPreviewGraph(PlayableGraph graph, Playable inputPlayable)
         {
+            if (!enabled)
+                return inputPlayable;
+
             var animator = GetComponent<Animator>();
             if (animator == null || layers.Count == 0)
                 return inputPlayable;

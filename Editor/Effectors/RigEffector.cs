@@ -52,6 +52,9 @@ namespace UnityEditor.Animations.Rigging
             if (style.shape == null)
                 return;
 
+            if (SceneVisibilityManager.instance.IsHidden(transform.gameObject, false))
+                return;
+
             int id = GUIUtility.GetControlID(s_ButtonHash, FocusType.Passive);
             Event evt = Event.current;
 
@@ -70,10 +73,14 @@ namespace UnityEditor.Animations.Rigging
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
                             GameObject targetGameObject = transform.gameObject;
-
-                            GUIUtility.hotControl = id; // Grab mouse focus
-                            EditorHelper.HandleClickSelection(targetGameObject, evt);
-                            evt.Use();
+#if UNITY_2019_3_OR_NEWER
+                            if (!SceneVisibilityManager.instance.IsPickingDisabled(targetGameObject, false))
+#endif
+                            {
+                                GUIUtility.hotControl = id; // Grab mouse focus
+                                EditorHelper.HandleClickSelection(targetGameObject, evt);
+                                evt.Use();
+                            }
                         }
                         break;
                     }
@@ -81,13 +88,19 @@ namespace UnityEditor.Animations.Rigging
                     {
                         if (!evt.alt && GUIUtility.hotControl == id)
                         {
-                            DragAndDrop.PrepareStartDrag();
-                            DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
-                            DragAndDrop.StartDrag(ObjectNames.GetDragAndDropTitle(transform));
+                            GameObject targetGameObject = transform.gameObject;
+#if UNITY_2019_3_OR_NEWER
+                            if (!SceneVisibilityManager.instance.IsPickingDisabled(targetGameObject, false))
+#endif
+                            {
+                                DragAndDrop.PrepareStartDrag();
+                                DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
+                                DragAndDrop.StartDrag(ObjectNames.GetDragAndDropTitle(transform));
 
-                            GUIUtility.hotControl = 0;
+                                GUIUtility.hotControl = 0;
 
-                            evt.Use();
+                                evt.Use();
+                            }
                         }
                         break;
                     }
@@ -105,7 +118,13 @@ namespace UnityEditor.Animations.Rigging
                         Matrix4x4 matrix = GetEffectorMatrix(transform, style.position, style.rotation, style.size);
 
                         Color highlight = style.color;
-                        if (GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id)
+
+                        bool hoveringEffector = GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id;
+#if UNITY_2019_3_OR_NEWER
+                        hoveringEffector = hoveringEffector && !SceneVisibilityManager.instance.IsPickingDisabled(transform.gameObject, false);
+#endif
+
+                        if (hoveringEffector)
                         {
                             highlight = Handles.preselectionColor;
                         }

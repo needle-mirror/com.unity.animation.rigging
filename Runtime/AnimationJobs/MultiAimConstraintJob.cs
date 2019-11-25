@@ -38,14 +38,17 @@ namespace UnityEngine.Animations.Rigging
 
                 float sumWeights = AnimationRuntimeUtils.Sum(weightBuffer);
                 if (sumWeights < k_Epsilon)
+                {
+                    AnimationRuntimeUtils.PassThrough(stream, driven);
                     return;
+                }
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
                 Vector2 minMaxAngles = new Vector2(minLimit.Get(stream), maxLimit.Get(stream));
                 driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
-                Vector3 currentDir = currentWRot * aimAxis;
                 Quaternion accumDeltaRot = QuaternionExt.zero;
+                Quaternion drivenParentInvRot = Quaternion.Inverse(drivenParent.GetRotation(stream));
                 float accumWeights = 0f;
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
@@ -55,13 +58,29 @@ namespace UnityEngine.Animations.Rigging
 
                     ReadOnlyTransformHandle sourceTransform = sourceTransforms[i];
 
-                    var toDir = sourceTransform.GetPosition(stream) - currentWPos;
+                    var fromDir = aimAxis;
+                    var toDir = drivenParentInvRot * (sourceTransform.GetPosition(stream) - currentWPos);
                     if (toDir.sqrMagnitude < k_Epsilon)
                         continue;
 
+                    var crossDir = Vector3.Cross(fromDir, toDir).normalized;
+                    if (Vector3.Dot(axesMask, axesMask) < 3f)
+                    {
+                        crossDir = AnimationRuntimeUtils.Select(Vector3.zero, crossDir, axesMask).normalized;
+                        if (Vector3.Dot(crossDir, crossDir) > k_Epsilon)
+                        {
+                            fromDir = AnimationRuntimeUtils.ProjectOnPlane(fromDir, crossDir);
+                            toDir = AnimationRuntimeUtils.ProjectOnPlane(toDir, crossDir);
+                        }
+                        else
+                        {
+                            toDir = fromDir;
+                        }
+                    }
+
                     var rotToSource = Quaternion.AngleAxis(
-                        Mathf.Clamp(Vector3.Angle(currentDir, toDir), minMaxAngles.x, minMaxAngles.y),
-                        Vector3.Cross(currentDir, toDir).normalized
+                        Mathf.Clamp(Vector3.Angle(fromDir, toDir), minMaxAngles.x, minMaxAngles.y),
+                        crossDir
                         );
 
                     accumDeltaRot = QuaternionExt.Add(
@@ -78,15 +97,10 @@ namespace UnityEngine.Animations.Rigging
                 if (accumWeights < 1f)
                     accumDeltaRot = Quaternion.Lerp(Quaternion.identity, accumDeltaRot, accumWeights);
 
-                Quaternion newRot = accumDeltaRot * currentWRot;
-
-                // Convert newRot to local space
-                if (drivenParent.IsValid(stream))
-                    newRot = Quaternion.Inverse(drivenParent.GetRotation(stream)) * newRot;
-
+                Quaternion newRot = accumDeltaRot;
                 Quaternion currentLRot = driven.GetLocalRotation(stream);
                 if (Vector3.Dot(axesMask, axesMask) < 3f)
-                    newRot = Quaternion.Euler(AnimationRuntimeUtils.Lerp(currentLRot.eulerAngles, newRot.eulerAngles, axesMask));
+                    newRot = Quaternion.Euler(AnimationRuntimeUtils.Select(currentLRot.eulerAngles, newRot.eulerAngles, axesMask));
 
                 var offset = drivenOffset.Get(stream);
                 if (Vector3.Dot(offset, offset) > 0f)

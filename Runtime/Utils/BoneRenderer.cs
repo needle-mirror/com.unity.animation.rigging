@@ -72,12 +72,17 @@ namespace UnityEngine.Animations.Rigging
             onRemoveBoneRenderer?.Invoke(this);
         }
 
-        void Reset()
+        public void Invalidate()
+        {
+            ExtractBones();
+        }
+
+        public void Reset()
         {
             ClearBones();
         }
 
-        void ClearBones()
+        public void ClearBones()
         {
             m_Bones = null;
             m_Tips = null;
@@ -104,9 +109,11 @@ namespace UnityEngine.Animations.Rigging
                 if (transform == null)
                     continue;
 
+                if (UnityEditor.SceneVisibilityManager.instance.IsHidden(transform.gameObject, false))
+                    continue;
+
                 if (transform.childCount > 0)
                 {
-
                     for (var k = 0; k < transform.childCount; ++k)
                     {
                         var childTransform = transform.GetChild(k);

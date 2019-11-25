@@ -34,7 +34,10 @@ namespace UnityEngine.Animations.Rigging
 
                 float sumWeights = AnimationRuntimeUtils.Sum(weightBuffer);
                 if (sumWeights < k_Epsilon)
+                {
+                    AnimationRuntimeUtils.PassThrough(stream, driven);
                     return;
+                }
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 

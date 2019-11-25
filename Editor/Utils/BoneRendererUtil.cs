@@ -117,6 +117,7 @@ namespace UnityEditor.Animations.Rigging
         {
             BoneRenderer.onAddBoneRenderer += OnAddBoneRenderer;
             BoneRenderer.onRemoveBoneRenderer += OnRemoveBoneRenderer;
+            SceneVisibilityManager.visibilityChanged += OnVisibilityChanged;
 
             SceneView.duringSceneGui += DrawSkeletons;
         }
@@ -382,9 +383,14 @@ namespace UnityEditor.Animations.Rigging
                     {
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
-                            GUIUtility.hotControl = id; // Grab mouse focus
-                            EditorHelper.HandleClickSelection(boneGO, evt);
-                            evt.Use();
+#if UNITY_2019_3_OR_NEWER
+                            if (!SceneVisibilityManager.instance.IsPickingDisabled(boneGO, false))
+#endif
+                            {
+                                GUIUtility.hotControl = id; // Grab mouse focus
+                                EditorHelper.HandleClickSelection(boneGO, evt);
+                                evt.Use();
+                            }
                         }
                         break;
                     }
@@ -392,13 +398,18 @@ namespace UnityEditor.Animations.Rigging
                     {
                         if (!evt.alt && GUIUtility.hotControl == id)
                         {
-                            DragAndDrop.PrepareStartDrag();
-                            DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
-                            DragAndDrop.StartDrag(ObjectNames.GetDragAndDropTitle(transform));
+#if UNITY_2019_3_OR_NEWER
+                            if (!SceneVisibilityManager.instance.IsPickingDisabled(boneGO, false))
+#endif
+                            {
+                                DragAndDrop.PrepareStartDrag();
+                                DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
+                                DragAndDrop.StartDrag(ObjectNames.GetDragAndDropTitle(transform));
 
-                            GUIUtility.hotControl = 0;
+                                GUIUtility.hotControl = 0;
 
-                            evt.Use();
+                                evt.Use();
+                            }
                         }
                         break;
                     }
@@ -414,7 +425,13 @@ namespace UnityEditor.Animations.Rigging
                 case EventType.Repaint:
                     {
                         Color highlight = color;
-                        if (GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id)
+
+                        bool hoveringBone = GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id;
+#if UNITY_2019_3_OR_NEWER
+                        hoveringBone = hoveringBone && !SceneVisibilityManager.instance.IsPickingDisabled(transform.gameObject, false);
+#endif
+
+                        if (hoveringBone)
                         {
                             highlight = Handles.preselectionColor;
                         }
@@ -454,6 +471,14 @@ namespace UnityEditor.Animations.Rigging
         public static void OnRemoveBoneRenderer(BoneRenderer obj)
         {
             s_BoneRendererComponents.Remove(obj);
+        }
+
+        public static void OnVisibilityChanged()
+        {
+            foreach(var boneRenderer in s_BoneRendererComponents)
+            {
+                boneRenderer.Invalidate();
+            }
         }
     }
 }
