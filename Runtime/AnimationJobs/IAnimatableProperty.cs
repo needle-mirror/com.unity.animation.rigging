@@ -1,7 +1,5 @@
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public interface IAnimatableProperty<T>
     {
         T Get(AnimationStream stream);

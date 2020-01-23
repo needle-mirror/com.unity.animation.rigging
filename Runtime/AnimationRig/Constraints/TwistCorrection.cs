@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
@@ -21,7 +20,7 @@ namespace UnityEngine.Animations.Rigging
 
         public Axis twistAxis { get => m_TwistAxis; set => m_TwistAxis = value; }
 
-        Transform ITwistCorrectionData.source => m_Source.transform;
+        Transform ITwistCorrectionData.source => m_Source;
         Vector3 ITwistCorrectionData.twistAxis => Convert(m_TwistAxis);
 
         string ITwistCorrectionData.twistNodesProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TwistNodes));
@@ -39,7 +38,7 @@ namespace UnityEngine.Animations.Rigging
 
         bool IAnimationJobData.IsValid()
         {
-            if (m_Source.transform == null)
+            if (m_Source == null)
                 return false;
 
             for (int i = 0; i < m_TwistNodes.Count; ++i)
@@ -52,7 +51,7 @@ namespace UnityEngine.Animations.Rigging
         void IAnimationJobData.SetDefaultValues()
         {
             m_Source = null;
-            m_TwistAxis = Axis.X;
+            m_TwistAxis = Axis.Z;
             m_TwistNodes.Clear();
         }
     }
@@ -69,9 +68,5 @@ namespace UnityEngine.Animations.Rigging
     #pragma warning disable 0414
         [NotKeyable, SerializeField, HideInInspector] bool m_TwistNodesGUIToggle;
     #endif
-
-        void OnValidate()
-        {
-        }
     }
 }

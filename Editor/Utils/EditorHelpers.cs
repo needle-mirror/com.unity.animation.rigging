@@ -1,9 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEditorInternal;
-
-using System;
-using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {

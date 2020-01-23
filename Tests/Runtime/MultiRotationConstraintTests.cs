@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class MultiRotationConstraintTests
+public class MultiRotationConstraintTests
 {
-    const float k_Epsilon = 0.05f;
+    const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public MultiRotationConstraint constraint;
@@ -20,13 +20,13 @@ class MultiRotationConstraintTests
         public Quaternion constrainedObjectRestRotation;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
         data.rigData = RuntimeRiggingTestFixture.SetupRigHierarchy();
 
-        var multiRotationGO = new GameObject("multiPosition");
+        var multiRotationGO = new GameObject("multiRotation");
         var multiRotation = multiRotationGO.AddComponent<MultiRotationConstraint>();
         multiRotation.Reset();
 
@@ -63,12 +63,14 @@ class MultiRotationConstraintTests
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
 
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+
         // src0.w = 0, src1.w = 0
         Assert.Zero(sources[0].weight);
         Assert.Zero(sources[1].weight);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.rotation, data.constrainedObjectRestRotation);
+        Assert.That(constrainedObject.rotation, Is.EqualTo(data.constrainedObjectRestRotation).Using(rotationComparer));
 
         // Add rotation to source objects
         sources[0].transform.rotation *= Quaternion.AngleAxis(90, Vector3.up);
@@ -79,7 +81,7 @@ class MultiRotationConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.rotation, sources[0].transform.rotation);
+        Assert.That(constrainedObject.rotation, Is.EqualTo(sources[0].transform.rotation).Using(rotationComparer));
 
         // src0.w = 0, src1.w = 1
         sources[0] = new WeightedTransform(sources[0].transform, 0f);
@@ -87,7 +89,7 @@ class MultiRotationConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.rotation, sources[1].transform.rotation);
+        Assert.That(constrainedObject.rotation, Is.EqualTo(sources[1].transform.rotation).Using(rotationComparer));
     }
 
     [UnityTest]
@@ -98,6 +100,8 @@ class MultiRotationConstraintTests
 
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
+
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
 
         sources[0].transform.rotation *= Quaternion.AngleAxis(90, Vector3.up);
         sources[0] = new WeightedTransform(sources[0].transform, 1f);
@@ -111,9 +115,9 @@ class MultiRotationConstraintTests
             yield return null;
 
             Quaternion weightedRot = Quaternion.Lerp(data.constrainedObjectRestRotation, sources[0].transform.rotation, w);
-            Assert.AreEqual(
+            Assert.That(
                 constrainedObject.rotation,
-                weightedRot,
+                Is.EqualTo(weightedRot).Using(rotationComparer),
                 String.Format("Expected constrainedObject rotation to be {0} for a weight of {1}, but was {2}", weightedRot, w, constrainedObject.rotation)
                 );
         }

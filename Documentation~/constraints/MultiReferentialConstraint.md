@@ -1,5 +1,7 @@
 # Multi-Referential Constraint
 
+![Example](../images/constraint_multi_referential/multi_ref.gif)
+
 The Multi-Referential Constraint allow the user to set a parent-child like behavior between a group of GameObjects.
 The selected driving GameObject acts as the parent to the rest of the referenced GameObjects specified.
 Any Reference Objects can be set has the current Driving GameObject to influence the others.

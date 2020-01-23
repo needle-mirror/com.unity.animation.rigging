@@ -2,8 +2,6 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public static class AnimationRuntimeUtils
     {
         const float k_SqrEpsilon = 1e-8f;

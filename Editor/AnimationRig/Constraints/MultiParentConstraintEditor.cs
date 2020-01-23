@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEditorInternal;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
@@ -90,6 +91,59 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/MultiParentConstraint/Transfer motion to constraint", false, 611)]
+        public static void TransferMotionToConstraint(MenuCommand command)
+        {
+            var constraint = command.context as MultiParentConstraint;
+            BakeUtils.TransferMotionToConstraint(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiParentConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as MultiParentConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiParentConstraint/Transfer motion to constraint", true)]
+        [MenuItem("CONTEXT/MultiParentConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as MultiParentConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(MultiParentConstraint))]
+    class MultiParentConstraintParameters : BakeParameters<MultiParentConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => true;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, MultiParentConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            for (int i = 0; i < constraint.data.sourceObjects.Count; ++i)
+            {
+                var sourceObject = constraint.data.sourceObjects[i];
+
+                EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, sourceObject.transform, bindings);
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, sourceObject.transform, bindings);
+                EditorCurveBindingUtils.CollectPropertyBindings(rigBuilder.transform, constraint, ((IMultiParentConstraintData)constraint.data).sourceObjectsProperty + ".m_Item" + i + ".weight", bindings);
+            }
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, MultiParentConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+            EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+            EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+            return bindings;
         }
     }
 }

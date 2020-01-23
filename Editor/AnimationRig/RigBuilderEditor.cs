@@ -17,13 +17,13 @@ namespace UnityEditor.Animations.Rigging
             m_Rigs = serializedObject.FindProperty("m_RigLayers");
             m_ReorderableList = ReorderableListHelper.Create(serializedObject, m_Rigs, true, true);
             if (m_ReorderableList.count == 0)
-                ((RigBuilder)serializedObject.targetObject).layers.Add(new RigBuilder.RigLayer(null));
+                ((RigBuilder)serializedObject.targetObject).layers.Add(new RigLayer(null));
 
             m_ReorderableList.drawHeaderCallback = (Rect rect) => EditorGUI.LabelField(rect, k_RigLabel);
 
             m_ReorderableList.onAddCallback = (ReorderableList list) =>
             {
-                ((RigBuilder)(serializedObject.targetObject)).layers.Add(new RigBuilder.RigLayer(null, true));
+                ((RigBuilder)(serializedObject.targetObject)).layers.Add(new RigLayer(null, true));
             };
         }
 
@@ -34,39 +34,28 @@ namespace UnityEditor.Animations.Rigging
             m_ReorderableList.DoLayoutList();
             serializedObject.ApplyModifiedProperties();
         }
-    }
 
-    [CustomPropertyDrawer(typeof(RigBuilder.RigLayer))]
-    public class RigLayerDrawer : PropertyDrawer
-    {
-        const int k_Padding = 6;
-        const int k_TogglePadding = 30;
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        [MenuItem("CONTEXT/RigBuilder/Transfer motion to constraint", false, 611)]
+        public static void TransferMotionToConstraint(MenuCommand command)
         {
-            return EditorGUIUtility.singleLineHeight;
+            var rigBuilder = command.context as RigBuilder;
+            BakeUtils.TransferMotionToConstraint(rigBuilder);
         }
 
-        public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
+        [MenuItem("CONTEXT/RigBuilder/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
         {
-            EditorGUI.BeginProperty(rect, label, property);
-
-            var w = rect.width - k_TogglePadding;
-            var weightRect = new Rect(rect.x + w + k_Padding, rect.y, rect.width - w - k_Padding, rect.height);
-            rect.width = w;
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.PropertyField(rect, property.FindPropertyRelative("rig"), label);
-
-            var indentLvl = EditorGUI.indentLevel;
-            EditorGUI.indentLevel = 0;
-            EditorGUI.PropertyField(weightRect, property.FindPropertyRelative("active"), GUIContent.none);
-            EditorGUI.indentLevel = indentLvl;
-
-            if (EditorGUI.EndChangeCheck())
-                property.serializedObject.ApplyModifiedProperties();
-
-            EditorGUI.EndProperty();
+            var rigBuilder = command.context as RigBuilder;
+            BakeUtils.TransferMotionToSkeleton(rigBuilder);
         }
+
+        [MenuItem("CONTEXT/RigBuilder/Transfer motion to constraint", true)]
+        [MenuItem("CONTEXT/RigBuilder/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var rigBuilder = command.context as RigBuilder;
+            return BakeUtils.TransferMotionValidate(rigBuilder);
+        }
+
     }
 }

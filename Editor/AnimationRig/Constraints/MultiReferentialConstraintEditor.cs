@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -92,6 +92,56 @@ namespace UnityEditor.Animations.Rigging
                 var name = element.objectReferenceValue == null ? "None" : element.objectReferenceValue.name;
                 m_DrivingLabels[i] = i + " : " + name;
             }
+        }
+
+        [MenuItem("CONTEXT/MultiReferentialConstraint/Transfer motion to constraint", false, 611)]
+        public static void TransferMotionToConstraint(MenuCommand command)
+        {
+            var constraint = command.context as MultiReferentialConstraint;
+            BakeUtils.TransferMotionToConstraint(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiReferentialConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as MultiReferentialConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiReferentialConstraint/Transfer motion to constraint", true)]
+        [MenuItem("CONTEXT/MultiReferentialConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as MultiReferentialConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(MultiReferentialConstraint))]
+    class MultiReferentialConstraintBakeParameters : BakeParameters<MultiReferentialConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => true;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, MultiReferentialConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            var sources = constraint.data.sourceObjects;
+            for (int i = 1; i < sources.Count; ++i)
+                EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, sources[i], bindings);
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, MultiReferentialConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            var transform = constraint.data.sourceObjects[0];
+            EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, transform, bindings);
+
+            return bindings;
         }
     }
 }

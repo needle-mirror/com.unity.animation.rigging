@@ -7,18 +7,18 @@ using System.Collections.Generic;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class MultiAimConstraintTests
+public class MultiAimConstraintTests
 {
     const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public MultiAimConstraint constraint;
         public AffineTransform constrainedObjectRestTx;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -62,6 +62,10 @@ class MultiAimConstraintTests
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
+
         // Add displacement to source objects
         sources[0].transform.position += Vector3.left;
         sources[1].transform.position += Vector3.right;
@@ -71,8 +75,8 @@ class MultiAimConstraintTests
         Assert.Zero(sources[1].weight);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, data.constrainedObjectRestTx.translation);
-        Assert.AreEqual(constrainedObject.rotation, data.constrainedObjectRestTx.rotation);
+        Assert.That(constrainedObject.position, Is.EqualTo(data.constrainedObjectRestTx.translation).Using(positionComparer));
+        Assert.That(constrainedObject.rotation, Is.EqualTo(data.constrainedObjectRestTx.rotation).Using(rotationComparer));
 
         // src0.w = 1, src1.w = 0
         sources.SetWeight(0, 1f);
@@ -82,8 +86,8 @@ class MultiAimConstraintTests
         Vector3 currAim = constrainedObject.rotation * Vector3.forward;
         Vector3 src0Dir = (sources[0].transform.position - constrainedObject.position).normalized;
         Vector3 src1Dir = (sources[1].transform.position - constrainedObject.position).normalized;
-        Assert.AreEqual(0f, Vector3.Angle(currAim, src0Dir), k_Epsilon);
-        Assert.AreNotEqual(0f, Vector3.Angle(currAim, src1Dir));
+        Assert.That(Vector3.Angle(currAim, src0Dir), Is.EqualTo(0f).Using(floatComparer));
+        Assert.That(Vector3.Angle(currAim, src1Dir), Is.Not.EqualTo(0f).Using(floatComparer));
 
         // src0.w = 0, src1.w = 1
         sources.SetWeight(0, 0f);
@@ -94,8 +98,8 @@ class MultiAimConstraintTests
         currAim = constrainedObject.rotation * Vector3.forward;
         src0Dir = (sources[0].transform.position - constrainedObject.position).normalized;
         src1Dir = (sources[1].transform.position - constrainedObject.position).normalized;
-        Assert.AreNotEqual(0f, Vector3.Angle(currAim, src0Dir));
-        Assert.AreEqual(0f, Vector3.Angle(currAim, src1Dir), k_Epsilon);
+        Assert.That(Vector3.Angle(currAim, src0Dir), Is.Not.EqualTo(0f).Using(floatComparer));
+        Assert.That(Vector3.Angle(currAim, src1Dir), Is.EqualTo(0f).Using(floatComparer));
     }
 
     [UnityTest]
@@ -106,6 +110,8 @@ class MultiAimConstraintTests
 
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
+
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
 
         Assert.Zero(sources[0].weight);
         Assert.Zero(sources[1].weight);
@@ -128,7 +134,7 @@ class MultiAimConstraintTests
             var src0Dir = (src0Pos - constrainedObject.position).normalized;
             var angleTest = Vector3.Angle(currAim, src0Dir);
 
-            Assert.Less(angleTest, angle, "Angle between currAim and src0Dir should be smaller than last frame since constraint weight is greater.");
+            Assert.That(angleTest, Is.LessThan(angle).Using(floatComparer), "Angle between currAim and src0Dir should be smaller than last frame since constraint weight is greater.");
             angle = angleTest;
         }
     }

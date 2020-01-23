@@ -4,8 +4,6 @@ using System.Reflection;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public static class RigUtils
     {
         internal static readonly Dictionary<Type, PropertyDescriptor> s_SupportedPropertyTypeToDescriptor = new Dictionary<Type, PropertyDescriptor>
@@ -137,15 +135,19 @@ namespace UnityEngine.Animations.Rigging
             return handled;
         }
 
-        private static void ExtractAllSyncableData(Animator animator, Rig[] rigs, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties)
+        private static void ExtractAllSyncableData(Animator animator, IList<IRigLayer> layers, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties)
         {
             syncableTransforms = new List<Transform>();
-            syncableProperties = new List<SyncableProperties>(rigs.Length);
+            syncableProperties = new List<SyncableProperties>(layers.Count);
 
             Dictionary<Type, FieldInfo[]> typeToSyncableFields = new Dictionary<Type, FieldInfo[]>();
-            foreach (var rig in rigs)
+            foreach (var layer in layers)
             {
-                var constraints = rig.constraints;
+                if (!layer.IsValid())
+                    continue;
+
+                var constraints = layer.constraints;
+
                 List<ConstraintProperties> allConstraintProperties = new List<ConstraintProperties>(constraints.Length);
 
                 foreach (var constraint in constraints)
@@ -182,7 +184,7 @@ namespace UnityEngine.Animations.Rigging
 
                     allConstraintProperties.Add(
                         new ConstraintProperties {
-                            component = constraint as Component,
+                            component = constraint.component,
                             properties = properties.ToArray()
                         }
                     );
@@ -190,7 +192,7 @@ namespace UnityEngine.Animations.Rigging
 
                 syncableProperties.Add(
                     new SyncableProperties {
-                        rig = new RigProperties { component = rig as Component },
+                        rig = new RigProperties { component = layer.rig as Component },
                         constraints = allConstraintProperties.ToArray()
                     }
                 );
@@ -280,10 +282,10 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
-        public static IAnimationJobData CreateSyncSceneToStreamData(Animator animator, Rig[] rigs)
+        public static IAnimationJobData CreateSyncSceneToStreamData(Animator animator, IList<IRigLayer> layers)
         {
-            ExtractAllSyncableData(animator, rigs, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties);
-            return new RigSyncSceneToStreamData(syncableTransforms.ToArray(), syncableProperties.ToArray(), rigs.Length);
+            ExtractAllSyncableData(animator, layers, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties);
+            return new RigSyncSceneToStreamData(syncableTransforms.ToArray(), syncableProperties.ToArray(), layers.Count);
         }
 
         public static IAnimationJobBinder syncSceneToStreamBinder { get; } = new RigSyncSceneToStreamJobBinder<RigSyncSceneToStreamData>();

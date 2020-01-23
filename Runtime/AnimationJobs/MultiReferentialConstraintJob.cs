@@ -1,9 +1,7 @@
-﻿using Unity.Collections;
+using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     [Unity.Burst.BurstCompile]
     public struct MultiReferentialConstraintJob : IWeightedAnimationJob
     {

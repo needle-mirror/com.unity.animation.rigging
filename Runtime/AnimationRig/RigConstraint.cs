@@ -1,7 +1,5 @@
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public class RigConstraint<TJob, TData, TBinder> : MonoBehaviour, IRigConstraint
         where TJob    : struct, IWeightedAnimationJob
         where TData   : struct, IAnimationJobData
@@ -46,5 +44,6 @@ namespace UnityEngine.Animations.Rigging
 
         IAnimationJobBinder IRigConstraint.binder => s_Binder;
         IAnimationJobData IRigConstraint.data => m_Data;
+        Component IRigConstraint.component => (Component)this;
     }
 }

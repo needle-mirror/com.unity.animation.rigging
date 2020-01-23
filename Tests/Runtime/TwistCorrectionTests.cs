@@ -9,7 +9,7 @@ using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
 class TwistCorrectionTests
 {
-    const float k_Epsilon = 0.005f;
+    const float k_Epsilon = .005f;
 
     struct ConstraintTestData
     {
@@ -71,6 +71,9 @@ class TwistCorrectionTests
         var sourceObject = constraint.data.sourceObject;
         var twistNodes = constraint.data.twistNodes;
 
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
+
         // Apply rotation to source object
         sourceObject.localRotation = sourceObject.localRotation * Quaternion.AngleAxis(90, Vector3.left);
 
@@ -79,9 +82,9 @@ class TwistCorrectionTests
         Assert.AreEqual(twistNodes[1].weight, 0.0f);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreNotEqual(sourceObject.localRotation, data.restLocalRotation);
-        Assert.AreEqual(twistNodes[0].transform.localRotation, Quaternion.identity);
-        Assert.AreEqual(twistNodes[1].transform.localRotation, Quaternion.identity);
+        Assert.That(sourceObject.localRotation, Is.Not.EqualTo(data.restLocalRotation).Using(rotationComparer));
+        Assert.That(twistNodes[0].transform.localRotation, Is.EqualTo(Quaternion.identity).Using(rotationComparer));
+        Assert.That(twistNodes[1].transform.localRotation, Is.EqualTo(Quaternion.identity).Using(rotationComparer));
 
         // twistNode0.w = 1f, twistNode1.w = 1f [twist nodes should be equal to source]
         twistNodes.SetWeight(0, 1f);
@@ -90,10 +93,10 @@ class TwistCorrectionTests
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
         // Verify twist on X axis
-        Assert.AreEqual(twistNodes[0].transform.localRotation.w, sourceObject.localRotation.w, k_Epsilon);
-        Assert.AreEqual(twistNodes[0].transform.localRotation.x, sourceObject.localRotation.x, k_Epsilon);
-        Assert.AreEqual(twistNodes[1].transform.localRotation.w, sourceObject.localRotation.w, k_Epsilon);
-        Assert.AreEqual(twistNodes[1].transform.localRotation.x, sourceObject.localRotation.x, k_Epsilon);
+        Assert.That(twistNodes[0].transform.localRotation.x, Is.EqualTo(sourceObject.localRotation.x).Using(floatComparer));
+        Assert.That(twistNodes[0].transform.localRotation.w, Is.EqualTo(sourceObject.localRotation.w).Using(floatComparer));
+        Assert.That(twistNodes[1].transform.localRotation.x, Is.EqualTo(sourceObject.localRotation.x).Using(floatComparer));
+        Assert.That(twistNodes[1].transform.localRotation.w, Is.EqualTo(sourceObject.localRotation.w).Using(floatComparer));
 
         // twistNode0.w = -1f, twistNode1.w = -1f [twist nodes should be inverse to source]
         twistNodes.SetWeight(0, -1f);
@@ -103,10 +106,10 @@ class TwistCorrectionTests
 
         var invTwist = Quaternion.Inverse(sourceObject.localRotation);
         // Verify twist on X axis
-        Assert.AreEqual(twistNodes[0].transform.localRotation.w, invTwist.w, k_Epsilon);
-        Assert.AreEqual(twistNodes[0].transform.localRotation.x, invTwist.x, k_Epsilon);
-        Assert.AreEqual(twistNodes[1].transform.localRotation.w, invTwist.w, k_Epsilon);
-        Assert.AreEqual(twistNodes[1].transform.localRotation.x, invTwist.x, k_Epsilon);
+        Assert.That(twistNodes[0].transform.localRotation.x, Is.EqualTo(invTwist.x).Using(floatComparer));
+        Assert.That(twistNodes[0].transform.localRotation.w, Is.EqualTo(invTwist.w).Using(floatComparer));
+        Assert.That(twistNodes[1].transform.localRotation.x, Is.EqualTo(invTwist.x).Using(floatComparer));
+        Assert.That(twistNodes[1].transform.localRotation.w, Is.EqualTo(invTwist.w).Using(floatComparer));
     }
 
     [UnityTest]
@@ -117,6 +120,8 @@ class TwistCorrectionTests
 
         var sourceObject = constraint.data.sourceObject;
         var twistNodes = constraint.data.twistNodes;
+
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
 
         // Apply rotation to source object
         sourceObject.localRotation = sourceObject.localRotation * Quaternion.AngleAxis(90, Vector3.left);
@@ -131,8 +136,8 @@ class TwistCorrectionTests
             yield return null;
 
             var weightedRot = Quaternion.Lerp(data.restLocalRotation, sourceObject.localRotation, w);
-            Assert.AreEqual(twistNodes[0].transform.localRotation.w, weightedRot.w, k_Epsilon);
-            Assert.AreEqual(twistNodes[0].transform.localRotation.x, weightedRot.x, k_Epsilon);
+            Assert.That(twistNodes[0].transform.localRotation.x, Is.EqualTo(weightedRot.x).Using(floatComparer));
+            Assert.That(twistNodes[0].transform.localRotation.w, Is.EqualTo(weightedRot.w).Using(floatComparer));
         }
     }
 }

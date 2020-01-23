@@ -1,7 +1,5 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public struct ReadWriteTransformHandle
     {
         TransformStreamHandle m_Handle;

@@ -1,22 +1,16 @@
-using System;
 using System.Collections.Generic;
-
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
-
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
 {
-    using Rendering;
-
     using BoneShape = BoneRenderer.BoneShape;
-    using UnityObject = UnityEngine.Object;
 
     [InitializeOnLoad]
-    public static class BoneRendererUtil
+    public static class BoneRendererUtils
     {
         private class BatchRenderer
         {
@@ -113,7 +107,7 @@ namespace UnityEditor.Animations.Rigging
 
         private static int s_ButtonHash = "BoneHandle".GetHashCode();
 
-        static BoneRendererUtil()
+        static BoneRendererUtils()
         {
             BoneRenderer.onAddBoneRenderer += OnAddBoneRenderer;
             BoneRenderer.onRemoveBoneRenderer += OnRemoveBoneRenderer;
@@ -383,9 +377,7 @@ namespace UnityEditor.Animations.Rigging
                     {
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
-#if UNITY_2019_3_OR_NEWER
                             if (!SceneVisibilityManager.instance.IsPickingDisabled(boneGO, false))
-#endif
                             {
                                 GUIUtility.hotControl = id; // Grab mouse focus
                                 EditorHelper.HandleClickSelection(boneGO, evt);
@@ -398,9 +390,7 @@ namespace UnityEditor.Animations.Rigging
                     {
                         if (!evt.alt && GUIUtility.hotControl == id)
                         {
-#if UNITY_2019_3_OR_NEWER
                             if (!SceneVisibilityManager.instance.IsPickingDisabled(boneGO, false))
-#endif
                             {
                                 DragAndDrop.PrepareStartDrag();
                                 DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
@@ -427,9 +417,7 @@ namespace UnityEditor.Animations.Rigging
                         Color highlight = color;
 
                         bool hoveringBone = GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id;
-#if UNITY_2019_3_OR_NEWER
                         hoveringBone = hoveringBone && !SceneVisibilityManager.instance.IsPickingDisabled(transform.gameObject, false);
-#endif
 
                         if (hoveringBone)
                         {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
@@ -68,6 +69,54 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/OverrideTransform/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as OverrideTransform;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/OverrideTransform/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as OverrideTransform;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(OverrideTransform))]
+    class OverrideTransformBakeParameters : BakeParameters<OverrideTransform>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => false;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, OverrideTransform constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            if (constraint.data.sourceObject != null)
+            {
+                EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, constraint.data.sourceObject, bindings);
+            }
+            else
+            {
+                var data = (IOverrideTransformData)constraint.data;
+                EditorCurveBindingUtils.CollectVector3Bindings(rigBuilder.transform, constraint, data.positionVector3Property, bindings);
+                EditorCurveBindingUtils.CollectVector3Bindings(rigBuilder.transform, constraint, data.rotationVector3Property, bindings);
+            }
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, OverrideTransform constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectTRSBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+
+            return bindings;
         }
     }
 }

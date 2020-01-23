@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEditorInternal;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
@@ -104,6 +105,59 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/MultiAimConstraint/Transfer motion to constraint", false, 611)]
+        public static void TransferMotionToConstraint(MenuCommand command)
+        {
+            var constraint = command.context as MultiAimConstraint;
+            BakeUtils.TransferMotionToConstraint(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiAimConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as MultiAimConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiAimConstraint/Transfer motion to constraint", true)]
+        [MenuItem("CONTEXT/MultiAimConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as MultiAimConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(MultiAimConstraint))]
+    class MultiAimConstraintBakeParameters : BakeParameters<MultiAimConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => true;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, MultiAimConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            for (int i = 0; i < constraint.data.sourceObjects.Count; ++i)
+            {
+                var sourceObject = constraint.data.sourceObjects[i];
+
+                EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, sourceObject.transform, bindings);
+                EditorCurveBindingUtils.CollectPropertyBindings(rigBuilder.transform, constraint, ((IMultiAimConstraintData)constraint.data).sourceObjectsProperty + ".m_Item" + i + ".weight", bindings);
+            }
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, MultiAimConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+
+            return bindings;
         }
     }
 }

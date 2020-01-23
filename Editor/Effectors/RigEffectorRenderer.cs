@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-
-using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 

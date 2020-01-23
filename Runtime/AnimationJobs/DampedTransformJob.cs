@@ -1,7 +1,5 @@
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     [Unity.Burst.BurstCompile]
     public struct DampedTransformJob : IWeightedAnimationJob
     {

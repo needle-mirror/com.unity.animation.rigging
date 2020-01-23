@@ -2,8 +2,6 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     [Unity.Burst.BurstCompile]
     public struct MultiParentConstraintJob : IWeightedAnimationJob
     {
@@ -52,6 +50,7 @@ namespace UnityEngine.Animations.Rigging
 
                     sourceTransform.GetGlobalTR(stream, out Vector3 srcWPos, out Quaternion srcWRot);
                     var sourceTx = new AffineTransform(srcWPos, srcWRot);
+
                     sourceTx *= sourceOffsets[i];
 
                     accumTx.translation += sourceTx.translation * normalizedWeight;

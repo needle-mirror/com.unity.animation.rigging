@@ -1,5 +1,3 @@
-using System;
-using System.Reflection;
 using UnityEngine;
 
 namespace UnityEditor.Animations.Rigging
@@ -62,19 +60,31 @@ namespace UnityEditor.Animations.Rigging
         [MenuItem("Animation Rigging/Restore Bind Pose", false, 11)]
         static void RestoreBindPose()
         {
-            var selection = Selection.gameObjects;
-            if (selection.Length == 0)
+            var selection = Selection.activeTransform;
+            if (selection == null)
                 return;
 
-            Undo.RegisterFullObjectHierarchyUndo(selection[0], "Restore bind pose");
+            AnimationRiggingEditorUtils.RestoreBindPose(selection);
+        }
 
-            Type type = Type.GetType("UnityEditor.AvatarSetupTool, UnityEditor");
-            if (type != null)
-            {
-                MethodInfo info = type.GetMethod("SampleBindPose", BindingFlags.Static | BindingFlags.Public);
-                if (info != null)
-                    info.Invoke(null, new object[] { selection[0] });
-            }
+        [MenuItem("Animation Rigging/Rig Setup", false, 12)]
+        static void RigSetup()
+        {
+            var selection = Selection.activeTransform;
+            if (selection == null)
+                return;
+
+            AnimationRiggingEditorUtils.RigSetup(selection);
+        }
+
+        [MenuItem("Animation Rigging/Bone Renderer Setup", false, 13)]
+        static void BoneRendererSetup()
+        {
+            var selection = Selection.activeTransform;
+            if (selection == null)
+                return;
+
+            AnimationRiggingEditorUtils.BoneRendererSetup(selection);
         }
     }
 }

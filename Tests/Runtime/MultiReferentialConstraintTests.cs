@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Animations.Rigging;
 using NUnit.Framework;
@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class MultiReferentialConstraintTests
+public class MultiReferentialConstraintTests
 {
-    const float k_Epsilon = 0.000001f;
+    const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public MultiReferentialConstraint constraint;
@@ -20,7 +20,7 @@ class MultiReferentialConstraintTests
         public AffineTransform restPose;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -29,7 +29,7 @@ class MultiReferentialConstraintTests
         var multiRefGO = new GameObject("multiReferential");
         var multiRef = multiRefGO.AddComponent<MultiReferentialConstraint>();
         multiRef.Reset();
-        
+
         multiRefGO.transform.parent = data.rigData.rigGO.transform;
 
         List<Transform> sources = new List<Transform>(3);
@@ -61,7 +61,10 @@ class MultiReferentialConstraintTests
     {
         var data = SetupConstraintRig();
         var constraint = data.constraint;
-        
+
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+
         var sources = constraint.data.sourceObjects;
 
         constraint.data.driver = 0;
@@ -70,10 +73,10 @@ class MultiReferentialConstraintTests
         driver.rotation *= Quaternion.AngleAxis(90, Vector3.up);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(driver.position, sources[1].position);
-        Assert.AreEqual(driver.rotation, sources[1].rotation);
-        Assert.AreEqual(driver.position, sources[2].position);
-        Assert.AreEqual(driver.rotation, sources[2].rotation);
+        Assert.That(driver.position, Is.EqualTo(sources[1].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[1].rotation).Using(rotationComparer));
+        Assert.That(driver.position, Is.EqualTo(sources[2].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[2].rotation).Using(rotationComparer));
 
         constraint.data.driver = 1;
         driver = sources[1];
@@ -81,10 +84,10 @@ class MultiReferentialConstraintTests
         driver.rotation *= Quaternion.AngleAxis(-90, Vector3.up);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(driver.position, sources[0].position);
-        Assert.AreEqual(driver.rotation, sources[0].rotation);
-        Assert.AreEqual(driver.position, sources[2].position);
-        Assert.AreEqual(driver.rotation, sources[2].rotation);
+        Assert.That(driver.position, Is.EqualTo(sources[0].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[0].rotation).Using(rotationComparer));
+        Assert.That(driver.position, Is.EqualTo(sources[2].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[2].rotation).Using(rotationComparer));
 
         constraint.data.driver = 2;
         driver = sources[2];
@@ -92,10 +95,10 @@ class MultiReferentialConstraintTests
         driver.rotation *= Quaternion.AngleAxis(90, Vector3.left);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(driver.position, sources[0].position);
-        Assert.AreEqual(driver.rotation, sources[0].rotation);
-        Assert.AreEqual(driver.position, sources[1].position);
-        Assert.AreEqual(driver.rotation, sources[1].rotation);
+        Assert.That(driver.position, Is.EqualTo(sources[0].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[0].rotation).Using(rotationComparer));
+        Assert.That(driver.position, Is.EqualTo(sources[1].position).Using(positionComparer));
+        Assert.That(driver.rotation, Is.EqualTo(sources[1].rotation).Using(rotationComparer));
     }
 
     [UnityTest]
@@ -113,6 +116,9 @@ class MultiReferentialConstraintTests
         sources[1].position += Vector3.right;
         sources[1].rotation *= Quaternion.AngleAxis(-90, Vector3.up);
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+
         for (int i = 0; i <= 5; ++i)
         {
             float w = i / 5.0f;
@@ -121,36 +127,34 @@ class MultiReferentialConstraintTests
             yield return null;
 
             var weightedPos = Vector3.Lerp(data.restPose.translation, sources[1].position, w);
-            Assert.AreEqual(
+
+            Assert.That(
                 sources[0].position,
-                weightedPos,
+                Is.EqualTo(weightedPos).Using(positionComparer),
                 String.Format("Expected Source0 to be at {0} for a weight of {1}, but was {2}", weightedPos, w, sources[0].position)
                 );
-            Assert.AreEqual(
+            Assert.That(
                 sources[2].position,
-                weightedPos,
+                Is.EqualTo(weightedPos).Using(positionComparer),
                 String.Format("Expected Source2 to be at {0} for a weight of {1}, but was {2}", weightedPos, w, sources[2].position)
                 );
 
             var weightedRot = Quaternion.Lerp(data.restPose.rotation, sources[1].rotation, w);
-            RotationsAreEqual(sources[0].rotation, weightedRot, w);
-            RotationsAreEqual(sources[2].rotation, weightedRot, w);
+            Assert.That(
+                sources[0].rotation,
+                Is.EqualTo(weightedRot).Using(rotationComparer),
+                String.Format("Expected rotations to be equal for a weight of {0}", w)
+                );
+            Assert.That(
+                sources[2].rotation,
+                Is.EqualTo(weightedRot).Using(rotationComparer),
+                String.Format("Expected rotations to be equal for a weight of {0}", w)
+                );
 
             // Since we have no animation in the stream the new rest pose
             // should be the last evaluated one.
             data.restPose.translation = sources[0].position;
             data.restPose.rotation = sources[0].rotation;
         }
-    }
-
-    static void RotationsAreEqual(Quaternion lhs, Quaternion rhs, float w)
-    {
-        var dot = Quaternion.Dot(lhs, rhs);
-        Assert.AreEqual(
-            Mathf.Abs(dot),
-            1f,
-            k_Epsilon,
-            String.Format("Expected rotations to be equal for a weight of {0}", w)
-            );
     }
 }

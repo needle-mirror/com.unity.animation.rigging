@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
@@ -51,8 +50,8 @@ namespace UnityEngine.Animations.Rigging
             m_ConstrainedPositionAxes = new Vector3Bool(true);
             m_ConstrainedRotationAxes = new Vector3Bool(true);
             m_SourceObjects.Clear();
-            m_MaintainPositionOffset = true;
-            m_MaintainRotationOffset = true;
+            m_MaintainPositionOffset = false;
+            m_MaintainRotationOffset = false;
         }
     }
 

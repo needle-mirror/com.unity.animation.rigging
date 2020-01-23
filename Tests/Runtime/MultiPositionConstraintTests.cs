@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class MultiPositionConstraintTests
+public class MultiPositionConstraintTests
 {
-    const float k_Epsilon = 0.05f;
+    const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public MultiPositionConstraint constraint;
@@ -20,7 +20,7 @@ class MultiPositionConstraintTests
         public Vector3 constrainedObjectRestPosition;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -63,12 +63,14 @@ class MultiPositionConstraintTests
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+
         // src0.w = 0, src1.w = 0
         Assert.Zero(sources[0].weight);
         Assert.Zero(sources[1].weight);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, data.constrainedObjectRestPosition);
+        Assert.That(constrainedObject.position, Is.EqualTo(data.constrainedObjectRestPosition).Using(positionComparer));
 
         // Add displacement to source objects
         sources[0].transform.position += Vector3.right;
@@ -79,7 +81,7 @@ class MultiPositionConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, sources[0].transform.position);
+        Assert.That(constrainedObject.position, Is.EqualTo(sources[0].transform.position).Using(positionComparer));
 
         // src0.w = 0, src1.w = 1
         sources.SetWeight(0, 0f);
@@ -87,7 +89,7 @@ class MultiPositionConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, sources[1].transform.position);
+        Assert.That(constrainedObject.position, Is.EqualTo(sources[1].transform.position).Using(positionComparer));
 
         // src0.w = 1, src1.w = 1
         // since source object positions are mirrored, we should simply evaluate to the original rest pos.
@@ -95,7 +97,7 @@ class MultiPositionConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, data.constrainedObjectRestPosition);
+        Assert.That(constrainedObject.position, Is.EqualTo(data.constrainedObjectRestPosition).Using(positionComparer));
     }
 
     [UnityTest]
@@ -106,6 +108,8 @@ class MultiPositionConstraintTests
 
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
+
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
 
         sources[0].transform.position += Vector3.forward;
         sources.SetWeight(0, 1f);
@@ -119,9 +123,9 @@ class MultiPositionConstraintTests
             yield return null;
 
             Vector3 weightedPos = Vector3.Lerp(data.constrainedObjectRestPosition, sources[0].transform.position, w);
-            Assert.AreEqual(
+            Assert.That(
                 constrainedObject.position,
-                weightedPos,
+                Is.EqualTo(weightedPos).Using(positionComparer),
                 String.Format("Expected constrainedObject to be at {0} for a weight of {1}, but was {2}", weightedPos, w, constrainedObject.position)
                 );
         }

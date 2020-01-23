@@ -2,8 +2,6 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public class WeightedTransformArrayBinder
     {
         public static void BindReadOnlyTransforms(Animator animator, Component component, WeightedTransformArray weightedTransformArray, out NativeArray<ReadOnlyTransformHandle> transforms)

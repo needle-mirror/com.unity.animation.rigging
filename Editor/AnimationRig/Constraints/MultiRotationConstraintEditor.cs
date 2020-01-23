@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEditorInternal;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
@@ -88,6 +89,70 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/MultiRotationConstraint/Transfer motion to constraint", false, 611)]
+        public static void TransferMotionToConstraint(MenuCommand command)
+        {
+            var constraint = command.context as MultiRotationConstraint;
+
+            var axesMask = new Vector3(
+                System.Convert.ToSingle(constraint.data.constrainedXAxis),
+                System.Convert.ToSingle(constraint.data.constrainedYAxis),
+                System.Convert.ToSingle(constraint.data.constrainedZAxis));
+
+            if (Vector3.Dot(axesMask, axesMask) < 3f)
+            {
+                Debug.LogWarning("Multi-Rotation constraint with one or more Constrained Axes toggled off may lose precision when transferring its motion to constraint.");
+            }
+
+            BakeUtils.TransferMotionToConstraint(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiRotationConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as MultiRotationConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/MultiRotationConstraint/Transfer motion to constraint", true)]
+        [MenuItem("CONTEXT/MultiRotationConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as MultiRotationConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(MultiRotationConstraint))]
+    class MultiRotationConstraintBakeParameters : BakeParameters<MultiRotationConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => true;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, MultiRotationConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            for (int i = 0; i < constraint.data.sourceObjects.Count; ++i)
+            {
+                var sourceObject = constraint.data.sourceObjects[i];
+
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, sourceObject.transform, bindings);
+                EditorCurveBindingUtils.CollectPropertyBindings(rigBuilder.transform, constraint, ((IMultiRotationConstraintData)constraint.data).sourceObjectsProperty + ".m_Item" + i + ".weight", bindings);
+            }
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, MultiRotationConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+
+            return bindings;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
@@ -71,6 +72,54 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/ChainIKConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as ChainIKConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/ChainIKConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as ChainIKConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(ChainIKConstraint))]
+    class ChainIKConstraintBakeParameters : BakeParameters<ChainIKConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => false;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, ChainIKConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, constraint.data.target, bindings);
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, ChainIKConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            var root = constraint.data.root;
+            var tip = constraint.data.tip;
+
+            var tmp = tip;
+            while (tmp != root)
+            {
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, tmp, bindings);
+                tmp = tmp.parent;
+            }
+            EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, root, bindings);
+
+            return bindings;
         }
     }
 }

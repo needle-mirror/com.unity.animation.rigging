@@ -18,4 +18,11 @@ expression that can be control and manipulate by a Target GameObject (Hand like 
 |Maintain Target Offset|The current offset (in Position, Rotation or both) between the tip and target are maintained when not set to None|
 |Target Position Weight|The amount in which the chain reaches to the target effector. If set to 1, the chain tries to fully reach for the target GameObject.|
 |Target Rotation Weight|The amount in which the tip GameObject rotates to match the target GameObject rotation. If set to 1, the tip rotates to fully match it's target.|
-|Hint Weight|The amount of influence the hint has on the configuration of the hierarchy. When set to 1, the hint fully influences the hierarchy configuration. If no hint GameObect is specified, the hint weight is ignored.|
+|Hint Weight|The amount of influence the hint has on the configuration of the hierarchy. When set to 1, the hint fully influences the hierarchy configuration. If no hint GameObject is specified, the hint weight is ignored.|
+
+## Auto Setup from Tip Transform
+
+This option allows you to automatically create the required effector Game Objects and assign all bindings based on the assigned Tip bone Game Object binding.
+
+To use this option, first create a Two Bone IK Constraint and assign the Tip bone Game Object. In the Two Bone IK Constraint component options, select "Auto Setup from Tip Transform".
+This will create two child effector Game Objects (ik_target & ik_hint) and assign them.  This also find the most likely root & mid bone Game Objects based on the hierarchy and add them to the component as well.

@@ -9,17 +9,17 @@ using System;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class ChainIKConstraintTests {
+public class ChainIKConstraintTests {
 
-    const float k_Epsilon = 0.05f;
+    const float k_Epsilon = 1e-4f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public ChainIKConstraint constraint;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -60,6 +60,8 @@ class ChainIKConstraintTests {
         var tip = constraint.data.tip;
         var root = constraint.data.root;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+
         for (int i = 0; i < 5; ++i)
         {
             target.position += new Vector3(0f, 0.1f, 0f);
@@ -68,9 +70,7 @@ class ChainIKConstraintTests {
             Vector3 rootToTip = (tip.position - root.position).normalized;
             Vector3 rootToTarget = (target.position - root.position).normalized;
 
-            Assert.AreEqual(rootToTarget.x, rootToTip.x, k_Epsilon, String.Format("Expected rootToTip.x to be {0}, but was {1}", rootToTip.x, rootToTarget.x));
-            Assert.AreEqual(rootToTarget.y, rootToTip.y, k_Epsilon, String.Format("Expected rootToTip.y to be {0}, but was {1}", rootToTip.y, rootToTarget.y));
-            Assert.AreEqual(rootToTarget.z, rootToTip.z, k_Epsilon, String.Format("Expected rootToTip.z to be {0}, but was {1}", rootToTip.z, rootToTarget.z));
+            Assert.That(rootToTarget, Is.EqualTo(rootToTip).Using(positionComparer), String.Format("Expected rootToTip to be {0}, but was {1}", rootToTip, rootToTarget));
         }
     }
 
@@ -80,15 +80,7 @@ class ChainIKConstraintTests {
         var data = SetupConstraintRig();
         var constraint = data.constraint;
 
-        List<Transform> chain = new List<Transform>();
-        Transform tmp = constraint.data.tip;
-        while (tmp != constraint.data.root)
-        {
-            chain.Add(tmp);
-            tmp = tmp.parent;
-        }
-        chain.Add(constraint.data.root);
-        chain.Reverse();
+        Transform[] chain = ConstraintsUtils.ExtractChain(constraint.data.root, constraint.data.tip);
 
         // Chain with no constraint.
         Vector3[] bindPoseChain = chain.Select(transform => transform.position).ToArray();
@@ -113,6 +105,8 @@ class ChainIKConstraintTests {
             inBetweenChains.Add(chain.Select(transform => transform.position).ToArray());
         }
 
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
+
         for (int i = 0; i <= 5; ++i)
         {
             Vector3[] prevChain = (i > 0) ? inBetweenChains[i - 1] : bindPoseChain;
@@ -128,8 +122,8 @@ class ChainIKConstraintTests {
                 float maxAngle = Vector2.Angle(dir1, dir3);
                 float angle = Vector2.Angle(dir1, dir2);
 
-                Assert.GreaterOrEqual(angle, 0f);
-                Assert.LessOrEqual(angle, maxAngle);
+                Assert.That(angle, Is.GreaterThanOrEqualTo(0f).Using(floatComparer));
+                Assert.That(angle, Is.LessThanOrEqualTo(maxAngle).Using(floatComparer));
             }
         }
     }

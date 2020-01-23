@@ -1,4 +1,3 @@
-
 namespace UnityEngine.Animations.Rigging
 {
     [System.Serializable]
@@ -47,7 +46,7 @@ namespace UnityEngine.Animations.Rigging
             m_ConstrainedObject = null;
             m_ConstrainedAxes = new Vector3Bool(true);
             m_SourceObjects.Clear();
-            m_MaintainOffset = true;
+            m_MaintainOffset = false;
             m_Offset = Vector3.zero;
         }
     }

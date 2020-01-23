@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
@@ -18,7 +19,7 @@ namespace UnityEditor.Animations.Rigging
 
         SerializedProperty m_SourceObjectsToggle;
         SerializedProperty m_SettingsToggle;
-    
+
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
@@ -59,6 +60,45 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/DampedTransform/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as DampedTransform;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/DampedTransform/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as DampedTransform;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(DampedTransform))]
+    class DampedTransformBakeParameters : BakeParameters<DampedTransform>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => false;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, DampedTransform constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, constraint.data.sourceObject, bindings);
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, DampedTransform constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectTRBindings(rigBuilder.transform, constraint.data.constrainedObject, bindings);
+
+            return bindings;
         }
     }
 }

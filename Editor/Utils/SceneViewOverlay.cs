@@ -1,9 +1,6 @@
 using UnityEngine;
-using UnityEditor;
-using UnityEngine.Animations.Rigging;
 using System;
 using System.Reflection;
-using System.Collections;
 
 namespace UnityEditor.Animations.Rigging
 {

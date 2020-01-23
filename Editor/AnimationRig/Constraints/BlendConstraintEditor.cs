@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
@@ -66,7 +67,7 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUI.indentLevel++;
 
                 MaintainOffsetHelper.DoDropdown(k_MaintainOffset, m_MaintainPositionOffsets, m_MaintainRotationOffsets);
-                
+
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(m_BlendPosition, k_BlendPosLabel);
                 using (new EditorGUI.DisabledScope(!m_BlendPosition.boolValue))
@@ -78,11 +79,67 @@ namespace UnityEditor.Animations.Rigging
                 using (new EditorGUI.DisabledScope(!m_BlendRotation.boolValue))
                     EditorGUILayout.PropertyField(m_RotationWeight, GUIContent.none);
                 EditorGUILayout.EndHorizontal();
-            
+
                 EditorGUI.indentLevel--;
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/BlendConstraint/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as BlendConstraint;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/BlendConstraint/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as BlendConstraint;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(BlendConstraint))]
+    class BlendConstraintBakeParameters : BakeParameters<BlendConstraint>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => false;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, BlendConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+            var sourceA = constraint.data.sourceObjectA;
+            var sourceB = constraint.data.sourceObjectB;
+
+            if (constraint.data.blendPosition)
+            {
+                EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, sourceA, bindings);
+                EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, sourceB, bindings);
+            }
+
+            if (constraint.data.blendRotation)
+            {
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, sourceA, bindings);
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, sourceB, bindings);
+            }
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, BlendConstraint constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+            var constrained = constraint.data.constrainedObject;
+
+            if (constraint.data.blendPosition)
+                EditorCurveBindingUtils.CollectPositionBindings(rigBuilder.transform, constrained, bindings);
+
+            if(constraint.data.blendRotation)
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, constrained, bindings);
+
+            return bindings;
         }
     }
 }

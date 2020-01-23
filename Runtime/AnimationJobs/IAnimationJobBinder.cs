@@ -1,8 +1,7 @@
-﻿namespace UnityEngine.Animations.Rigging
-{
-    using Experimental.Animations;
-    using Playables;
+using UnityEngine.Playables;
 
+namespace UnityEngine.Animations.Rigging
+{
     public interface IAnimationJobBinder
     {
         IAnimationJob Create(Animator animator, IAnimationJobData data, Component component = null);

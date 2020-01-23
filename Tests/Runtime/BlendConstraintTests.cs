@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Animations.Rigging;
 using NUnit.Framework;
@@ -6,18 +6,18 @@ using System.Collections;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class BlendConstraintTests
+public class BlendConstraintTests
 {
     const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public BlendConstraint constraint;
         public AffineTransform restPose;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -59,6 +59,9 @@ class BlendConstraintTests
         var srcObjB = constraint.data.sourceObjectB;
         var constrainedObj = constraint.data.constrainedObject;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+
         // Apply rotation on sourceB
         srcObjB.rotation *= Quaternion.AngleAxis(90, Vector3.right);
         yield return null;
@@ -68,24 +71,24 @@ class BlendConstraintTests
         constraint.data.rotationWeight = 0f;
         yield return null;
 
-        Assert.AreEqual(constrainedObj.position, srcObjA.position);
-        RotationsAreEqual(constrainedObj.rotation, srcObjA.rotation);
+        Assert.That(constrainedObj.position, Is.EqualTo(srcObjA.position).Using(positionComparer));
+        Assert.That(constrainedObj.rotation, Is.EqualTo(srcObjA.rotation).Using(rotationComparer));      
 
         // SourceB has full influence
         constraint.data.positionWeight = 1f;
         constraint.data.rotationWeight = 1f;
         yield return null;
 
-        Assert.AreEqual(constrainedObj.position, srcObjB.position);
-        RotationsAreEqual(constrainedObj.rotation, srcObjB.rotation);
+        Assert.That(constrainedObj.position, Is.EqualTo(srcObjB.position).Using(positionComparer));
+        Assert.That(constrainedObj.rotation, Is.EqualTo(srcObjB.rotation).Using(rotationComparer));
 
         // Translation/Rotation blending between sources is disabled
         constraint.data.blendPosition = false;
         constraint.data.blendRotation = false;
         yield return null;
- 
-        Assert.AreEqual(constrainedObj.position, data.restPose.translation);
-        RotationsAreEqual(constrainedObj.rotation, data.restPose.rotation);
+
+        Assert.That(constrainedObj.position, Is.EqualTo(data.restPose.translation).Using(positionComparer));
+        Assert.That(constrainedObj.rotation, Is.EqualTo(data.restPose.rotation).Using(rotationComparer));
     }
 
     [UnityTest]
@@ -95,6 +98,9 @@ class BlendConstraintTests
         var constraint = data.constraint;
         var srcObjB = constraint.data.sourceObjectB;
         var constrainedObj = constraint.data.constrainedObject;
+
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComparer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
 
         // SourceB has full influence
         constraint.data.positionWeight = 1f;
@@ -111,14 +117,8 @@ class BlendConstraintTests
 
             var weightedPos = Vector3.Lerp(data.restPose.translation, srcObjB.position, w);
             var weightedRot = Quaternion.Lerp(data.restPose.rotation, srcObjB.rotation, w);
-            Assert.AreEqual(constrainedObj.position, weightedPos);
-            RotationsAreEqual(constrainedObj.rotation, weightedRot);
+            Assert.That(constrainedObj.position, Is.EqualTo(weightedPos).Using(positionComparer));
+            Assert.That(constrainedObj.rotation, Is.EqualTo(weightedRot).Using(rotationComparer));
         }
-    }
-
-    static void RotationsAreEqual(Quaternion lhs, Quaternion rhs)
-    {
-        var dot = Quaternion.Dot(lhs, rhs);
-        Assert.AreEqual(Mathf.Abs(dot), 1f, k_Epsilon);
     }
 }

@@ -1,9 +1,8 @@
+using System;
 using UnityEngine;
 
 namespace UnityEditor.Animations.Rigging
 {
-    using System;
-
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class CustomOverlayAttribute : Attribute
     {

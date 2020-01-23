@@ -33,7 +33,7 @@ namespace UnityEngine.Animations.Rigging
         string ITwoBoneIKConstraintData.targetRotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TargetRotationWeight));
         string ITwoBoneIKConstraintData.hintWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_HintWeight));
 
-        bool IAnimationJobData.IsValid() => !(m_Tip == null || m_Mid == null || m_Root == null || m_Target == null);
+        bool IAnimationJobData.IsValid() => (m_Tip != null && m_Mid != null && m_Root != null && m_Target != null && m_Tip.IsChildOf(m_Mid) && m_Mid.IsChildOf(m_Root));
 
         void IAnimationJobData.SetDefaultValues()
         {

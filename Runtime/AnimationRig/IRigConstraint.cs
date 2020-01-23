@@ -1,7 +1,5 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     public interface IRigConstraint
     {
         bool IsValid();
@@ -12,6 +10,10 @@
 
         IAnimationJobData data { get; }
         IAnimationJobBinder binder { get; }
+
+        Component component { get; }
+
         float weight { get; set; }
     }
 }
+

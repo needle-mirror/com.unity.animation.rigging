@@ -2,8 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-using UnityEditor;
-
 namespace UnityEditor.Animations.Rigging
 {
     [Serializable]
@@ -73,9 +71,7 @@ namespace UnityEditor.Animations.Rigging
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
                             GameObject targetGameObject = transform.gameObject;
-#if UNITY_2019_3_OR_NEWER
                             if (!SceneVisibilityManager.instance.IsPickingDisabled(targetGameObject, false))
-#endif
                             {
                                 GUIUtility.hotControl = id; // Grab mouse focus
                                 EditorHelper.HandleClickSelection(targetGameObject, evt);
@@ -89,9 +85,7 @@ namespace UnityEditor.Animations.Rigging
                         if (!evt.alt && GUIUtility.hotControl == id)
                         {
                             GameObject targetGameObject = transform.gameObject;
-#if UNITY_2019_3_OR_NEWER
                             if (!SceneVisibilityManager.instance.IsPickingDisabled(targetGameObject, false))
-#endif
                             {
                                 DragAndDrop.PrepareStartDrag();
                                 DragAndDrop.objectReferences = new UnityEngine.Object[] {transform};
@@ -120,9 +114,7 @@ namespace UnityEditor.Animations.Rigging
                         Color highlight = style.color;
 
                         bool hoveringEffector = GUIUtility.hotControl == 0 && HandleUtility.nearestControl == id;
-#if UNITY_2019_3_OR_NEWER
                         hoveringEffector = hoveringEffector && !SceneVisibilityManager.instance.IsPickingDisabled(transform.gameObject, false);
-#endif
 
                         if (hoveringEffector)
                         {

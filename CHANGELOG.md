@@ -1,10 +1,18 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-<!--
-## [0.2.6] - 2019-XX-XX
+## [0.3.2] - 2020-01-23
 ### Patch Update of *Unity Package Animation Rigging*.
--->
+- Updated documentation.
+
+## [0.3.1] - 2020-01-14
+### Patch Update of *Unity Package Animation Rigging*.
+- Removed unecessary files BakeUtils.cs.orig and BakeUtils.cs.orig.meta.
+- Updated Burst to version 1.2.0-preview.12.
+
+## [0.3.0] - 2019-10-18
+### Patch Update of *Unity Package Animation Rigging*.
+- Added support for bidirectional-baking to existing constraints.
 
 ## [0.2.5] - 2019-11-20
 ### Patch Update of *Unity Package Animation Rigging*.

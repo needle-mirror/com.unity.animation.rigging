@@ -1,0 +1,15 @@
+{
+    "name": "Unity.Animation.Rigging.EditorTests",
+    "references": [
+        "Unity.Animation.Rigging",
+	"Unity.Animation.Rigging.Editor",
+	"Unity.Animation.Rigging.Tests"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

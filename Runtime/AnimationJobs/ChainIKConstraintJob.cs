@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
 using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
-    using Experimental.Animations;
-
     [Unity.Burst.BurstCompile]
     public struct ChainIKConstraintJob : IWeightedAnimationJob
     {
@@ -90,24 +87,16 @@ namespace UnityEngine.Animations.Rigging
     {
         public override ChainIKConstraintJob Create(Animator animator, ref T data, Component component)
         {
-            List<Transform> chain = new List<Transform>();
-            Transform tmp = data.tip;
-            while (tmp != data.root)
-            {
-                chain.Add(tmp);
-                tmp = tmp.parent;
-            }
-            chain.Add(data.root);
-            chain.Reverse();
+            Transform[] chain = ConstraintsUtils.ExtractChain(data.root, data.tip);
 
             var job = new ChainIKConstraintJob();
-            job.chain = new NativeArray<ReadWriteTransformHandle>(chain.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            job.linkLengths = new NativeArray<float>(chain.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            job.linkPositions = new NativeArray<Vector3>(chain.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            job.chain = new NativeArray<ReadWriteTransformHandle>(chain.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            job.linkLengths = new NativeArray<float>(chain.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            job.linkPositions = new NativeArray<Vector3>(chain.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             job.maxReach = 0f;
 
-            int tipIndex = chain.Count - 1;
-            for (int i = 0; i < chain.Count; ++i)
+            int tipIndex = chain.Length - 1;
+            for (int i = 0; i < chain.Length; ++i)
             {
                 job.chain[i] = ReadWriteTransformHandle.Bind(animator, chain[i]);
                 job.linkLengths[i] = (i != tipIndex) ? Vector3.Distance(chain[i].position, chain[i + 1].position) : 0f;
@@ -123,7 +112,7 @@ namespace UnityEngine.Animations.Rigging
 
             job.chainRotationWeight = FloatProperty.Bind(animator, component, data.chainRotationWeightFloatProperty);
             job.tipRotationWeight = FloatProperty.Bind(animator, component, data.tipRotationWeightFloatProperty);
- 
+
             var cacheBuilder = new AnimationJobCacheBuilder();
             job.maxIterationsIdx = cacheBuilder.Add(data.maxIterations);
             job.toleranceIdx = cacheBuilder.Add(data.tolerance);

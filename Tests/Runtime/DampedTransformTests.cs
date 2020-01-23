@@ -10,17 +10,17 @@ using System;
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
 
-class DampedTransformTests
+public class DampedTransformTests
 {
-    const float k_Epsilon = 0.05f;
+    const float k_Epsilon = 1e-4f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public DampedTransform constraint;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -73,14 +73,15 @@ class DampedTransformTests
 
         float[] distances = positions.Select((pos) => (pos - constrainedPos1).magnitude).ToArray();
 
+        var floatComparer = new RuntimeRiggingTestFixture.FloatEqualityComparer(k_Epsilon);
+
         for (int i = 0; i < kMaxIter - 1; ++i)
         {
             Vector3 dir = positions[i + 1] - positions[i];
 
-            Assert.AreEqual(0f, Vector3.Angle(dir, offset), k_Epsilon, String.Format("Offset direction mismatch at index {0}", i));
-
-            Assert.GreaterOrEqual(distances[i + 1], distances[i]);
-            Assert.LessOrEqual(distances[i], 0.5f);
+            Assert.That(Vector3.Angle(dir, offset), Is.EqualTo(0f).Using(floatComparer), String.Format("Offset direction mismatch at index {0}", i));
+            Assert.That(distances[i + 1], Is.GreaterThanOrEqualTo(distances[i]).Using(floatComparer));
+            Assert.That(distances[i], Is.LessThanOrEqualTo(0.5f).Using(floatComparer));
         }
     }
 
@@ -111,6 +112,8 @@ class DampedTransformTests
         sourceTransform.localPosition += offset;
         Vector3 constrainedPos2 = constrainedPos1 + offset;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+
         for (int i = 0; i <= 5; ++i)
         {
             float w = i / 5.0f;
@@ -125,9 +128,7 @@ class DampedTransformTests
             Vector3 weightedConstrainedPos = Vector3.Lerp(constrainedPos1, constrainedPos2, w);
             Vector3 constrainedPos = constrainedTransform.position;
 
-            Assert.AreEqual(weightedConstrainedPos.x, constrainedPos.x, k_Epsilon, String.Format("Expected constrainedPos.x to be {0} for a weight of {1}, but was {2}", weightedConstrainedPos.x, w, constrainedPos.x));
-            Assert.AreEqual(weightedConstrainedPos.y, constrainedPos.y, k_Epsilon, String.Format("Expected constrainedPos.y to be {0} for a weight of {1}, but was {2}", weightedConstrainedPos.y, w, constrainedPos.y));
-            Assert.AreEqual(weightedConstrainedPos.z, constrainedPos.z, k_Epsilon, String.Format("Expected constrainedPos.z to be {0} for a weight of {1}, but was {2}", weightedConstrainedPos.z, w, constrainedPos.z));
+            Assert.That(weightedConstrainedPos, Is.EqualTo(constrainedPos).Using(positionComparer), String.Format("Expected constrainedPos to be {0} for a weight of {1}, but was {2}", weightedConstrainedPos, w, constrainedPos));
         }
     }
 

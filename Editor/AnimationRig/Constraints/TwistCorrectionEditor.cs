@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEditorInternal;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
@@ -68,6 +69,46 @@ namespace UnityEditor.Animations.Rigging
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        [MenuItem("CONTEXT/TwistCorrection/Transfer motion to skeleton", false, 612)]
+        public static void TransferMotionToSkeleton(MenuCommand command)
+        {
+            var constraint = command.context as TwistCorrection;
+            BakeUtils.TransferMotionToSkeleton(constraint);
+        }
+
+        [MenuItem("CONTEXT/TwistCorrection/Transfer motion to skeleton", true)]
+        public static bool TransferMotionValidate(MenuCommand command)
+        {
+            var constraint = command.context as TwistCorrection;
+            return BakeUtils.TransferMotionValidate(constraint);
+        }
+    }
+
+    [BakeParameters(typeof(TwistCorrection))]
+    class TwistCorrectionBakeParameters : BakeParameters<TwistCorrection>
+    {
+        public override bool canBakeToSkeleton => true;
+        public override bool canBakeToConstraint => false;
+
+        public override IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, TwistCorrection constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, constraint.data.sourceObject, bindings);
+
+            return bindings;
+        }
+
+        public override IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, TwistCorrection constraint)
+        {
+            var bindings = new List<EditorCurveBinding>();
+
+            foreach (var node in constraint.data.twistNodes)
+                EditorCurveBindingUtils.CollectRotationBindings(rigBuilder.transform, node.transform, bindings);
+
+            return bindings;
         }
     }
 }

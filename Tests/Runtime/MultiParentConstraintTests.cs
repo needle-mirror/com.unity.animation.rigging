@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 using RigTestData = RuntimeRiggingTestFixture.RigTestData;
 
-class MultiParentConstraintTests
+public class MultiParentConstraintTests
 {
-    const float k_Epsilon = 0.05f;
+    const float k_Epsilon = 1e-5f;
 
-    struct ConstraintTestData
+    public struct ConstraintTestData
     {
         public RigTestData rigData;
         public MultiParentConstraint constraint;
@@ -20,7 +20,7 @@ class MultiParentConstraintTests
         public AffineTransform constrainedObjectRestTx;
     }
 
-    private ConstraintTestData SetupConstraintRig()
+    public static ConstraintTestData SetupConstraintRig()
     {
         var data = new ConstraintTestData();
 
@@ -68,13 +68,16 @@ class MultiParentConstraintTests
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
 
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComprarer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
+
         // src0.w = 0, src1.w = 0
         Assert.Zero(sources[0].weight);
         Assert.Zero(sources[1].weight);
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, data.constrainedObjectRestTx.translation);
-        Assert.AreEqual(constrainedObject.rotation, data.constrainedObjectRestTx.rotation);
+        Assert.That(constrainedObject.position, Is.EqualTo(data.constrainedObjectRestTx.translation).Using(positionComparer));
+        Assert.That(constrainedObject.rotation, Is.EqualTo(data.constrainedObjectRestTx.rotation).Using(rotationComprarer));
 
         // Add displacement to source objects
         sources[0].transform.position += Vector3.right;
@@ -87,8 +90,8 @@ class MultiParentConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, sources[0].transform.position);
-        Assert.AreEqual(constrainedObject.rotation, sources[0].transform.rotation);
+        Assert.That(constrainedObject.position, Is.EqualTo(sources[0].transform.position).Using(positionComparer));
+        Assert.That(constrainedObject.rotation, Is.EqualTo(sources[0].transform.rotation).Using(rotationComprarer));
 
         // src0.w = 0, src1.w = 1
         sources.SetWeight(0, 0f);
@@ -96,8 +99,8 @@ class MultiParentConstraintTests
         constraint.data.sourceObjects = sources;
         yield return RuntimeRiggingTestFixture.YieldTwoFrames();
 
-        Assert.AreEqual(constrainedObject.position, sources[1].transform.position);
-        Assert.AreEqual(constrainedObject.rotation, sources[1].transform.rotation);
+        Assert.That(constrainedObject.position, Is.EqualTo(sources[1].transform.position).Using(positionComparer));
+        Assert.That(constrainedObject.rotation, Is.EqualTo(sources[1].transform.rotation).Using(rotationComprarer));
     }
 
     [UnityTest]
@@ -108,6 +111,9 @@ class MultiParentConstraintTests
 
         var constrainedObject = constraint.data.constrainedObject;
         var sources = constraint.data.sourceObjects;
+
+        var positionComparer = new RuntimeRiggingTestFixture.Vector3EqualityComparer(k_Epsilon);
+        var rotationComprarer = new RuntimeRiggingTestFixture.QuaternionEqualityComparer(k_Epsilon);
 
         sources[0].transform.position += Vector3.right;
         sources[0].transform.rotation *= Quaternion.AngleAxis(-90, Vector3.up);
@@ -122,18 +128,17 @@ class MultiParentConstraintTests
             data.constraint.weight = w;
             yield return null;
 
-
             var weightedPos = Vector3.Lerp(data.constrainedObjectRestTx.translation, sources[0].transform.position, w);
-            Assert.AreEqual(
+            Assert.That(
                 constrainedObject.position,
-                weightedPos,
+                Is.EqualTo(weightedPos).Using(positionComparer),
                 String.Format("Expected constrainedObject to be at {0} for a weight of {1}, but was {2}", weightedPos, w, constrainedObject.position)
                 );
 
             var weightedRot = Quaternion.Lerp(data.constrainedObjectRestTx.rotation, sources[0].transform.rotation, w);
-             Assert.AreEqual(
+             Assert.That(
                 constrainedObject.rotation,
-                weightedRot,
+                Is.EqualTo(weightedRot).Using(rotationComprarer),
                 String.Format("Expected constrainedObject to be at {0} for a weight of {1}, but was {2}", weightedRot, w, constrainedObject.rotation)
                 );
         }

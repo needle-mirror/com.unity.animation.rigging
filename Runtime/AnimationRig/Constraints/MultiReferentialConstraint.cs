@@ -41,7 +41,7 @@ namespace UnityEngine.Animations.Rigging
                 return false;
 
             foreach (var src in m_SourceObjects)
-                if (src.transform == null)
+                if (src == null)
                     return false;
 
             return true;
