@@ -46,9 +46,12 @@ namespace UnityEngine.Animations.Rigging
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
                 Vector2 minMaxAngles = new Vector2(minLimit.Get(stream), maxLimit.Get(stream));
-                driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
+
+                var drivenWPos = driven.GetPosition(stream);
+                var drivenLRot = driven.GetLocalRotation(stream);
+                var drivenParentInvRot = Quaternion.Inverse(drivenParent.GetRotation(stream));
                 Quaternion accumDeltaRot = QuaternionExt.zero;
-                Quaternion drivenParentInvRot = Quaternion.Inverse(drivenParent.GetRotation(stream));
+                var fromDir = drivenLRot * aimAxis;
                 float accumWeights = 0f;
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
@@ -58,8 +61,7 @@ namespace UnityEngine.Animations.Rigging
 
                     ReadOnlyTransformHandle sourceTransform = sourceTransforms[i];
 
-                    var fromDir = aimAxis;
-                    var toDir = drivenParentInvRot * (sourceTransform.GetPosition(stream) - currentWPos);
+                    var toDir = drivenParentInvRot * (sourceTransform.GetPosition(stream) - drivenWPos);
                     if (toDir.sqrMagnitude < k_Epsilon)
                         continue;
 
@@ -97,16 +99,15 @@ namespace UnityEngine.Animations.Rigging
                 if (accumWeights < 1f)
                     accumDeltaRot = Quaternion.Lerp(Quaternion.identity, accumDeltaRot, accumWeights);
 
-                Quaternion newRot = accumDeltaRot;
-                Quaternion currentLRot = driven.GetLocalRotation(stream);
+                Quaternion newRot = accumDeltaRot * drivenLRot;
                 if (Vector3.Dot(axesMask, axesMask) < 3f)
-                    newRot = Quaternion.Euler(AnimationRuntimeUtils.Select(currentLRot.eulerAngles, newRot.eulerAngles, axesMask));
+                    newRot = Quaternion.Euler(AnimationRuntimeUtils.Select(drivenLRot.eulerAngles, newRot.eulerAngles, axesMask));
 
                 var offset = drivenOffset.Get(stream);
                 if (Vector3.Dot(offset, offset) > 0f)
                     newRot *= Quaternion.Euler(offset);
 
-                driven.SetLocalRotation(stream, Quaternion.Lerp(currentLRot, newRot, w));
+                driven.SetLocalRotation(stream, Quaternion.Lerp(drivenLRot, newRot, w));
             }
             else
                 AnimationRuntimeUtils.PassThrough(stream, driven);

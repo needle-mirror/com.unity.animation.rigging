@@ -1,10 +1,9 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-<!--
-## [0.2.6] - 2019-XX-XX
+## [0.2.6] - 2020-03-06
 ### Patch Update of *Unity Package Animation Rigging*.
--->
+- Adjusted MultiAim calculations to prevent rolling effects (case 1215736).
 
 ## [0.2.5] - 2019-11-20
 ### Patch Update of *Unity Package Animation Rigging*.
