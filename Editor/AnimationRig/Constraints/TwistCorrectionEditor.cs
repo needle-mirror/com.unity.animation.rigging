@@ -48,7 +48,15 @@ namespace UnityEditor.Animations.Rigging
 
             m_ReorderableList.onChangedCallback = (ReorderableList reorderableList) =>
             {
+                Undo.RegisterCompleteObjectUndo(m_Constraint, "Edit TwistCorrection");
                 m_Constraint.data.twistNodes = (WeightedTransformArray)reorderableList.list;
+                if (PrefabUtility.IsPartOfPrefabInstance(m_Constraint))
+                    EditorUtility.SetDirty(m_Constraint);
+            };
+
+            Undo.undoRedoPerformed += () =>
+            {
+                m_ReorderableList.list = m_Constraint.data.twistNodes;
             };
         }
 
@@ -64,6 +72,7 @@ namespace UnityEditor.Animations.Rigging
             if (m_TwistNodesToggle.boolValue)
             {
                 EditorGUI.indentLevel++;
+
                 m_ReorderableList.DoLayoutList();
                 EditorGUI.indentLevel--;
             }

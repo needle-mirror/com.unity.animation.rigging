@@ -64,9 +64,16 @@ namespace UnityEditor.Animations.Rigging
 
             m_ReorderableList.onChangedCallback = (ReorderableList reorderableList) =>
             {
+                Undo.RegisterCompleteObjectUndo(m_Constraint, "Edit MultiAim");
                 m_Constraint.data.sourceObjects = (WeightedTransformArray)reorderableList.list;
+                if (PrefabUtility.IsPartOfPrefabInstance(m_Constraint))
+                    EditorUtility.SetDirty(m_Constraint);
             };
 
+            Undo.undoRedoPerformed += () =>
+            {
+                m_ReorderableList.list = m_Constraint.data.sourceObjects;
+            };
         }
 
         public override void OnInspectorGUI()

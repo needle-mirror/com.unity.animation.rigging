@@ -1,4 +1,4 @@
-* [Animation Rigging](AnimationRigging.md)
+* [Animation Rigging](index.md)
 * [Rigging workflow](RiggingWorkflow.md)
 * [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md)
 * [Animation Rigging Menu](AnimationRiggingMenu.md)

@@ -16,7 +16,6 @@ namespace UnityEngine.Animations.Rigging
             float posWeight,
             float rotWeight,
             float hintWeight,
-            Vector2 limbLengths,
             AffineTransform targetOffset
             )
         {
@@ -33,8 +32,13 @@ namespace UnityEngine.Animations.Rigging
             Vector3 ac = cPosition - aPosition;
             Vector3 at = tPosition - aPosition;
 
-            float oldAbcAngle = TriangleAngle(ac.magnitude, limbLengths[0], limbLengths[1]);
-            float newAbcAngle = TriangleAngle(at.magnitude, limbLengths[0], limbLengths[1]);
+            float abLen = ab.magnitude;
+            float bcLen = bc.magnitude;
+            float acLen = ac.magnitude;
+            float atLen = at.magnitude;
+
+            float oldAbcAngle = TriangleAngle(acLen, abLen, bcLen);
+            float newAbcAngle = TriangleAngle(atLen, abLen, bcLen);
 
             // Bend normal strategy is to take whatever has been provided in the animation
             // stream to minimize configuration changes, however if this is collinear
@@ -78,7 +82,7 @@ namespace UnityEngine.Animations.Rigging
                     Vector3 abProj = ab - acNorm * Vector3.Dot(ab, acNorm);
                     Vector3 ahProj = ah - acNorm * Vector3.Dot(ah, acNorm);
 
-                    float maxReach = limbLengths[0] + limbLengths[1];
+                    float maxReach = abLen + bcLen;
                     if (abProj.sqrMagnitude > (maxReach * maxReach * 0.001f) && ahProj.sqrMagnitude > 0f)
                     {
                         Quaternion hintR = QuaternionExt.FromToRotation(abProj, ahProj);

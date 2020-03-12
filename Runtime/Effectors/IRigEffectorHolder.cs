@@ -7,7 +7,7 @@ namespace UnityEngine.Animations.Rigging
 #if UNITY_EDITOR
         IEnumerable<RigEffectorData> effectors { get; }
 
-        void AddEffector(Transform transform);
+        void AddEffector(Transform transform, RigEffectorData.Style style);
         void RemoveEffector(Transform transform);
         bool ContainsEffector(Transform transform);
 #endif

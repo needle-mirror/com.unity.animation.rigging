@@ -11,7 +11,6 @@ namespace UnityEngine.Animations.Rigging
         public ReadOnlyTransformHandle target;
 
         public AffineTransform targetOffset;
-        public Vector2 linkLengths;
 
         public FloatProperty targetPositionWeight;
         public FloatProperty targetRotationWeight;
@@ -31,7 +30,6 @@ namespace UnityEngine.Animations.Rigging
                     targetPositionWeight.Get(stream) * w,
                     targetRotationWeight.Get(stream) * w,
                     hintWeight.Get(stream) * w,
-                    linkLengths,
                     targetOffset
                     );
             }
@@ -80,9 +78,6 @@ namespace UnityEngine.Animations.Rigging
                 job.targetOffset.translation = data.tip.position - data.target.position;
             if (data.maintainTargetRotationOffset)
                 job.targetOffset.rotation = Quaternion.Inverse(data.target.rotation) * data.tip.rotation;
-
-            job.linkLengths[0] = Vector3.Distance(data.root.position, data.mid.position);
-            job.linkLengths[1] = Vector3.Distance(data.mid.position, data.tip.position);
 
             job.targetPositionWeight = FloatProperty.Bind(animator, component, data.targetPositionWeightFloatProperty);
             job.targetRotationWeight = FloatProperty.Bind(animator, component, data.targetRotationWeightFloatProperty);

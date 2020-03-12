@@ -19,23 +19,6 @@ namespace UnityEngine.Animations.Rigging
         [SerializeField] private Style m_Style = new Style();
         [SerializeField] private bool m_Visible = true;
 
-        public static Style defaultStyle
-        {
-            get
-            {
-                var style = new Style()
-                {
-                    shape =  Resources.Load<Mesh>("Shapes/LocatorEffector"),
-                    color = new Color(1f, 0f, 0f, 0.5f),
-                    size = 0.10f,
-                    position = Vector3.zero,
-                    rotation = Vector3.zero
-                };
-
-                return style;
-            }
-        }
-
         public Transform transform { get => m_Transform; }
         public Style style { get => m_Style; }
         public bool visible { get => m_Visible; set => m_Visible = value; }

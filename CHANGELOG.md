@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [0.3.3] - 2020-03-06
+### Patch Update of *Unity Package Animation Rigging*.
+- Improved RigEffector picking when using custom shapes.
+- Improved RigEffector hover feedback when shape does not have line geometry.
+- Adjusted MultiAim calculations to prevent rolling effects (case 1215736).
+- Removed cached 'LimbLengths' in TwoBoneIKConstraintJob which lets users modify bone lengths dynamically.  [AAA-97]
+- Fixed erroneous link to TwistChain constraint documentation in the ConstraintSamples readme.  [AAA-95]
+- Fixed add and remove operations in ReorderableList when constraint is nested in prefab.  [AAA-98]
+- Fixed undo operations in ReorderableList.  [AAA-98]
+- Removed uses of Resources.Load in Runtime and Editor assemblies.
+
 ## [0.3.2] - 2020-01-23
 ### Patch Update of *Unity Package Animation Rigging*.
 - Updated documentation.

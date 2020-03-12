@@ -15,10 +15,10 @@ namespace UnityEngine.Animations.Rigging
         [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
         public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
 
-        public void AddEffector(Transform transform)
+        public void AddEffector(Transform transform, RigEffectorData.Style style)
         {
             var effector = new RigEffectorData();
-            effector.Initialize(transform, RigEffectorData.defaultStyle);
+            effector.Initialize(transform, style);
 
             m_Effectors.Add(effector);
         }

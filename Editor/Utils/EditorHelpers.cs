@@ -43,12 +43,14 @@ namespace UnityEditor.Animations.Rigging
         public static ReorderableList CreateReorderableList(SerializedProperty property, ref WeightedTransformArray array, RangeAttribute range = null, bool draggable = true, bool displayHeader = false)
         {
             var reorderableList = new ReorderableList(array, typeof(WeightedTransform), draggable, displayHeader, true, true);
+            var serializedObject = property.serializedObject;
 
             reorderableList.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 // Didn't find a way to register a callback before we repaint the reorderable list to toggle draggable flag.
                 // Ideally, we'd need a callback canReorderElementCallback that would enable/disable draggable handle.
                 reorderableList.draggable = !AnimationMode.InAnimationMode() && !Application.isPlaying;
+                ReorderableList.defaultBehaviours.DrawElementBackground(rect, index, isActive, isFocused, reorderableList.draggable);
             };
 
             reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -144,6 +146,20 @@ namespace UnityEditor.Animations.Rigging
 
     public static class EditorHelper
     {
+        private const string EditorFolder = "Packages/com.unity.animation.rigging/Editor/";
+        private const string ShadersFolder = EditorFolder + "Shaders/";
+        private const string ShapesFolder = EditorFolder + "Shapes/";
+
+        public static Shader LoadShader(string filename)
+        {
+            return AssetDatabase.LoadAssetAtPath<Shader>(ShadersFolder + filename);
+        }
+
+        public static Mesh LoadShape(string filename)
+        {
+            return AssetDatabase.LoadAssetAtPath<Mesh>(ShapesFolder + filename);
+        }
+
         public static T GetClosestComponent<T>(Transform transform, Transform root = null)
         {
             if (transform == null)

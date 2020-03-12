@@ -51,7 +51,7 @@ namespace UnityEditor.Animations.Rigging
                     if (PrefabUtility.IsPartOfPrefabInstance(targetObject))
                         EditorUtility.SetDirty(targetObject);
 
-                    pair.holder.AddEffector(pair.transform);
+                    pair.holder.AddEffector(pair.transform, RigEffector.defaultStyle);
                 }
             }
 

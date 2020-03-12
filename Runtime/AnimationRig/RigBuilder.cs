@@ -173,10 +173,10 @@ namespace UnityEngine.Animations.Rigging
         }
 
 #if UNITY_EDITOR
-        public void AddEffector(Transform transform)
+        public void AddEffector(Transform transform, RigEffectorData.Style style)
         {
             var effector = new RigEffectorData();
-            effector.Initialize(transform, RigEffectorData.defaultStyle);
+            effector.Initialize(transform, style);
 
             m_Effectors.Add(effector);
         }
