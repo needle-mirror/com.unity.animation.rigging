@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomPropertyDrawer(typeof(Vector3Bool))]
-    public class Vector3BoolDrawer : PropertyDrawer
+    class Vector3BoolDrawer : PropertyDrawer
     {
         private const int k_Offset = 16;
         private const int k_ToggleWidth = 50;

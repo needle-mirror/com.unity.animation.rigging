@@ -5,7 +5,7 @@ namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(BoneRenderer))]
     [CanEditMultipleObjects]
-    public class BoneRendererInspector : Editor
+    class BoneRendererInspector : Editor
     {
         static readonly GUIContent k_BoneSizeLabel = new GUIContent("Bone Size");
         static readonly GUIContent k_BoneColorLabel = new GUIContent("Color");

@@ -1,28 +1,48 @@
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The TwistCorrection constraint data.
+    /// </summary>
     [System.Serializable]
     public struct TwistCorrectionData : IAnimationJobData, ITwistCorrectionData
     {
-        public enum Axis { X, Y ,Z }
+        /// <summary>
+        /// Axis type for TwistCorrection.
+        /// </summary>
+        public enum Axis
+        {
+            /// <summary>X Axis.</summary>
+            X,
+            /// <summary>Y Axis.</summary>
+            Y,
+            /// <summary>Z Axis.</summary>
+            Z
+        }
 
         [SyncSceneToStream, SerializeField] Transform m_Source;
 
         [NotKeyable, SerializeField] Axis m_TwistAxis;
         [SyncSceneToStream, SerializeField, Range(-1, 1)] WeightedTransformArray m_TwistNodes;
 
+        /// <summary>The source Transform that influences the twist nodes.</summary>
         public Transform sourceObject { get => m_Source; set => m_Source = value; }
 
+        /// <inheritdoc />
         public WeightedTransformArray twistNodes
         {
             get => m_TwistNodes;
             set => m_TwistNodes = value;
         }
 
+        /// <inheritdoc />
         public Axis twistAxis { get => m_TwistAxis; set => m_TwistAxis = value; }
 
+        /// <inheritdoc />
         Transform ITwistCorrectionData.source => m_Source;
+        /// <inheritdoc />
         Vector3 ITwistCorrectionData.twistAxis => Convert(m_TwistAxis);
 
+        /// <inheritdoc />
         string ITwistCorrectionData.twistNodesProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TwistNodes));
 
         static Vector3 Convert(Axis axis)
@@ -36,6 +56,7 @@ namespace UnityEngine.Animations.Rigging
             return Vector3.forward;
         }
 
+        /// <inheritdoc />
         bool IAnimationJobData.IsValid()
         {
             if (m_Source == null)
@@ -48,6 +69,7 @@ namespace UnityEngine.Animations.Rigging
             return true;
         }
 
+        /// <inheritdoc />
         void IAnimationJobData.SetDefaultValues()
         {
             m_Source = null;
@@ -56,8 +78,11 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// TwistCorrection constraint.
+    /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Twist Correction")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/TwistCorrection.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/TwistCorrection.html")]
     public class TwistCorrection : RigConstraint<
         TwistCorrectionJob,
         TwistCorrectionData,

@@ -4,9 +4,14 @@ using UnityEngine.Experimental.Animations;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// RigBuilder is the root component that holds the Rigs that create an Animation Rigging hierarchy.
+    /// Its purpose is to create the PlayableGraph that will be used in the associated Animator component to animate
+    /// a character with constraints.
+    /// </summary>
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/index.html")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [SerializeField] private List<RigLayer> m_RigLayers;
@@ -16,13 +21,29 @@ namespace UnityEngine.Animations.Rigging
 
 #if UNITY_EDITOR
         [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
+
+        /// <inheritdoc />
         public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
 #endif
 
+        /// <summary>
+        /// Delegate function that covers a RigBuilder calling OnEnable.
+        /// </summary>
+        /// <param name="rigBuilder">The RigBuilder component</param>
         public delegate void OnAddRigBuilderCallback(RigBuilder rigBuilder);
+        /// <summary>
+        /// Delegate function that covers a RigBuilder calling OnDisable.
+        /// </summary>
+        /// <param name="rigBuilder">The RigBuilder component</param>
         public delegate void OnRemoveRigBuilderCallback(RigBuilder rigBuilder);
 
+        /// <summary>
+        /// Notification callback that is sent whenever a RigBuilder calls OnEnable.
+        /// </summary>
         public static OnAddRigBuilderCallback onAddRigBuilder;
+        /// <summary>
+        /// Notification callback that is sent whenever a RigBuilder calls OnDisable.
+        /// </summary>
         public static OnRemoveRigBuilderCallback onRemoveRigBuilder;
 
         void OnEnable()
@@ -53,15 +74,17 @@ namespace UnityEngine.Animations.Rigging
             if (!graph.IsValid())
                 return;
 
-            syncSceneToStreamLayer.Update(layers.ToArray());
+            syncSceneToStreamLayer.Update(m_RuntimeRigLayers);
 
-            for (int i = 0, count = layers.Count; i < count; ++i)
+            for (int i = 0, count = m_RuntimeRigLayers.Length; i < count; ++i)
             {
-                if (layers[i].IsValid() && layers[i].active)
-                    layers[i].Update();
+                if (m_RuntimeRigLayers[i].IsValid() && m_RuntimeRigLayers[i].active)
+                    m_RuntimeRigLayers[i].Update();
             }
         }
 
+        /// <summary>Builds the RigBuilder PlayableGraph.</summary>
+        /// <returns>Returns true if the RigBuilder has created a valid PlayableGraph. Returns false otherwise.</returns>
         public bool Build()
         {
             Clear();
@@ -83,6 +106,9 @@ namespace UnityEngine.Animations.Rigging
             return true;
         }
 
+        /// <summary>
+        /// Destroys the RigBuilder PlayableGraph and frees associated RigLayers memory.
+        /// </summary>
         public void Clear()
         {
             if (graph.IsValid())
@@ -103,6 +129,8 @@ namespace UnityEngine.Animations.Rigging
         // IAnimationWindowPreview methods implementation
         //
 
+        /// <summary>Notification callback when the animation previewer starts previewing an AnimationClip.</summary>
+        /// <remarks>This is called by the Animation Window or the Timeline Editor.</remarks>
         public void StartPreview()
         {
             if (!enabled)
@@ -122,6 +150,8 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
+        /// <summary>Notification callback when the animation previewer stops previewing an AnimationClip.</summary>
+        /// <remarks>This is called by the Animation Window or the Timeline Editor.</remarks>
         public void StopPreview()
         {
             if (!enabled)
@@ -133,6 +163,9 @@ namespace UnityEngine.Animations.Rigging
             Clear();
         }
 
+        /// <summary>Notification callback when the animation previewer updates its PlayableGraph before sampling an AnimationClip.</summary>
+        /// <remarks>This is called by the Animation Window or the Timeline Editor.</remarks>
+        /// <param name="graph">The animation previewer PlayableGraph</param>
         public void UpdatePreviewGraph(PlayableGraph graph)
         {
             if (!enabled)
@@ -150,6 +183,12 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
+        /// <summary>
+        /// Appends custom Playable nodes to the animation previewer PlayableGraph.
+        /// </summary>
+        /// <param name="graph">The animation previewer PlayableGraph</param>
+        /// <param name="inputPlayable">The current root of the PlayableGraph</param>
+        /// <returns></returns>
         public Playable BuildPreviewGraph(PlayableGraph graph, Playable inputPlayable)
         {
             if (!enabled)
@@ -173,6 +212,7 @@ namespace UnityEngine.Animations.Rigging
         }
 
 #if UNITY_EDITOR
+        /// <inheritdoc />
         public void AddEffector(Transform transform, RigEffectorData.Style style)
         {
             var effector = new RigEffectorData();
@@ -181,17 +221,22 @@ namespace UnityEngine.Animations.Rigging
             m_Effectors.Add(effector);
         }
 
+        /// <inheritdoc />
         public void RemoveEffector(Transform transform)
         {
             m_Effectors.RemoveAll((RigEffectorData data) => data.transform == transform);
         }
 
+        /// <inheritdoc />
         public bool ContainsEffector(Transform transform)
         {
             return m_Effectors.Exists((RigEffectorData data) => data.transform == transform);
         }
 #endif
 
+        /// <summary>
+        /// Returns a list of RigLayer associated to this RigBuilder.
+        /// </summary>
         public List<RigLayer> layers
         {
             get
@@ -218,6 +263,9 @@ namespace UnityEngine.Animations.Rigging
             set => m_SyncSceneToStreamLayer = value;
         }
 
+        /// <summary>
+        /// Retrieves the PlayableGraph created by this RigBuilder.
+        /// </summary>
         public PlayableGraph graph { get; private set; }
     }
 }

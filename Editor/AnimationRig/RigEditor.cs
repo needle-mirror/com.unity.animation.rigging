@@ -4,7 +4,7 @@ namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(Rig))]
     [CanEditMultipleObjects]
-    public class RigEditor : Editor
+    class RigEditor : Editor
     {
         SerializedProperty m_Weight;
 

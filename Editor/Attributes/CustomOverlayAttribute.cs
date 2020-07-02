@@ -4,15 +4,12 @@ using UnityEngine;
 namespace UnityEditor.Animations.Rigging
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public sealed class CustomOverlayAttribute : Attribute
+    internal sealed class CustomOverlayAttribute : Attribute
     {
         private Type m_EffectorType;
 
         public CustomOverlayAttribute(Type effectorType)
         {
-            if (effectorType == null || !effectorType.IsSubclassOf(typeof(IRigEffector)))
-                Debug.LogError("Invalid effector for CustomOverlay attribute.");
-
             m_EffectorType = effectorType;
         }
 

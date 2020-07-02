@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomOverlay(typeof(RigEffector))]
-    public class RigEffectorOverlay : IRigEffectorOverlay
+    class RigEffectorOverlay : IRigEffectorOverlay
     {
         private SerializedObject m_SerializedObject;
 

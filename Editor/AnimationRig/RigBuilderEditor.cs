@@ -5,7 +5,7 @@ using UnityEditorInternal;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(RigBuilder))]
-    public class RigBuilderEditor : Editor
+    class RigBuilderEditor : Editor
     {
         static readonly GUIContent k_RigLabel = new GUIContent("Rig Layers");
 

@@ -6,7 +6,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [Serializable]
-    public class RigEffector : ScriptableObject, IRigEffector
+    internal class RigEffector : ScriptableObject, IRigEffector
     {
         [SerializeField] private RigEffectorData m_Data;
 

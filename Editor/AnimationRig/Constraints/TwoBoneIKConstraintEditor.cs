@@ -5,7 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(TwoBoneIKConstraint))]
-    public class TwoBoneIKConstraintEditor : Editor
+    class TwoBoneIKConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
         static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");

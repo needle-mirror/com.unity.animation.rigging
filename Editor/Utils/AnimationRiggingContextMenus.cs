@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public static class AnimationRiggingContextMenus
+    internal static class AnimationRiggingContextMenus
     {
         [MenuItem("CONTEXT/Animator/Rig Setup", false, 611)]
         static void RigSetup(MenuCommand command)

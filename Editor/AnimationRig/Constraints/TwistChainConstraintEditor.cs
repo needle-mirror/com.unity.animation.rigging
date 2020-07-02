@@ -5,7 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(TwistChainConstraint))]
-    public class TwistChainConstraintEditor : Editor
+    class TwistChainConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
         static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");

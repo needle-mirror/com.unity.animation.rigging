@@ -2,27 +2,47 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The MultiParent constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct MultiParentConstraintJob : IWeightedAnimationJob
     {
         const float k_Epsilon = 1e-5f;
 
+        /// <summary>The Transform handle for the constrained object Transform.</summary>
         public ReadWriteTransformHandle driven;
+        /// <summary>The Transform handle for the constrained object parent Transform.</summary>
         public ReadOnlyTransformHandle drivenParent;
 
+        /// <summary>List of Transform handles for the source objects.</summary>
         public NativeArray<ReadOnlyTransformHandle> sourceTransforms;
+        /// <summary>List of weights for the source objects.</summary>
         public NativeArray<PropertyStreamHandle> sourceWeights;
+        /// <summary>List of offsets to apply to source rotations if maintainOffset is enabled.</summary>
         public NativeArray<AffineTransform> sourceOffsets;
 
+        /// <summary>Buffer used to store weights during job execution.</summary>
         public NativeArray<float> weightBuffer;
 
+        /// <summary>Position axes mask. Position will apply on the local axis for a value of 1.0, and will be kept as is for a value of 0.0.</summary>
         public Vector3 positionAxesMask;
+        /// <summary>Rotation axes mask. Rotation will apply on the local axis for a value of 1.0, and will be kept as is for a value of 0.0.</summary>
         public Vector3 rotationAxesMask;
 
+        /// <summary>The main weight given to the constraint. This is a value in between 0 and 1.</summary>
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             float w = jobWeight.Get(stream);
@@ -95,26 +115,48 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// This interface defines the data mapping for the MultiParent constraint.
+    /// </summary>
     public interface IMultiParentConstraintData
     {
+        /// <summary>The Transform affected by the constraint Source Transforms.</summary>
         Transform constrainedObject { get; }
+        /// <summary>
+        /// The list of Transforms that influence the constrained Transform rotation.
+        /// Each source has a weight from 0 to 1.
+        /// </summary>
         WeightedTransformArray sourceObjects { get; }
+        /// <summary>This is used to maintain the current position offset from the constrained GameObject to the source GameObjects.</summary>
         bool maintainPositionOffset { get; }
+        /// <summary>This is used to maintain the current rotation offset from the constrained GameObject to the source GameObjects.</summary>
         bool maintainRotationOffset { get; }
 
+        /// <summary>Toggles whether the constrained transform will translate along the X axis.</summary>
         bool constrainedPositionXAxis { get; }
+        /// <summary>Toggles whether the constrained transform will translate along the Y axis.</summary>
         bool constrainedPositionYAxis { get; }
+        /// <summary>Toggles whether the constrained transform will translate along the Z axis.</summary>
         bool constrainedPositionZAxis { get; }
+        /// <summary>Toggles whether the constrained transform will rotate along the X axis.</summary>
         bool constrainedRotationXAxis { get; }
+        /// <summary>Toggles whether the constrained transform will rotate along the Y axis.</summary>
         bool constrainedRotationYAxis { get; }
+        /// <summary>Toggles whether the constrained transform will rotate along the Z axis.</summary>
         bool constrainedRotationZAxis { get; }
 
+        /// <summary>The path to the source objects property in the constraint component.</summary>
         string sourceObjectsProperty { get; }
     }
 
+    /// <summary>
+    /// The MultiParent constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class MultiParentConstraintJobBinder<T> : AnimationJobBinder<MultiParentConstraintJob, T>
         where T : struct, IAnimationJobData, IMultiParentConstraintData
     {
+        /// <inheritdoc />
         public override MultiParentConstraintJob Create(Animator animator, ref T data, Component component)
         {
             var job = new MultiParentConstraintJob();
@@ -162,6 +204,7 @@ namespace UnityEngine.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(MultiParentConstraintJob job)
         {
             job.sourceTransforms.Dispose();

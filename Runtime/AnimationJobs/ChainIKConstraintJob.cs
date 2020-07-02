@@ -2,29 +2,56 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The ChainIK constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct ChainIKConstraintJob : IWeightedAnimationJob
     {
+        /// <summary>An array of Transform handles that represents the Transform chain.</summary>
         public NativeArray<ReadWriteTransformHandle> chain;
+        /// <summary>The Transform handle for the target Transform.</summary>
         public ReadOnlyTransformHandle target;
+
+        /// <summary>The offset applied to the target transform if maintainTargetPositionOffset or maintainTargetRotationOffset is enabled.</summary>
         public AffineTransform targetOffset;
 
+        /// <summary>An array of length in between Transforms in the chain.</summary>
         public NativeArray<float> linkLengths;
+
+        /// <summary>An array of positions for Transforms in the chain.</summary>
         public NativeArray<Vector3> linkPositions;
 
+        /// <summary>The weight for which ChainIK target has an effect on chain (up to tip Transform). This is a value in between 0 and 1.</summary>
         public FloatProperty chainRotationWeight;
+        /// <summary>The weight for which ChainIK target has and effect on tip Transform. This is a value in between 0 and 1.</summary>
         public FloatProperty tipRotationWeight;
 
+        /// <summary>CacheIndex to ChainIK tolerance value.</summary>
+        /// <seealso cref="AnimationJobCache"/>
         public CacheIndex toleranceIdx;
+        /// <summary>CacheIndex to ChainIK maxIterations value.</summary>
+        /// <seealso cref="AnimationJobCache"/>
         public CacheIndex maxIterationsIdx;
+        /// <summary>Cache for static properties in the job.</summary>
         public AnimationJobCache cache;
 
+        /// <summary>The maximum distance the Transform chain can reach.</summary>
         public float maxReach;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             float w = jobWeight.Get(stream);
@@ -46,7 +73,8 @@ namespace UnityEngine.Animations.Rigging
                     {
                         var prevDir = chain[i + 1].GetPosition(stream) - chain[i].GetPosition(stream);
                         var newDir = linkPositions[i + 1] - linkPositions[i];
-                        chain[i].SetRotation(stream, QuaternionExt.FromToRotation(prevDir, newDir) * chain[i].GetRotation(stream));
+                        var rot = chain[i].GetRotation(stream);
+                        chain[i].SetRotation(stream, Quaternion.Lerp(rot, QuaternionExt.FromToRotation(prevDir, newDir) * rot, chainRWeight));
                     }
                 }
 
@@ -67,24 +95,44 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// This interface defines the data mapping for the ChainIK constraint.
+    /// </summary>
     public interface IChainIKConstraintData
     {
+        /// <summary>The root Transform of the ChainIK hierarchy.</summary>
         Transform root { get; }
+        /// <summary>The tip Transform of the ChainIK hierarchy. The tip needs to be a descendant/child of the root Transform.</summary>
         Transform tip { get; }
+        /// <summary>The ChainIK target Transform.</summary>
         Transform target { get; }
 
+        /// <summary>The maximum number of iterations allowed for the ChainIK algorithm to converge to a solution.</summary>
         int maxIterations { get; }
+        /// <summary>
+        /// The allowed distance between the tip and target Transform positions.
+        /// When the distance is smaller than the tolerance, the algorithm has converged on a solution and will stop.
+        /// </summary>
         float tolerance { get; }
+        /// <summary>This is used to maintain the current position offset from the tip Transform to target Transform.</summary>
         bool maintainTargetPositionOffset { get; }
+        /// <summary>This is used to maintain the current rotation offset from the tip Transform to target Transform.</summary>
         bool maintainTargetRotationOffset { get; }
 
+        /// <summary>The path to the chain rotation weight property in the constraint component.</summary>
         string chainRotationWeightFloatProperty { get; }
+        /// <summary>The path to the tip rotation weight property in the constraint component.</summary>
         string tipRotationWeightFloatProperty { get; }
     }
 
+    /// <summary>
+    /// The ChainIK constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class ChainIKConstraintJobBinder<T> : AnimationJobBinder<ChainIKConstraintJob, T>
         where T : struct, IAnimationJobData, IChainIKConstraintData
     {
+        /// <inheritdoc />
         public override ChainIKConstraintJob Create(Animator animator, ref T data, Component component)
         {
             Transform[] chain = ConstraintsUtils.ExtractChain(data.root, data.tip);
@@ -121,6 +169,7 @@ namespace UnityEngine.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(ChainIKConstraintJob job)
         {
             job.chain.Dispose();
@@ -129,6 +178,7 @@ namespace UnityEngine.Animations.Rigging
             job.cache.Dispose();
         }
 
+        /// <inheritdoc />
         public override void Update(ChainIKConstraintJob job, ref T data)
         {
             job.cache.SetRaw(data.maxIterations, job.maxIterationsIdx);

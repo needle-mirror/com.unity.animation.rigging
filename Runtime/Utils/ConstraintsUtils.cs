@@ -3,8 +3,17 @@ using System.Collections.Generic;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// Utility functions for constraints.
+    /// </summary>
     public static class ConstraintsUtils
     {
+        /// <summary>
+        /// Creates a list of Transforms all parented to one another in between two GameObjects.
+        /// </summary>
+        /// <param name="root">The root Transform.</param>
+        /// <param name="tip">The tip Transform.</param>
+        /// <returns></returns>
         public static Transform[] ExtractChain(Transform root, Transform tip)
         {
             if (!tip.IsChildOf(root))
@@ -24,6 +33,11 @@ namespace UnityEngine.Animations.Rigging
             return chain.ToArray();
         }
 
+        /// <summary>
+        /// Calculates the distances in between every Transforms in the specified Transform chain.
+        /// </summary>
+        /// <param name="chain">The Transform chain.</param>
+        /// <returns>An array of distances.</returns>
         public static float[] ExtractLengths(Transform[] chain)
         {
             float[] lengths = new float[chain.Length];
@@ -38,6 +52,12 @@ namespace UnityEngine.Animations.Rigging
             return lengths;
         }
 
+        /// <summary>
+        /// Calculates the interpolant values for each Transform using distance as a measure
+        /// such that first Transform is at 0 and last Transform is at 1.
+        /// </summary>
+        /// <param name="chain">The Transform chain.</param>
+        /// <returns>An array of interpolants.</returns>
         public static float[] ExtractSteps(Transform[] chain)
         {
             float[] lengths = ExtractLengths(chain);

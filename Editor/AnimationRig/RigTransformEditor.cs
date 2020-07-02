@@ -3,7 +3,7 @@
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(RigTransform))]
-    public class RigTransformEditor : Editor
+    class RigTransformEditor : Editor
     {
         public override void OnInspectorGUI()
         {

@@ -1,5 +1,8 @@
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The Blend constraint data.
+    /// </summary>
     [System.Serializable]
     public struct BlendConstraintData : IAnimationJobData, IBlendConstraintData
     {
@@ -15,23 +18,44 @@ namespace UnityEngine.Animations.Rigging
         [NotKeyable, SerializeField] bool m_MaintainPositionOffsets;
         [NotKeyable, SerializeField] bool m_MaintainRotationOffsets;
 
+        /// <inheritdoc />
         public Transform constrainedObject { get => m_ConstrainedObject; set => m_ConstrainedObject = value; }
+        /// <inheritdoc />
         public Transform sourceObjectA { get => m_SourceA; set => m_SourceA = value; }
+        /// <inheritdoc />
         public Transform sourceObjectB { get => m_SourceB; set => m_SourceB = value; }
+        /// <summary>Toggles whether position is blended in the constraint.</summary>
         public bool blendPosition { get => m_BlendPosition; set => m_BlendPosition = value; }
+        /// <summary>Toggles whether rotation is blended in the constraint.</summary>
         public bool blendRotation { get => m_BlendRotation; set => m_BlendRotation = value; }
+        /// <summary>
+        /// Specifies the weight with which to blend position.
+        /// A weight of zero will result in the position of sourceObjectA, while a weight of one will result in the position of sourceObjectB.
+        /// </summary>
         public float positionWeight { get => m_PositionWeight; set => m_PositionWeight = Mathf.Clamp01(value); }
+        /// <summary>
+        /// Specifies the weight with which to blend rotation.
+        /// A weight of zero will result in the rotation of sourceObjectA, while a weight of one will result in the rotation of sourceObjectB.
+        /// </summary>
         public float rotationWeight { get => m_RotationWeight; set => m_RotationWeight = Mathf.Clamp01(value); }
+        /// <inheritdoc />
         public bool maintainPositionOffsets { get => m_MaintainPositionOffsets; set => m_MaintainPositionOffsets = value; }
+        /// <inheritdoc />
         public bool maintainRotationOffsets { get => m_MaintainRotationOffsets; set => m_MaintainRotationOffsets = value; }
 
+        /// <inheritdoc />
         string IBlendConstraintData.blendPositionBoolProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_BlendPosition));
+        /// <inheritdoc />
         string IBlendConstraintData.blendRotationBoolProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_BlendRotation));
+        /// <inheritdoc />
         string IBlendConstraintData.positionWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_PositionWeight));
+        /// <inheritdoc />
         string IBlendConstraintData.rotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_RotationWeight));
 
+        /// <inheritdoc />
         bool IAnimationJobData.IsValid() => !(m_ConstrainedObject == null || m_SourceA == null || m_SourceB == null);
 
+        /// <inheritdoc />
         void IAnimationJobData.SetDefaultValues()
         {
             m_ConstrainedObject = null;
@@ -46,8 +70,11 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// Blend constraint.
+    /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Blend Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/BlendConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/BlendConstraint.html")]
     public class BlendConstraint : RigConstraint<
         BlendConstraintJob,
         BlendConstraintData,

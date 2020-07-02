@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace UnityEngine.Animations.Rigging
 {
-    public static class RigUtils
+    static class RigUtils
     {
         internal static readonly Dictionary<Type, PropertyDescriptor> s_SupportedPropertyTypeToDescriptor = new Dictionary<Type, PropertyDescriptor>
         {
@@ -282,7 +282,7 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
-        public static IAnimationJobData CreateSyncSceneToStreamData(Animator animator, IList<IRigLayer> layers)
+        internal static IAnimationJobData CreateSyncSceneToStreamData(Animator animator, IList<IRigLayer> layers)
         {
             ExtractAllSyncableData(animator, layers, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties);
             return new RigSyncSceneToStreamData(syncableTransforms.ToArray(), syncableProperties.ToArray(), layers.Count);

@@ -2,9 +2,13 @@ using System.Collections.Generic;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The BoneRenderer component is responsible for displaying pickable bones in the Scene View.
+    /// This component does nothing during runtime.
+    /// </summary>
     [ExecuteInEditMode]
     [AddComponentMenu("Animation Rigging/Setup/Bone Renderer")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/index.html")]
     public class BoneRenderer : MonoBehaviour
     {
     #if UNITY_EDITOR

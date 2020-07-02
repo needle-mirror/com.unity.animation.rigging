@@ -5,16 +5,30 @@ using Unity.Collections;
 
 namespace UnityEditor.Animations.Rigging
 {
+    /// <summary>
+    /// The MultiReferential inverse constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct MultiReferentialInverseConstraintJob : IWeightedAnimationJob
     {
+        /// <summary>The list of Transforms that are affected by the specified driver.</summary>
         public NativeArray<ReadWriteTransformHandle> sources;
+        /// <summary>List of AffineTransform to apply to driven source objects.</summary>
         public NativeArray<AffineTransform> offsetTx;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             jobWeight.Set(stream, 1f);
@@ -37,9 +51,14 @@ namespace UnityEditor.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// The MultiReferential inverse constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class MultiReferentialInverseConstraintJobBinder<T> : AnimationJobBinder<MultiReferentialInverseConstraintJob, T>
         where T : struct, IAnimationJobData, IMultiReferentialConstraintData
     {
+        /// <inheritdoc />
         public override MultiReferentialInverseConstraintJob Create(Animator animator, ref T data, Component component)
         {
             var job = new MultiReferentialInverseConstraintJob();
@@ -67,6 +86,7 @@ namespace UnityEditor.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(MultiReferentialInverseConstraintJob job)
         {
             job.sources.Dispose();

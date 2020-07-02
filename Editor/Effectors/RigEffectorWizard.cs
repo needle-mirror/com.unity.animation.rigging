@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public class RigEffectorWizard : IRigEffectorOverlay
+    class RigEffectorWizard : IRigEffectorOverlay
     {
         private static GUIContent s_CreateEffectorLabel = new GUIContent("Create Effector");
 

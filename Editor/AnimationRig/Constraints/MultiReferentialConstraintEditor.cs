@@ -7,7 +7,7 @@ using UnityEditorInternal;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(MultiReferentialConstraint))]
-    public class MultiReferentialConstraintEditor : Editor
+    class MultiReferentialConstraintEditor : Editor
     {
         static readonly GUIContent k_DrivingLabel = new GUIContent("Driving");
         static readonly GUIContent k_ReferenceObjectsLabel = new GUIContent("Reference Objects");

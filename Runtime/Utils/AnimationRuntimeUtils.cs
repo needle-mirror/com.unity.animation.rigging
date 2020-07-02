@@ -2,10 +2,26 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// Utility functions for runtime constraints.
+    /// </summary>
     public static class AnimationRuntimeUtils
     {
         const float k_SqrEpsilon = 1e-8f;
 
+        /// <summary>
+        /// Evaluates the Two-Bone IK algorithm.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
+        /// <param name="root">The transform handle for the root transform.</param>
+        /// <param name="mid">The transform handle for the mid transform.</param>
+        /// <param name="tip">The transform handle for the tip transform.</param>
+        /// <param name="target">The transform handle for the target transform.</param>
+        /// <param name="hint">The transform handle for the hint transform.</param>
+        /// <param name="posWeight">The weight for which target position has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="rotWeight">The weight for which target rotation has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="hintWeight">The weight for which hint transform has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="targetOffset">The offset applied to the target transform.</param>
         public static void SolveTwoBoneIK(
             AnimationStream stream,
             ReadWriteTransformHandle root,
@@ -103,8 +119,20 @@ namespace UnityEngine.Animations.Rigging
             return Mathf.Acos(c);
         }
 
-        // Implementation of unconstrained FABRIK solver : Forward and Backward Reaching Inverse Kinematic
-        // Aristidou A, Lasenby J. FABRIK: a fast, iterative solver for the inverse kinematics problem. Graphical Models 2011; 73(5): 243–260.
+        /// <summary>
+        /// Evaluates the FABRIK ChainIK algorithm.
+        /// </summary>
+        /// <param name="linkPositions">Uninitialized buffer of positions. linkPositions and linkLengths must have the same size.</param>
+        /// <param name="linkLengths">Array of distances in between positions. linkPositions and linkLenghts must have the same size.</param>
+        /// <param name="target">Target position.</param>
+        /// <param name="tolerance">The maximum distance the resulting position and initial target are allowed to have in between them.</param>
+        /// <param name="maxReach">The maximum distance the Transform chain can reach.</param>
+        /// <param name="maxIterations">The maximum number of iterations allowed for the ChainIK algorithm to converge to a solution.</param>
+        /// <returns>Returns true if ChainIK calculations were successful. False otherwise.</returns>
+        /// <remarks>
+        /// Implementation of unconstrained FABRIK solver : Forward and Backward Reaching Inverse Kinematic
+        /// Aristidou A, Lasenby J. FABRIK: a fast, iterative solver for the inverse kinematics problem. Graphical Models 2011; 73(5): 243–260.
+        /// </remarks>
         public static bool SolveFABRIK(
             ref NativeArray<Vector3> linkPositions,
             ref NativeArray<float> linkLengths,
@@ -157,31 +185,70 @@ namespace UnityEngine.Animations.Rigging
             return false;
         }
 
-        public static float SqrDistance(Vector3 p0, Vector3 p1)
+        /// <summary>
+        /// Returns the square length between two vectors.
+        /// </summary>
+        /// <param name="lhs">Vector3 value.</param>
+        /// <param name="rhs">Vector3 value.</param>
+        /// <returns>Square length between lhs and rhs.</returns>
+        public static float SqrDistance(Vector3 lhs, Vector3 rhs)
         {
-            return (p1 - p0).sqrMagnitude;
+            return (rhs - lhs).sqrMagnitude;
         }
 
+        /// <summary>
+        /// Returns the square value of a float.
+        /// </summary>
+        /// <param name="value">Float value.</param>
+        /// <returns>Squared value.</returns>
         public static float Square(float value)
         {
             return value * value;
         }
 
+        /// <summary>
+        /// Linearly interpolates between two vectors using a vector interpolant.
+        /// </summary>
+        /// <param name="a">Start Vector3 value.</param>
+        /// <param name="b">End Vector3 value.</param>
+        /// <param name="t">Interpolant Vector3 value.</param>
+        /// <returns>Interpolated value.</returns>
         public static Vector3 Lerp(Vector3 a, Vector3 b, Vector3 t)
         {
             return Vector3.Scale(a, Vector3.one - t) + Vector3.Scale(b, t);
         }
 
+        /// <summary>
+        /// Returns b if c is greater than zero, a otherwise.
+        /// </summary>
+        /// <param name="a">First float value.</param>
+        /// <param name="b">Second float value.</param>
+        /// <param name="c">Comparator float value.</param>
+        /// <returns>Selected float value.</returns>
         public static float Select(float a, float b, float c)
         {
             return (c > 0f) ? b : a;
         }
 
+        /// <summary>
+        /// Returns a componentwise selection between two vectors a and b based on a vector selection mask c.
+        /// Per component, the component from b is selected when c is greater than zero, otherwise the component from a is selected.
+        /// </summary>
+        /// <param name="a">First Vector3 value.</param>
+        /// <param name="b">Second Vector3 value.</param>
+        /// <param name="c">Comparator Vector3 value.</param>
+        /// <returns>Selected Vector3 value.</returns>
         public static Vector3 Select(Vector3 a, Vector3 b, Vector3 c)
         {
             return new Vector3(Select(a.x, b.x, c.x), Select(a.y, b.y, c.y), Select(a.z, b.z, c.z));
         }
 
+        /// <summary>
+        /// Projects a vector onto a plane defined by a normal orthogonal to the plane.
+        /// </summary>
+        /// <param name="vector">The location of the vector above the plane.</param>
+        /// <param name="planeNormal">The direction from the vector towards the plane.</param>
+        /// <returns>The location of the vector on the plane.</returns>
         public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal)
         {
             float sqrMag = Vector3.Dot(planeNormal, planeNormal);
@@ -191,7 +258,7 @@ namespace UnityEngine.Animations.Rigging
                     vector.z - planeNormal.z * dot / sqrMag);
         }
 
-        public static float Sum(AnimationJobCache cache, CacheIndex index, int count)
+        internal static float Sum(AnimationJobCache cache, CacheIndex index, int count)
         {
             if (count == 0)
                 return 0f;
@@ -203,6 +270,11 @@ namespace UnityEngine.Animations.Rigging
             return sum;
         }
 
+        /// <summary>
+        /// Calculates the sum of all float elements in the array.
+        /// </summary>
+        /// <param name="floatBuffer">An array of float elements.</param>
+        /// <returns>Sum of all float elements.</returns>
         public static float Sum(NativeArray<float> floatBuffer)
         {
             if (floatBuffer.Length == 0)
@@ -217,6 +289,11 @@ namespace UnityEngine.Animations.Rigging
             return sum;
         }
 
+        /// <summary>
+        /// Copies translation, rotation and scale values from specified Transform handle to stream.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
+        /// <param name="handle">The transform handle to copy.</param>
         public static void PassThrough(AnimationStream stream, ReadWriteTransformHandle handle)
         {
             handle.GetLocalTRS(stream, out Vector3 position, out Quaternion rotation, out Vector3 scale);

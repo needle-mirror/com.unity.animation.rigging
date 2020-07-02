@@ -2,37 +2,43 @@ using System;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The [SyncSceneToStream] attribute can be used to ensure constraints properties are read from the scene
+    /// and written back in the AnimationStream if they were not previously animated.
+    /// Supported value types are: Float, Int, Bool, Vector2, Vector3, Vector4, Quaternion, Vector3Int, Vector3Bool,
+    /// Transform, Transform[], WeightedTransform and WeightedTransformArray.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public sealed class SyncSceneToStreamAttribute : Attribute { }
 
-    public enum PropertyType : byte { Bool, Int, Float };
+    internal enum PropertyType : byte { Bool, Int, Float };
 
-    public struct PropertyDescriptor
+    internal struct PropertyDescriptor
     {
         public int size;
         public PropertyType type;
     }
 
-    public struct Property
+    internal struct Property
     {
         public string name;
         public PropertyDescriptor descriptor;
     }
 
-    public struct RigProperties
+    internal struct RigProperties
     {
         public static string s_Weight = "m_Weight";
         public Component component;
     }
 
-    public struct ConstraintProperties
+    internal struct ConstraintProperties
     {
         public static string s_Weight = "m_Weight";
         public Component component;
         public Property[] properties;
     }
 
-    public static class PropertyUtils
+    internal static class PropertyUtils
     {
         public static string ConstructConstraintDataPropertyName(string property)
         {

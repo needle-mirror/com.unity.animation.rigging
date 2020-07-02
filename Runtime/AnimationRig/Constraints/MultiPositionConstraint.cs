@@ -1,5 +1,8 @@
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The MultiPosition constraint job.
+    /// </summary>
     [System.Serializable]
     public struct MultiPositionConstraintData : IAnimationJobData, IMultiPositionConstraintData
     {
@@ -11,24 +14,35 @@ namespace UnityEngine.Animations.Rigging
         [NotKeyable, SerializeField] Vector3Bool m_ConstrainedAxes;
         [NotKeyable, SerializeField] bool m_MaintainOffset;
 
+        /// <inheritdoc />
         public Transform constrainedObject { get => m_ConstrainedObject; set => m_ConstrainedObject = value; }
 
+        /// <inheritdoc />
         public WeightedTransformArray sourceObjects
         {
             get => m_SourceObjects;
             set => m_SourceObjects = value;
         }
 
+        /// <inheritdoc />
         public bool maintainOffset { get => m_MaintainOffset; set => m_MaintainOffset = value; }
+
+        /// <summary>Post-Translation offset applied to the constrained Transform.</summary>
         public Vector3 offset { get => m_Offset; set => m_Offset = value; }
 
+        /// <inheritdoc />
         public bool constrainedXAxis { get => m_ConstrainedAxes.x; set => m_ConstrainedAxes.x = value; }
+        /// <inheritdoc />
         public bool constrainedYAxis { get => m_ConstrainedAxes.y; set => m_ConstrainedAxes.y = value; }
+        /// <inheritdoc />
         public bool constrainedZAxis { get => m_ConstrainedAxes.z; set => m_ConstrainedAxes.z = value; }
 
+        /// <inheritdoc />
         string IMultiPositionConstraintData.offsetVector3Property => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_Offset));
+        /// <inheritdoc />
         string IMultiPositionConstraintData.sourceObjectsProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
 
+        /// <inheritdoc />
         bool IAnimationJobData.IsValid()
         {
             if (m_ConstrainedObject == null || m_SourceObjects.Count == 0)
@@ -41,6 +55,7 @@ namespace UnityEngine.Animations.Rigging
             return true;
         }
 
+        /// <inheritdoc />
         void IAnimationJobData.SetDefaultValues()
         {
             m_ConstrainedObject = null;
@@ -51,8 +66,11 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// MultiPosition constraint.
+    /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Position Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/MultiPositionConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/MultiPositionConstraint.html")]
     public class MultiPositionConstraint : RigConstraint<
         MultiPositionConstraintJob,
         MultiPositionConstraintData,

@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public static class AnimationRiggingEditorUtils
+    internal static class AnimationRiggingEditorUtils
     {
         public static void RigSetup(Transform transform)
         {
@@ -69,7 +69,7 @@ namespace UnityEditor.Animations.Rigging
             {
                 bones.AddRange(transform.GetComponentsInChildren<Transform>());
             }
-            
+
             boneRenderer.transforms = bones.ToArray();
 
             if (PrefabUtility.IsPartOfPrefabInstance(boneRenderer))

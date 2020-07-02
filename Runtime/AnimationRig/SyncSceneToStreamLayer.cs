@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace UnityEngine.Animations.Rigging
 {
-    public class SyncSceneToStreamLayer
+    class SyncSceneToStreamLayer
     {
         public bool Initialize(Animator animator, IList<IRigLayer> layers)
         {

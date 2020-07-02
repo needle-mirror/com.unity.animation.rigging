@@ -6,7 +6,7 @@ namespace UnityEngine.Animations.Rigging
     using PropertySyncer  = RigSyncSceneToStreamJob.PropertySyncer;
 
     [Unity.Burst.BurstCompile]
-    public struct RigSyncSceneToStreamJob : IAnimationJob
+    internal struct RigSyncSceneToStreamJob : IAnimationJob
     {
         public struct TransformSyncer : System.IDisposable
         {
@@ -54,7 +54,7 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
-        public struct PropertySyncer : System.IDisposable
+        internal struct PropertySyncer : System.IDisposable
         {
             public NativeArray<PropertySceneHandle> sceneHandles;
             public NativeArray<PropertyStreamHandle> streamHandles;
@@ -135,13 +135,13 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
-    public struct SyncableProperties
+    internal struct SyncableProperties
     {
         public RigProperties rig;
         public ConstraintProperties[] constraints;
     }
 
-    public interface IRigSyncSceneToStreamData
+    internal interface IRigSyncSceneToStreamData
     {
         Transform[] syncableTransforms { get; }
         SyncableProperties[] syncableProperties { get; }
@@ -149,7 +149,7 @@ namespace UnityEngine.Animations.Rigging
         bool[] rigStates { get; }
     }
 
-    public class RigSyncSceneToStreamJobBinder<T> : AnimationJobBinder<RigSyncSceneToStreamJob, T>
+    internal class RigSyncSceneToStreamJobBinder<T> : AnimationJobBinder<RigSyncSceneToStreamJob, T>
         where T : struct, IAnimationJobData, IRigSyncSceneToStreamData
     {
         internal static string[] s_PropertyElementNames = new string[] {".x", ".y", ".z", ".w"};

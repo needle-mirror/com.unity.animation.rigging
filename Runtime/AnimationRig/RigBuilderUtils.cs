@@ -5,7 +5,7 @@ using UnityEngine.Playables;
 
 namespace UnityEngine.Animations.Rigging
 {
-    public static class RigBuilderUtils
+    internal static class RigBuilderUtils
     {
         public struct PlayableChain
         {

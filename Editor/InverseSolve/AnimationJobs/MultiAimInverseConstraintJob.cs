@@ -5,27 +5,47 @@ using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging
 {
+    /// <summary>
+    /// The MultiAim inverse constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct MultiAimInverseConstraintJob : IWeightedAnimationJob
     {
         const float k_Epsilon = 1e-5f;
 
+        /// <summary>The Transform handle for the constrained object Transform.</summary>
         public ReadOnlyTransformHandle driven;
+        /// <summary>The Transform handle for the constrained object parent Transform.</summary>
         public ReadOnlyTransformHandle drivenParent;
+        /// <summary>The post-rotation offset applied to the constrained object.</summary>
         public Vector3Property drivenOffset;
 
+        /// <summary>List of Transform handles for the source objects.</summary>
         public NativeArray<ReadWriteTransformHandle> sourceTransforms;
+        /// <summary>List of weights for the source objects.</summary>
         public NativeArray<PropertyStreamHandle> sourceWeights;
+        /// <summary>List of offsets to apply to source rotations if maintainOffset is enabled.</summary>
         public NativeArray<Quaternion> sourceOffsets;
 
+        /// <summary>Buffer used to store weights during job execution.</summary>
         public NativeArray<float> weightBuffer;
 
+        /// <summary>Local axis of the constrained object Transform.</summary>
         public Vector3 aimAxis;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             jobWeight.Set(stream, 1f);
@@ -54,9 +74,15 @@ namespace UnityEditor.Animations.Rigging
             }
         }
     }
+
+    /// <summary>
+    /// The MultiAim inverse constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class MultiAimInverseConstraintJobBinder<T> : AnimationJobBinder<MultiAimInverseConstraintJob, T>
         where T : struct, IAnimationJobData, IMultiAimConstraintData
     {
+        /// <inheritdoc />
         public override MultiAimInverseConstraintJob Create(Animator animator, ref T data, Component component)
         {
             var job = new MultiAimInverseConstraintJob();
@@ -92,6 +118,7 @@ namespace UnityEditor.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(MultiAimInverseConstraintJob job)
         {
             job.sourceTransforms.Dispose();

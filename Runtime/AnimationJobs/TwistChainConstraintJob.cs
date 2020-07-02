@@ -2,22 +2,40 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The TwistChain constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct TwistChainConstraintJob : IWeightedAnimationJob
     {
+        /// <summary>The Transform handle for the root target Transform.</summary>
         public ReadWriteTransformHandle rootTarget;
+        /// <summary>The Transform handle for the tip target Transform.</summary>
         public ReadWriteTransformHandle tipTarget;
 
+        /// <summary>An array of Transform handles that represents the Transform chain.</summary>
         public NativeArray<ReadWriteTransformHandle> chain;
 
+        /// <summary>An array of interpolant values used to reevaluate the weights.</summary>
         public NativeArray<float> steps;
+        /// <summary>An array of weight values used to adjust how twist is distributed along the chain.</summary>
         public NativeArray<float> weights;
+        /// <summary>An array of rotation offsets to maintain the chain initial shape.</summary>
         public NativeArray<Quaternion> rotations;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             float w = jobWeight.Get(stream);
@@ -49,20 +67,33 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// This interface defines the data mapping for the TwistChain constraint.
+    /// </summary>
     public interface ITwistChainConstraintData
     {
+        /// <summary>The root Transform of the TwistChain hierarchy.</summary>
         Transform root { get; }
+        /// <summary>The tip Transform of the TwistChain hierarchy.</summary>
         Transform tip { get; }
 
+        /// <summary>The TwistChain root target Transform.</summary>
         Transform rootTarget { get; }
+        /// <summary>The TwistChain tip target Transform.</summary>
         Transform tipTarget { get; }
 
+        /// <summary>Curve with weight values used to adjust how twist is distributed along the chain.</summary>
         AnimationCurve curve { get; }
     }
 
+    /// <summary>
+    /// The TwistChain constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class TwistChainConstraintJobBinder<T> : AnimationJobBinder<TwistChainConstraintJob, T>
         where T : struct, IAnimationJobData, ITwistChainConstraintData
     {
+        /// <inheritdoc />
         public override TwistChainConstraintJob Create(Animator animator, ref T data, Component component)
         {
             // Retrieve chain in-between root and tip transforms.
@@ -99,6 +130,7 @@ namespace UnityEngine.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(TwistChainConstraintJob job)
         {
             job.chain.Dispose();
@@ -108,6 +140,7 @@ namespace UnityEngine.Animations.Rigging
         }
 
 #if UNITY_EDITOR
+        /// <inheritdoc />
         public override void Update(TwistChainConstraintJob job, ref T data)
         {
             // Update weights based on curve.

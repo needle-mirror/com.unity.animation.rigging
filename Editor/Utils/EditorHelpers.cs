@@ -5,11 +5,22 @@ using UnityEditorInternal;
 
 namespace UnityEditor.Animations.Rigging
 {
+    /// <summary>
+    /// Helper class to manage ReorderableList appearance in the editor.
+    /// </summary>
     public static class ReorderableListHelper
     {
         const int k_NoHeaderHeight = 2;
         const int k_ElementHeightPadding = 2;
 
+        /// <summary>
+        /// Creates a ReorderableList using a SerializedProperty array as source.
+        /// </summary>
+        /// <param name="obj">SerializedObject owning the SerializedProperty.</param>
+        /// <param name="property">SerializedProperty array.</param>
+        /// <param name="draggable">Toggles whether an object is draggable in the list. True when an object is draggable, false otherwise.</param>
+        /// <param name="displayHeader">Displays the ReorderableList header.</param>
+        /// <returns>Returns a new ReorderableList.</returns>
         public static ReorderableList Create(SerializedObject obj, SerializedProperty property, bool draggable = true, bool displayHeader = false)
         {
             var list = new ReorderableList(obj, property, draggable, displayHeader, true, true);
@@ -34,16 +45,27 @@ namespace UnityEditor.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// Helper class to manage WeightedTransform and WeightedTransformArray appearance in the editor.
+    /// </summary>
     public static class WeightedTransformHelper
     {
         const int k_NoHeaderHeight = 2;
         const int k_ElementHeightPadding = 2;
         const int k_TransformPadding = 6;
 
+        /// <summary>
+        /// Creates a ReorderableList using a WeightedTransformArray as source.
+        /// </summary>
+        /// <param name="property">The serialized property of the WeightedTransformArray.</param>
+        /// <param name="array">The source WeightedTransformArray.</param>
+        /// <param name="range">Range attribute given for weights in WeightedTransform. No boundaries are set if null.</param>
+        /// <param name="draggable">Toggles whether a WeightedTransform is draggable in the list. True when WeightedTransform is draggable, false otherwise.</param>
+        /// <param name="displayHeader">Displays the ReorderableList header.</param>
+        /// <returns>Returns a new ReorderableList for a WeightedTransformArray.</returns>
         public static ReorderableList CreateReorderableList(SerializedProperty property, ref WeightedTransformArray array, RangeAttribute range = null, bool draggable = true, bool displayHeader = false)
         {
             var reorderableList = new ReorderableList(array, typeof(WeightedTransform), draggable, displayHeader, true, true);
-            var serializedObject = property.serializedObject;
 
             reorderableList.drawElementBackgroundCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
@@ -63,7 +85,7 @@ namespace UnityEditor.Animations.Rigging
 
                 EditorGUI.BeginChangeCheck();
 
-                WeightedTransformOnGUI(rect, element, GUIContent.none, range);
+                WeightedTransformOnGUI(rect, element, range);
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -97,7 +119,13 @@ namespace UnityEditor.Animations.Rigging
             return reorderableList;
         }
 
-        public static void WeightedTransformOnGUI(Rect rect, SerializedProperty property, GUIContent label, RangeAttribute range = null)
+        /// <summary>
+        /// Display a single WeightedTransform in the editor.
+        /// </summary>
+        /// <param name="rect">Rectangle on the screen to use for the WeightedTransform.</param>
+        /// <param name="property">Serialized property </param>
+        /// <param name="range">Range attribute given for weights in WeightedTransform. No boundaries are set if null.</param>
+        public static void WeightedTransformOnGUI(Rect rect, SerializedProperty property, RangeAttribute range = null)
         {
             EditorGUI.BeginProperty(rect, GUIContent.none, property);
 
@@ -125,7 +153,7 @@ namespace UnityEditor.Animations.Rigging
         }
     }
 
-    public static class MaintainOffsetHelper
+    internal static class MaintainOffsetHelper
     {
         static readonly string[] k_MaintainOffsetTypeLables = { "None", "Position and Rotation", "Position", "Rotation"};
         static readonly int[] k_BitsToIndex = new int[] {0, 2, 3, 1};
@@ -144,7 +172,7 @@ namespace UnityEditor.Animations.Rigging
         }
     }
 
-    public static class EditorHelper
+    internal static class EditorHelper
     {
         private const string EditorFolder = "Packages/com.unity.animation.rigging/Editor/";
         private const string ShadersFolder = EditorFolder + "Shaders/";

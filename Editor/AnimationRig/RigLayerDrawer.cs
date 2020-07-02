@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomPropertyDrawer(typeof(RigLayer))]
-    public class RigLayerDrawer : PropertyDrawer
+    class RigLayerDrawer : PropertyDrawer
     {
         const int k_Padding = 6;
         const int k_TogglePadding = 30;

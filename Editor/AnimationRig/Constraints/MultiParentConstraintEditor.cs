@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(MultiParentConstraint))]
-    public class MultiParentConstraintEditor : Editor
+    class MultiParentConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
         static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");

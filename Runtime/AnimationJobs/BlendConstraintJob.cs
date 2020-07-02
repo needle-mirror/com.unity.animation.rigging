@@ -1,26 +1,53 @@
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The Blend constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct BlendConstraintJob : IWeightedAnimationJob
     {
-        public const int k_BlendTranslationMask = 1 << 0;
-        public const int k_BlendRotationMask = 1 << 1;
+        private const int k_BlendTranslationMask = 1 << 0;
+        private const int k_BlendRotationMask = 1 << 1;
 
+        /// <summary>The Transform handle for the constrained object Transform.</summary>
         public ReadWriteTransformHandle driven;
+        /// <summary>The Transform handle for sourceA Transform.</summary>
         public ReadOnlyTransformHandle sourceA;
+        /// <summary>The Transform handle for sourceB Transform.</summary>
         public ReadOnlyTransformHandle sourceB;
+        /// <summary>TR offset to apply to sourceA if maintainOffset is enabled.</summary>
         public AffineTransform sourceAOffset;
+        /// <summary>TR offset to apply to sourceB if maintainOffset is enabled.</summary>
         public AffineTransform sourceBOffset;
 
+        /// <summary>Toggles whether to blend position in the job.</summary>
         public BoolProperty blendPosition;
+        /// <summary>Toggles whether to blend rotation in the job.</summary>
         public BoolProperty blendRotation;
+        /// <summary>
+        /// Specifies the weight with which to blend position.
+        /// A weight of zero will result in the position of sourceA, while a weight of one will result in the position of sourceB.
+        /// </summary>
         public FloatProperty positionWeight;
+        /// <summary>
+        /// Specifies the weight with which to blend rotation.
+        /// A weight of zero will result in the rotation of sourceA, while a weight of one will result in the rotation of sourceB.
+        /// </summary>
         public FloatProperty rotationWeight;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             float w = jobWeight.Get(stream);
@@ -55,32 +82,49 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// This interface defines the data mapping for the Blend constraint.
+    /// </summary>
     public interface IBlendConstraintData
     {
+        /// <summary>The Transform affected by the two source Transforms.</summary>
         Transform constrainedObject { get; }
+        /// <summary>First Transform in blend.</summary>
         Transform sourceObjectA { get; }
+        /// <summary>Second Transform in blend.</summary>
         Transform sourceObjectB { get; }
 
+        /// <summary>This is used to maintain the current position offset from the constrained GameObject to the source GameObjects.</summary>
         bool maintainPositionOffsets { get; }
+        /// <summary>This is used to maintain the current rotation offset from the constrained GameObject to the source GameObjects.</summary>
         bool maintainRotationOffsets { get; }
 
+        /// <summary>The path to the blend position property in the constraint component.</summary>
         string blendPositionBoolProperty { get; }
+        /// <summary>The path to the blend rotation property in the constraint component.</summary>
         string blendRotationBoolProperty { get; }
+        /// <summary>The path to the position weight property in the constraint component.</summary>
         string positionWeightFloatProperty { get; }
+        /// <summary>The path to the rotation weight property in the constraint component.</summary>
         string rotationWeightFloatProperty { get; }
     }
 
+    /// <summary>
+    /// The Blend constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class BlendConstraintJobBinder<T> : AnimationJobBinder<BlendConstraintJob, T>
         where T : struct, IAnimationJobData, IBlendConstraintData
     {
+        /// <inheritdoc />
         public override BlendConstraintJob Create(Animator animator, ref T data, Component component)
         {
             var job = new BlendConstraintJob();
-            
+
             job.driven = ReadWriteTransformHandle.Bind(animator, data.constrainedObject);
             job.sourceA = ReadOnlyTransformHandle.Bind(animator, data.sourceObjectA);
             job.sourceB = ReadOnlyTransformHandle.Bind(animator, data.sourceObjectB);
-            
+
             job.sourceAOffset = job.sourceBOffset = AffineTransform.identity;
             if (data.maintainPositionOffsets)
             {
@@ -104,6 +148,7 @@ namespace UnityEngine.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(BlendConstraintJob job)
         {
         }

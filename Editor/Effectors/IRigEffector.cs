@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public interface IRigEffector
+    internal interface IRigEffector
     {
         Transform transform { get; }
         bool visible { get; set; }

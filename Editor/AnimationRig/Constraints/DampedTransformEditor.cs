@@ -5,7 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(DampedTransform))]
-    public class DampedTransformEditor : Editor
+    class DampedTransformEditor : Editor
     {
         static readonly GUIContent k_SourceObjectLabel = new GUIContent("Source Object");
         static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");

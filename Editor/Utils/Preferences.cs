@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public static class Preferences
+    internal static class Preferences
     {
         static readonly string k_Prefix = "com.unity.animation.rigging";
 

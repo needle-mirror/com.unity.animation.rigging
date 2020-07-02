@@ -2,27 +2,47 @@ using Unity.Collections;
 
 namespace UnityEngine.Animations.Rigging
 {
+    /// <summary>
+    /// The MultiRotation constraint job.
+    /// </summary>
     [Unity.Burst.BurstCompile]
     public struct MultiRotationConstraintJob : IWeightedAnimationJob
     {
         const float k_Epsilon = 1e-5f;
 
+        /// <summary>The Transform handle for the constrained object Transform.</summary>
         public ReadWriteTransformHandle driven;
+        /// <summary>The Transform handle for the constrained object parent Transform.</summary>
         public ReadOnlyTransformHandle drivenParent;
+        /// <summary>The post-rotation offset applied to the constrained object.</summary>
         public Vector3Property drivenOffset;
 
+        /// <summary>List of Transform handles for the source objects.</summary>
         public NativeArray<ReadOnlyTransformHandle> sourceTransforms;
+        /// <summary>List of weights for the source objects.</summary>
         public NativeArray<PropertyStreamHandle> sourceWeights;
+        /// <summary>List of offsets to apply to source rotations if maintainOffset is enabled.</summary>
         public NativeArray<Quaternion> sourceOffsets;
 
+        /// <summary>Buffer used to store weights during job execution.</summary>
         public NativeArray<float> weightBuffer;
 
+        /// <summary>Axes mask. Rotation will apply on the local axis for a value of 1.0, and will be kept as is for a value of 0.0.</summary>
         public Vector3 axesMask;
 
+        /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        /// <summary>
+        /// Defines what to do when processing the root motion.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessRootMotion(AnimationStream stream) { }
 
+        /// <summary>
+        /// Defines what to do when processing the animation.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
         public void ProcessAnimation(AnimationStream stream)
         {
             float w = jobWeight.Get(stream);
@@ -78,23 +98,43 @@ namespace UnityEngine.Animations.Rigging
         }
     }
 
+    /// <summary>
+    /// This interface defines the data mapping for the MultiRotation constraint.
+    /// </summary>
     public interface IMultiRotationConstraintData
     {
+        /// <summary>The Transform affected by the constraint Source Transforms.</summary>
         Transform constrainedObject { get; }
+
+        /// <summary>
+        /// The list of Transforms that influence the constrained Transform rotation.
+        /// Each source has a weight from 0 to 1.
+        /// </summary>
         WeightedTransformArray sourceObjects { get; }
+        /// <summary>This is used to maintain the current rotation offset from the constrained GameObject to the source GameObjects.</summary>
         bool maintainOffset { get; }
 
+        /// <summary>The path to the offset property in the constraint component.</summary>
         string offsetVector3Property { get; }
+        /// <summary>The path to the source objects property in the constraint component.</summary>
         string sourceObjectsProperty { get; }
 
+        /// <summary>Toggles whether the constrained transform will rotate along the X axis.</summary>
         bool constrainedXAxis { get; }
+        /// <summary>Toggles whether the constrained transform will rotate along the Y axis.</summary>
         bool constrainedYAxis { get; }
+        /// <summary>Toggles whether the constrained transform will rotate along the Z axis.</summary>
         bool constrainedZAxis { get; }
     }
 
+    /// <summary>
+    /// The MultiRotation constraint job binder.
+    /// </summary>
+    /// <typeparam name="T">The constraint data type</typeparam>
     public class MultiRotationConstraintJobBinder<T> : AnimationJobBinder<MultiRotationConstraintJob, T>
         where T : struct, IAnimationJobData, IMultiRotationConstraintData
     {
+        /// <inheritdoc />
         public override MultiRotationConstraintJob Create(Animator animator, ref T data, Component component)
         {
             var job = new MultiRotationConstraintJob();
@@ -128,6 +168,7 @@ namespace UnityEngine.Animations.Rigging
             return job;
         }
 
+        /// <inheritdoc />
         public override void Destroy(MultiRotationConstraintJob job)
         {
             job.sourceTransforms.Dispose();

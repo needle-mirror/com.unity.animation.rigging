@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.Animations.Rigging
 {
-    public static class AnimationRiggingMenu
+    internal static class AnimationRiggingMenu
     {
         static bool FilterSourceAndDestinationFromSelection(out Transform source, out Transform destination)
         {

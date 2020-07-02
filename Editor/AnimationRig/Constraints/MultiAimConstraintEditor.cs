@@ -7,17 +7,25 @@ using System.Collections.Generic;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(MultiAimConstraint))]
-    public class MultiAimConstraintEditor : Editor
+    class MultiAimConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
         static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
         static readonly GUIContent k_AimAxisLabel = new GUIContent("Aim Axis");
-        static readonly string[] k_AimAxisLabels = { "X", "-X", "Y", "-Y", "Z", "-Z" };
+        static readonly GUIContent k_UpAxisLabel = new GUIContent("Up Axis");
+        static readonly GUIContent k_WorldUpAxisLabel = new GUIContent("World Up Axis");
+        static readonly GUIContent k_WorldUpType = new GUIContent("World Up Type");
+        static readonly GUIContent k_WorldUpObject = new GUIContent("World Up Object");
+        static readonly string[] k_AxisLabels = { "X", "-X", "Y", "-Y", "Z", "-Z" };
         static readonly GUIContent k_MaintainOffsetLabel = new GUIContent("Maintain Rotation Offset");
 
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
         SerializedProperty m_AimAxis;
+        SerializedProperty m_UpAxis;
+        SerializedProperty m_WorldUpType;
+        SerializedProperty m_WorldUpAxis;
+        SerializedProperty m_WorldUpObject;
         SerializedProperty m_SourceObjects;
         SerializedProperty m_MaintainOffset;
         SerializedProperty m_Offset;
@@ -40,6 +48,10 @@ namespace UnityEditor.Animations.Rigging
             var data = serializedObject.FindProperty("m_Data");
             m_ConstrainedObject = data.FindPropertyRelative("m_ConstrainedObject");
             m_AimAxis = data.FindPropertyRelative("m_AimAxis");
+            m_UpAxis = data.FindPropertyRelative("m_UpAxis");
+            m_WorldUpType = data.FindPropertyRelative("m_WorldUpType");
+            m_WorldUpAxis = data.FindPropertyRelative("m_WorldUpAxis");
+            m_WorldUpObject = data.FindPropertyRelative("m_WorldUpObject");
             m_SourceObjects = data.FindPropertyRelative("m_SourceObjects");
             m_MaintainOffset = data.FindPropertyRelative("m_MaintainOffset");
             m_Offset = data.FindPropertyRelative("m_Offset");
@@ -85,8 +97,30 @@ namespace UnityEditor.Animations.Rigging
 
             Rect rect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(rect, k_AimAxisLabel, m_AimAxis);
-            m_AimAxis.enumValueIndex = EditorGUI.Popup(rect, m_AimAxis.displayName, m_AimAxis.enumValueIndex, k_AimAxisLabels);
+            m_AimAxis.enumValueIndex = EditorGUI.Popup(rect, m_AimAxis.displayName, m_AimAxis.enumValueIndex, k_AxisLabels);
             EditorGUI.EndProperty();
+
+            rect = EditorGUILayout.GetControlRect();
+            EditorGUI.BeginProperty(rect, k_UpAxisLabel, m_UpAxis);
+            m_UpAxis.enumValueIndex = EditorGUI.Popup(rect, m_UpAxis.displayName, m_UpAxis.enumValueIndex, k_AxisLabels);
+            EditorGUI.EndProperty();
+
+            EditorGUILayout.PropertyField(m_WorldUpType);
+
+            var worldUpType = (MultiAimConstraintData.WorldUpType)m_WorldUpType.intValue;
+
+            using (new EditorGUI.DisabledGroupScope(worldUpType != MultiAimConstraintData.WorldUpType.ObjectRotationUp && worldUpType != MultiAimConstraintData.WorldUpType.Vector))
+            {
+                rect = EditorGUILayout.GetControlRect();
+                EditorGUI.BeginProperty(rect, k_UpAxisLabel, m_WorldUpAxis);
+                m_WorldUpAxis.enumValueIndex = EditorGUI.Popup(rect, m_WorldUpAxis.displayName, m_WorldUpAxis.enumValueIndex, k_AxisLabels);
+                EditorGUI.EndProperty();
+            }
+
+            using (new EditorGUI.DisabledGroupScope(worldUpType != MultiAimConstraintData.WorldUpType.ObjectUp && worldUpType != MultiAimConstraintData.WorldUpType.ObjectRotationUp))
+            {
+                EditorGUILayout.PropertyField(m_WorldUpObject);
+            }
 
             m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectsLabel);
             if (m_SourceObjectsToggle.boolValue)

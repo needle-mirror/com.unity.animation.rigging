@@ -8,12 +8,15 @@ using UnityEngine.Playables;
 
 namespace UnityEditor.Animations.Rigging
 {
+    /// <summary>
+    /// Utility class that groups bi-directional baking utilities.
+    /// </summary>
     public static class BakeUtils
     {
-        public const string kBakeToSkeletonUndoLabel = "Transfer motion to skeleton";
-        public const string kBakeToConstraintUndoLabel = "Transfer motion to constraint";
+        private const string kBakeToSkeletonUndoLabel = "Transfer motion to skeleton";
+        private const string kBakeToConstraintUndoLabel = "Transfer motion to constraint";
 
-        public interface IEvaluationGraph
+        interface IEvaluationGraph
         {
             void Evaluate(float time);
         }
@@ -148,9 +151,14 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
+        /// <summary>
+        /// Validates if the Editor and the provided RigBuilder are in a correct state to do motion transfer.
+        /// </summary>
+        /// <param name="rigBuilder">The RigBuilder that will be used for motion transfer.</param>
+        /// <returns>Returns true if both the editor and the provided RigBuilder are in a valid state for motion transfer. Returns false if the requirements are not met.</returns>
         public static bool TransferMotionValidate(RigBuilder rigBuilder)
         {
-            if (!AnimationWindowReflection.isPreviewing || AnimationWindowReflection.activeAnimationClip == null)
+            if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
             var selected = Selection.instanceIDs;
@@ -168,9 +176,14 @@ namespace UnityEditor.Animations.Rigging
             return true;
         }
 
+        /// <summary>
+        /// Validates if the Editor and the provided Rig are in a correct state to do motion transfer.
+        /// </summary>
+        /// <param name="rig">The Rig that will be used for motion transfer.</param>
+        /// <returns>Returns true if both the editor and the provided Rig are in a valid state for motion transfer. Returns false if the requirements are not met.</returns>
         public static bool TransferMotionValidate(Rig rig)
         {
-            if (!AnimationWindowReflection.isPreviewing || AnimationWindowReflection.activeAnimationClip == null)
+            if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
             var selected = Selection.instanceIDs;
@@ -200,10 +213,16 @@ namespace UnityEditor.Animations.Rigging
             return inRigBuilder;
         }
 
+        /// <summary>
+        /// Validates if the Editor and the provided RigConstraint are in a correct state to do motion transfer.
+        /// </summary>
+        /// <typeparam name="T">Type of RigConstraint that is to be validated.</typeparam>
+        /// <param name="constraint">The RigConstraint that will be used for motion transfer.</param>
+        /// <returns>Returns true if both the editor and the provided RigConstraint are in a valid state for motion transfer. Returns false if the requirements are not met.</returns>
         public static bool TransferMotionValidate<T>(T constraint)
             where T : MonoBehaviour, IRigConstraint
         {
-            if (!AnimationWindowReflection.isPreviewing || AnimationWindowReflection.activeAnimationClip == null)
+            if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
             var selected = Selection.instanceIDs;
@@ -240,6 +259,10 @@ namespace UnityEditor.Animations.Rigging
             return constraint.IsValid();
         }
 
+        /// <summary>
+        /// Bakes motion from any RigConstraints in the RigBuilder to the skeleton.
+        /// </summary>
+        /// <param name="rigBuilder">The RigBuilder whose RigConstraints are to be baked.</param>
         public static void TransferMotionToSkeleton(RigBuilder rigBuilder)
         {
             List<RigLayer> layers = rigBuilder.layers;
@@ -255,6 +278,10 @@ namespace UnityEditor.Animations.Rigging
             TransferMotionToSkeleton(rigBuilder, rigs);
         }
 
+        /// <summary>
+        /// Bakes motion from any RigConstraints in the Rig to the skeleton.
+        /// </summary>
+        /// <param name="rig">The Rig whose RigConstraints are to be baked.</param>
         public static void TransferMotionToSkeleton(Rig rig)
         {
             var rigBuilder = rig.GetComponentInParent<RigBuilder>();
@@ -264,7 +291,7 @@ namespace UnityEditor.Animations.Rigging
             TransferMotionToSkeleton(rigBuilder, new Rig[]{rig});
         }
 
-        public static void TransferMotionToSkeleton(RigBuilder rigBuilder, IEnumerable<Rig> rigs)
+        private static void TransferMotionToSkeleton(RigBuilder rigBuilder, IEnumerable<Rig> rigs)
         {
             var constraints = new List<IRigConstraint>();
             foreach(var rig in rigs)
@@ -272,7 +299,7 @@ namespace UnityEditor.Animations.Rigging
                 constraints.AddRange(RigUtils.GetConstraints(rig));
             }
 
-            var clip = AnimationWindowReflection.activeAnimationClip;
+            var clip = AnimationWindowUtils.activeAnimationClip;
 
             // Make sure we have a clip selected
             if (clip == null)
@@ -327,6 +354,11 @@ namespace UnityEditor.Animations.Rigging
                 RemoveCurves(editableClip, bindingsToRemove);
         }
 
+        /// <summary>
+        /// Bakes motion from the RigConstraint to the skeleton.
+        /// </summary>
+        /// <typeparam name="T">Type of RigConstraint that is to be baked.</typeparam>
+        /// <param name="constraint">The RigConstraint that will be baked to the skeleton.</param>
         public static void TransferMotionToSkeleton<T>(T constraint)
             where T : MonoBehaviour, IRigConstraint
         {
@@ -342,7 +374,7 @@ namespace UnityEditor.Animations.Rigging
                 throw new InvalidOperationException("Constraint disallows transfering motion to skeleton.");
 
             var bindings = bakeParameters.GetConstrainedCurveBindings(rigBuilder, constraint);
-            var clip = AnimationWindowReflection.activeAnimationClip;
+            var clip = AnimationWindowUtils.activeAnimationClip;
 
             // Make sure we have a clip selected
             if (clip == null)
@@ -377,7 +409,7 @@ namespace UnityEditor.Animations.Rigging
 
         }
 
-        public static void BakeToSkeleton<T>(T constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
+        internal static void BakeToSkeleton<T>(T constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
             where T : MonoBehaviour, IRigConstraint
         {
             // Make sure we have a rigbuilder (which guarantees an animator).
@@ -392,7 +424,7 @@ namespace UnityEditor.Animations.Rigging
             BakeToSkeleton(rigBuilder, constraint, clip, defaultPoseClip, bindings, filterOptions);
         }
 
-        public static void BakeToSkeleton(RigBuilder rigBuilder, IRigConstraint constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
+        private static void BakeToSkeleton(RigBuilder rigBuilder, IRigConstraint constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
         {
             // Make sure the base constraint is valid
             if (constraint == null || !constraint.IsValid())
@@ -410,6 +442,10 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
+        /// <summary>
+        /// Bakes motion from the skeleton to the constraints in the RigBuilder.
+        /// </summary>
+        /// <param name="rigBuilder">The RigBuilder whose RigConstraints are to be baked.</param>
         public static void TransferMotionToConstraint(RigBuilder rigBuilder)
         {
             List<RigLayer> layers = rigBuilder.layers;
@@ -425,6 +461,10 @@ namespace UnityEditor.Animations.Rigging
             TransferMotionToConstraint(rigBuilder, rigs);
         }
 
+        /// <summary>
+        /// Bakes motion from the skeleton to the constraints in the Rig.
+        /// </summary>
+        /// <param name="rig">The Rig whose RigConstraints are to be baked.</param>
         public static void TransferMotionToConstraint(Rig rig)
         {
             var rigBuilder = rig.GetComponentInParent<RigBuilder>();
@@ -434,7 +474,7 @@ namespace UnityEditor.Animations.Rigging
             TransferMotionToConstraint(rigBuilder, new Rig[]{rig});
         }
 
-        public static void TransferMotionToConstraint(RigBuilder rigBuilder, IEnumerable<Rig> rigs)
+        private static void TransferMotionToConstraint(RigBuilder rigBuilder, IEnumerable<Rig> rigs)
         {
             var constraints = new List<IRigConstraint>();
             foreach(var rig in rigs)
@@ -442,7 +482,7 @@ namespace UnityEditor.Animations.Rigging
                 constraints.AddRange(RigUtils.GetConstraints(rig));
             }
 
-            var clip = AnimationWindowReflection.activeAnimationClip;
+            var clip = AnimationWindowUtils.activeAnimationClip;
 
             // Make sure we have a clip selected
             if (clip == null)
@@ -497,6 +537,11 @@ namespace UnityEditor.Animations.Rigging
                 RemoveCurves(editableClip, bindingsToRemove);
         }
 
+        /// <summary>
+        /// Bakes motion from the skeleton to the RigConstraint
+        /// </summary>
+        /// <typeparam name="T">Type of RigConstraint that is to be baked.</typeparam>
+        /// <param name="constraint">The RigConstraint that will be baked to.</param>
         public static void TransferMotionToConstraint<T>(T constraint)
             where T : MonoBehaviour, IRigConstraint
         {
@@ -512,7 +557,7 @@ namespace UnityEditor.Animations.Rigging
                 throw new InvalidOperationException("Constraint disallows transfering motion to constraint.");
 
             var bindings = bakeParameters.GetSourceCurveBindings(rigBuilder, constraint);
-            var clip = AnimationWindowReflection.activeAnimationClip;
+            var clip = AnimationWindowUtils.activeAnimationClip;
 
             // Make sure we have a clip selected
             if (clip == null)
@@ -547,7 +592,7 @@ namespace UnityEditor.Animations.Rigging
                 RemoveCurves(editableClip, bakeParameters.GetConstrainedCurveBindings(rigBuilder, constraint));
         }
 
-        public static void BakeToConstraint<T>(T constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
+        internal static void BakeToConstraint<T>(T constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
             where T : MonoBehaviour, IRigConstraint
         {
             // Make sure we have a rigbuilder (which guarantees an animator).
@@ -562,7 +607,7 @@ namespace UnityEditor.Animations.Rigging
             BakeToConstraint(rigBuilder, constraint, clip, defaultPoseClip, bindings, filterOptions);
         }
 
-        public static void BakeToConstraint(RigBuilder rigBuilder, IRigConstraint constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
+        private static void BakeToConstraint(RigBuilder rigBuilder, IRigConstraint constraint, AnimationClip clip, AnimationClip defaultPoseClip, IEnumerable<EditorCurveBinding> bindings, CurveFilterOptions filterOptions)
         {
             // Make sure the base constraint is valid
             if (constraint == null || !constraint.IsValid())
@@ -597,7 +642,7 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
-        public static AnimationClip CreateDefaultPose(RigBuilder rigBuilder)
+        private static AnimationClip CreateDefaultPose(RigBuilder rigBuilder)
         {
             if(rigBuilder == null)
                 throw new ArgumentNullException("It is not possible to bake curves without an RigBuilder.");
@@ -657,7 +702,7 @@ namespace UnityEditor.Animations.Rigging
             return defaultPoseClip;
         }
 
-        public static void BakeCurvesToClip(AnimationClip clip, IEnumerable<EditorCurveBinding> bindings, RigBuilder rigBuilder, IEvaluationGraph graph, CurveFilterOptions filterOptions)
+        private static void BakeCurvesToClip(AnimationClip clip, IEnumerable<EditorCurveBinding> bindings, RigBuilder rigBuilder, IEvaluationGraph graph, CurveFilterOptions filterOptions)
         {
             if(rigBuilder == null)
                 throw new ArgumentNullException("It is not possible to bake curves without an RigBuilder.");
@@ -693,7 +738,7 @@ namespace UnityEditor.Animations.Rigging
             CopyCurvesToClip(tempClip, clip);
         }
 
-        public static void RemoveCurves(AnimationClip clip, IEnumerable<EditorCurveBinding> bindings)
+        private static void RemoveCurves(AnimationClip clip, IEnumerable<EditorCurveBinding> bindings)
         {
             if (clip == null)
                 throw new ArgumentNullException("The destination animation clip cannot be null.");
@@ -724,7 +769,7 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
-        public static IRigConstraint FindInverseRigConstraint(IRigConstraint constraint)
+        private static IRigConstraint FindInverseRigConstraint(IRigConstraint constraint)
         {
             if (constraint == null)
                 return null;
@@ -741,7 +786,7 @@ namespace UnityEditor.Animations.Rigging
             return null;
         }
 
-        public static IBakeParameters FindBakeParameters(IRigConstraint constraint)
+        internal static IBakeParameters FindBakeParameters(IRigConstraint constraint)
         {
             var constraintType = constraint.GetType();
             var bakeParametersTypes = TypeCache.GetTypesWithAttribute<BakeParametersAttribute>();
@@ -817,8 +862,8 @@ namespace UnityEditor.Animations.Rigging
                 if (EditorUtility.DisplayDialog(title, message, "yes", "no", DialogOptOutDecisionType.ForThisSession, "com.unity.animation.rigging-add-clip-to-controller"))
                 {
                     effectiveController.AddMotion(clip);
-                    AnimationWindowReflection.activeAnimationClip = clip;
-                    AnimationWindowReflection.StartPreview();
+                    AnimationWindowUtils.activeAnimationClip = clip;
+                    AnimationWindowUtils.StartPreview();
                 }
             }
         }

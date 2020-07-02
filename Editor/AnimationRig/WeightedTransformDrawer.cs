@@ -5,7 +5,7 @@ using System.Reflection;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomPropertyDrawer(typeof(WeightedTransform))]
-    public class WeightedTransformDrawer : PropertyDrawer
+    class WeightedTransformDrawer : PropertyDrawer
     {
         private const int k_TransformPadding = 6;
 
@@ -17,7 +17,7 @@ namespace UnityEditor.Animations.Rigging
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
             var range = fieldInfo.GetCustomAttribute<RangeAttribute>();
-            WeightedTransformHelper.WeightedTransformOnGUI(rect, property, label, range);
+            WeightedTransformHelper.WeightedTransformOnGUI(rect, property, range);
         }
     }
 }

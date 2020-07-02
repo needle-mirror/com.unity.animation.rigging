@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(TwistCorrection))]
-    public class TwistCorrectionEditor : Editor
+    class TwistCorrectionEditor : Editor
     {
         static readonly GUIContent k_TwistNodesLabel = new GUIContent("Twist Nodes");
 

@@ -10,7 +10,7 @@ namespace UnityEditor.Animations.Rigging
     using BoneShape = BoneRenderer.BoneShape;
 
     [InitializeOnLoad]
-    public static class BoneRendererUtils
+    static class BoneRendererUtils
     {
         private class BatchRenderer
         {
@@ -375,6 +375,9 @@ namespace UnityEditor.Animations.Rigging
                     break;
                 case EventType.MouseDown:
                     {
+                        if (evt.alt)
+                            break;
+
                         if (HandleUtility.nearestControl == id && evt.button == 0)
                         {
                             if (!SceneVisibilityManager.instance.IsPickingDisabled(boneGO, false))

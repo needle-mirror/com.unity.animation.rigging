@@ -7,7 +7,7 @@ using UnityEditor.SceneManagement;
 namespace UnityEditor.Animations.Rigging
 {
     [InitializeOnLoad]
-    public static class RigEffectorRenderer
+    static class RigEffectorRenderer
     {
         static GUIContent s_OverlayTitle = new GUIContent("Animation Rigging");
 
@@ -160,7 +160,11 @@ namespace UnityEditor.Animations.Rigging
 
             // Process overlay events.
             if (s_ActiveOverlay != null)
+            {
+                SceneViewOverlay.Begin(sceneView);
                 SceneViewOverlay.Window(s_OverlayTitle, SceneViewGUICallback, 1200);
+                SceneViewOverlay.End();
+            }
         }
 
         static void OnAddRigBuilder(RigBuilder rigBuilder)

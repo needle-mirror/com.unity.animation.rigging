@@ -1,6 +1,6 @@
 namespace UnityEditor.Animations.Rigging
 {
-    public interface IRigEffectorOverlay
+    interface IRigEffectorOverlay
     {
         void OnSceneGUIOverlay();
     }
