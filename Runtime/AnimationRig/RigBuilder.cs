@@ -9,7 +9,7 @@ namespace UnityEngine.Animations.Rigging
 
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@0.2?preview=1&subfolder=/manual/index.html")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [Serializable]

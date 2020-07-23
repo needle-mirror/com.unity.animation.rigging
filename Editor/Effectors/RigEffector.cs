@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -11,8 +12,16 @@ namespace UnityEditor.Animations.Rigging
     {
         [SerializeField] private RigEffectorData m_Data;
 
-        public Transform transform { get => m_Data.transform; }
-        public bool visible { get => m_Data.visible; set => m_Data.visible = value; }
+        public Transform transform
+        {
+            get => m_Data.transform;
+        }
+
+        public bool visible
+        {
+            get => m_Data.visible;
+            set => m_Data.visible = value;
+        }
 
         private static int s_ButtonHash = "RigEffector".GetHashCode();
 
@@ -22,6 +31,7 @@ namespace UnityEditor.Animations.Rigging
         }
 
         private static Material s_Material;
+
         public static Material material
         {
             get
@@ -135,6 +145,9 @@ namespace UnityEditor.Animations.Rigging
 
                         Material mat = material;
 
+                        var shapeHighlight = MeshHasWireframeShapes(style.shape) ? style.color : highlight;
+                        var wireHighlight = new Color(highlight.r, highlight.g, highlight.b, 1f);
+
                         if (style.shape.subMeshCount > 0)
                         {
                             //  Draw every sub meshes separately to control highlight vs shape colors.
@@ -143,7 +156,7 @@ namespace UnityEditor.Animations.Rigging
                                 MeshTopology topology = style.shape.GetTopology(i);
                                 bool isFilled = (topology == MeshTopology.Triangles || topology == MeshTopology.Quads);
 
-                                mat.SetColor("_Color", isFilled ? style.color : new Color(highlight.r, highlight.g, highlight.b, 1.0f));
+                                mat.SetColor("_Color", isFilled ? shapeHighlight : wireHighlight);
                                 mat.SetPass(0);
 
                                 Graphics.DrawMeshNow(style.shape, matrix, i);
@@ -154,7 +167,7 @@ namespace UnityEditor.Animations.Rigging
                             MeshTopology topology = style.shape.GetTopology(0);
                             bool isFilled = (topology == MeshTopology.Triangles || topology == MeshTopology.Quads);
 
-                            mat.SetColor("_Color", isFilled ? highlight : new Color(highlight.r, highlight.g, highlight.b, 1.0f));
+                            mat.SetColor("_Color", isFilled ? shapeHighlight : wireHighlight);
                             mat.SetPass(0);
 
                             Graphics.DrawMeshNow(style.shape, matrix);
@@ -163,6 +176,39 @@ namespace UnityEditor.Animations.Rigging
                     break;
             }
         }
+
+        private bool FindMeshTopology(Mesh shape, IEnumerable<MeshTopology> topologies)
+        {
+            if (shape.subMeshCount > 0)
+            {
+                for (int i = 0; i < shape.subMeshCount; ++i)
+                {
+                    MeshTopology topology = shape.GetTopology(i);
+                    foreach (var topologyQuery in topologies)
+                    {
+                        if (topologyQuery == topology)
+                            return true;
+                    }
+                }
+            }
+            else
+            {
+                var topology = shape.GetTopology(0);
+                foreach (var topologyQuery in topologies)
+                {
+                    if (topologyQuery == topology)
+                            return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool MeshHasFilledShapes(Mesh shape) =>
+            FindMeshTopology(shape, new MeshTopology[] {MeshTopology.Triangles, MeshTopology.Quads});
+
+        private bool MeshHasWireframeShapes(Mesh shape) =>
+            FindMeshTopology(shape, new MeshTopology[] {MeshTopology.Lines, MeshTopology.LineStrip});
 
         private Matrix4x4 GetEffectorMatrix(Transform transform, Vector3 position, Vector3 rotation, float size)
         {
@@ -177,13 +223,11 @@ namespace UnityEditor.Animations.Rigging
             if (shape == null)
                 return HandleUtility.DistanceToCircle(origin, size * 0.5f);
 
-            for (int i = 0; i < shape.subMeshCount; ++i)
+            if (MeshHasFilledShapes(shape))
             {
-                MeshTopology topology = shape.GetTopology(i);
-                if (topology == MeshTopology.Triangles || topology == MeshTopology.Quads)
-                {
-                    return HandleUtility.DistanceToCircle(origin, size * 0.5f);
-                }
+                var bounds = shape.bounds;
+                var extents = Mathf.Max( Mathf.Max(bounds.extents.x, bounds.extents.y), bounds.extents.z);
+                return HandleUtility.DistanceToCircle(origin + bounds.center * size, extents * size);
             }
 
             float nearestDistance = Mathf.Infinity;

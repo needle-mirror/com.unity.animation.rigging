@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [0.2.7] - 2020-07-23
+### Patch Update of *Unity Package Animation Rigging*.
+- Removed use of `latest` keyword in links to documentation (case 1233972).
+- Removed error log in CustomOverlayAttribute (case 1253862).
+- Fixed ChainIK not applying chain rotation weight properly.
+- Added context menu on TwoBoneIK to auto-setup constraint.
+- Added context menu on the Animator and menu item in the AnimationRigging menu to auto-setup RigBuilder and Rig.
+- Added context menu on the Animator and menu item in the AnimationRigging menu to auto-setup BoneRenderer.
+- Improved RigEffector picking when using custom shapes.
+- Improved RigEffector hover feedback when shape does not have line geometry.
+
 ## [0.2.6] - 2020-03-06
 ### Patch Update of *Unity Package Animation Rigging*.
 - Adjusted MultiAim calculations to prevent rolling effects (case 1215736).

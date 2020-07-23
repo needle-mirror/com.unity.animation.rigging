@@ -11,9 +11,6 @@ namespace UnityEditor.Animations.Rigging
 
         public CustomOverlayAttribute(Type effectorType)
         {
-            if (effectorType == null || !effectorType.IsSubclassOf(typeof(IRigEffector)))
-                Debug.LogError("Invalid effector for CustomOverlay attribute.");
-
             m_EffectorType = effectorType;
         }
 

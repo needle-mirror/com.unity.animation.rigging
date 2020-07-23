@@ -75,5 +75,103 @@ namespace UnityEditor.Animations.Rigging
 
             serializedObject.ApplyModifiedProperties();
         }
+
+        [MenuItem("CONTEXT/TwoBoneIKConstraint/Auto Setup from Tip Transform", false, 631)]
+        public static void TwoBoneIKAutoSetup(MenuCommand command)
+        {
+            var constraint = command.context as TwoBoneIKConstraint;
+            var tip = constraint.data.tip;
+            var animator = constraint.GetComponentInParent<Animator>()?.transform;
+            var dirty = false;
+
+            if (!tip)
+            {
+                var selection = Selection.transforms;
+                var constraintInSelection = false;
+
+                // Take transform from selection that is part of the animator hierarchy & not the constraint transform.
+                for (int i = 0; i < selection.Length; i++)
+                {
+                    if (selection[i].IsChildOf(animator))
+                    {
+                        if (selection[i] != constraint.transform)
+                        {
+                            tip = selection[i];
+                            break;
+                        }
+                        else
+                        {
+                            constraintInSelection = true;
+                        }
+                    }
+                }
+
+                // If the constraint itself was selected and we haven't found anything use that.
+                if (!tip && constraintInSelection)
+                    tip = constraint.transform;
+
+                // If there is still no tip return.
+                if (!tip)
+                {
+                    Debug.LogWarning("Please provide a tip before running auto setup!");
+                    return;
+                }
+                else
+                {
+                    Undo.RecordObject(constraint, "Setup tip bone from use selection");
+                    constraint.data.tip = tip;
+                    dirty = true;
+                }
+            }
+
+            if (!constraint.data.mid)
+            {
+                Undo.RecordObject(constraint, "Setup mid bone for TwoBoneIK");
+                constraint.data.mid = tip.parent;
+                dirty = true;
+            }
+
+            if (!constraint.data.root)
+            {
+                Undo.RecordObject(constraint, "Setup root bone for TwoBoneIK");
+                constraint.data.root = tip.parent.parent;
+                dirty = true;
+            }
+
+            if (!constraint.data.target)
+            {
+                var target = constraint.transform.Find(constraint.gameObject.name + "_target");
+                if (target == null)
+                {
+                    var t = new GameObject();
+                    Undo.RegisterCreatedObjectUndo(t, "Created target");
+                    t.name = constraint.gameObject.name + "_target";
+                    t.transform.localScale = .1f * t.transform.localScale;
+                    Undo.SetTransformParent(t.transform, constraint.transform, "Set new parent");
+                    target = t.transform;
+                }
+                constraint.data.target = target;
+                dirty = true;
+            }
+
+            if (!constraint.data.hint)
+            {
+                var hint = constraint.transform.Find(constraint.gameObject.name + "_hint");
+                if (hint == null)
+                {
+                    var t = new GameObject();
+                    Undo.RegisterCreatedObjectUndo(t, "Created hint");
+                    t.name = constraint.gameObject.name + "_hint";
+                    t.transform.localScale = .1f * t.transform.localScale;
+                    Undo.SetTransformParent(t.transform, constraint.transform, "Set new parent");
+                    hint = t.transform;
+                }
+                constraint.data.hint = hint;
+                dirty = true;
+            }
+
+            if (dirty && PrefabUtility.IsPartOfPrefabInstance(constraint))
+                EditorUtility.SetDirty(constraint);
+        }
     }
 }

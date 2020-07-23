@@ -76,5 +76,25 @@ namespace UnityEditor.Animations.Rigging
                     info.Invoke(null, new object[] { selection[0] });
             }
         }
+
+        [MenuItem("Animation Rigging/Rig Setup", false, 12)]
+        static void RigSetup()
+        {
+            var selection = Selection.activeTransform;
+            if (selection == null)
+                return;
+
+            AnimationRiggingEditorUtils.RigSetup(selection);
+        }
+
+        [MenuItem("Animation Rigging/Bone Renderer Setup", false, 13)]
+        static void BoneRendererSetup()
+        {
+            var selection = Selection.activeTransform;
+            if (selection == null)
+                return;
+
+            AnimationRiggingEditorUtils.BoneRendererSetup(selection);
+        }
     }
 }
