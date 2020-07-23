@@ -1,7 +1,7 @@
 {
   "name": "com.unity.animation.rigging",
   "displayName": "Animation Rigging",
-  "version": "0.3.3-preview",
+  "version": "0.3.4-preview",
   "unity": "2020.1",
   "description": "Animation Rigging toolkit using Unity's Animation C# Jobs",
   "keywords": [
@@ -14,11 +14,13 @@
     "com.unity.burst": "1.2.0-preview.12",
     "com.unity.test-framework": "1.0.7"
   },
+  "upmCi": {
+    "footprint": "31cedfa4947b6d2c1d8ce30d5be55a3c31b768e1"
+  },
   "repository": {
-    "footprint": "7efc407439f96b0e468d054a9e5453b61205deb6",
-    "type": "git",
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.animation.rigging.git",
-    "revision": "5c0e383961f7eef0d7ba0314bce5f9781b2537df"
+    "type": "git",
+    "revision": "6a382d04112e9dd3d1ad9b8c8de223c75c01f252"
   },
   "samples": [
     {

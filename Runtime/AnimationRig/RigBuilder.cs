@@ -6,7 +6,7 @@ namespace UnityEngine.Animations.Rigging
 {
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/index.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@0.3?preview=1&subfolder=/manual/index.html")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [SerializeField] private List<RigLayer> m_RigLayers;
@@ -53,12 +53,12 @@ namespace UnityEngine.Animations.Rigging
             if (!graph.IsValid())
                 return;
 
-            syncSceneToStreamLayer.Update(layers.ToArray());
+            syncSceneToStreamLayer.Update(m_RuntimeRigLayers);
 
-            for (int i = 0, count = layers.Count; i < count; ++i)
+            for (int i = 0, count = m_RuntimeRigLayers.Length; i < count; ++i)
             {
-                if (layers[i].IsValid() && layers[i].active)
-                    layers[i].Update();
+                if (m_RuntimeRigLayers[i].IsValid() && m_RuntimeRigLayers[i].active)
+                    m_RuntimeRigLayers[i].Update();
             }
         }
 

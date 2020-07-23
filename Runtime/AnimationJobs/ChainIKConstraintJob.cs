@@ -46,7 +46,8 @@ namespace UnityEngine.Animations.Rigging
                     {
                         var prevDir = chain[i + 1].GetPosition(stream) - chain[i].GetPosition(stream);
                         var newDir = linkPositions[i + 1] - linkPositions[i];
-                        chain[i].SetRotation(stream, QuaternionExt.FromToRotation(prevDir, newDir) * chain[i].GetRotation(stream));
+                        var rot = chain[i].GetRotation(stream);
+                        chain[i].SetRotation(stream, Quaternion.Lerp(rot, QuaternionExt.FromToRotation(prevDir, newDir) * rot, chainRWeight));
                     }
                 }
 

@@ -56,7 +56,7 @@ namespace UnityEngine.Animations.Rigging
     }
 
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Parent Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@latest?preview=1&subfolder=/manual/constraints/MultiParentConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@0.3?preview=1&subfolder=/manual/constraints/MultiParentConstraint.html")]
     public class MultiParentConstraint : RigConstraint<
         MultiParentConstraintJob,
         MultiParentConstraintData,

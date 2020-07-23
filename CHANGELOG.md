@@ -1,8 +1,15 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [0.3.4] - 2020-07-23
+### Patch Update of *Animation Rigging*.
+- Removed error log in CustomOverlayAttribute (case 1253862).
+- Removed use of `latest` keyword in links to documentation (case 1233972).
+- Fixed ChainIK not applying chain rotation weight properly.
+- Fixed unecessary GC Alloc in RigBuilder.Update().  [AAA-103]
+
 ## [0.3.3] - 2020-03-06
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Improved RigEffector picking when using custom shapes.
 - Improved RigEffector hover feedback when shape does not have line geometry.
 - Adjusted MultiAim calculations to prevent rolling effects (case 1215736).
@@ -13,31 +20,31 @@ All notable changes to this package will be documented in this file.
 - Removed uses of Resources.Load in Runtime and Editor assemblies.
 
 ## [0.3.2] - 2020-01-23
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Updated documentation.
 
 ## [0.3.1] - 2020-01-14
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Removed unecessary files BakeUtils.cs.orig and BakeUtils.cs.orig.meta.
 - Updated Burst to version 1.2.0-preview.12.
 
 ## [0.3.0] - 2019-10-18
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Added support for bidirectional-baking to existing constraints.
 
 ## [0.2.5] - 2019-11-20
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Adjusted calculations on MultiAim constrained axes. [AAA-86]
 
 ## [0.2.4] - 2019-11-06
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Added support for scene visibility and picking flags on BoneRenderer component and Rig effectors. [AAA-65]
 - Fixed preview of disabled RigBuilder component in Animation Window and Timeline. [AAA-37]
 - Fixed constrained axes in MultiAim not properly constraining local rotation. [AAA-86]
 - Updated Animation Rigging samples and added a Readme file.
 
 ## [0.2.3] - 2019-07-24
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Increased the priority index of AnimationPlayableOutput in order for Animation Rigging to always evaluate after State Machine and Timeline.
 - Fixed NullReferenceException in RigEffectorRenderer.
 - Fixed TwoBoneIK evaluation when used on straight limbs by using hint target to define a valid IK plane.
@@ -50,13 +57,13 @@ All notable changes to this package will be documented in this file.
 - Updated Burst to version 1.1.1.
 
 ## [0.2.2] - 2019-04-29
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Added Rig Effector visualization toolkit for Animation Rigging.
 - Fixed Animation Rigging align operations not using the same selection order in Scene View and Hierarchy.
 - Updated Burst to version 1.0.4.
 
 ## [0.2.1] - 2019-02-28
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Added Burst support to existing constraints.  The Animation Rigging package now depends on com.unity.burst.
 - Upgraded weighted transform arrays in order for weights to be animatable.  The following constraints were modified and will require a manual update:
 	- MultiAimConstraint
@@ -67,7 +74,7 @@ All notable changes to this package will be documented in this file.
 
 ## [0.2.0] - 2019-02-12
 
-### Keyframing support for *Unity Package Animation Rigging*.
+### Keyframing support for *Animation Rigging*.
 - Changed RigBuilder to build and update the PlayableGraph for Animation Window.
 - Added attribute [NotKeyable] to properties that shouldn't be animated.
 - Removed 'sync' property flag on transform fields for constraints. Syncing scene data to the animation stream is now performed by marking a constraint field with [SyncSceneToStream].
@@ -79,12 +86,12 @@ All notable changes to this package will be documented in this file.
 
 ## [0.1.4] - 2018-12-21
 
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Fixed onSceneGUIDelegate deprecation warning in BoneRenderUtils
 
 ## [0.1.3] - 2018-12-21
 
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Fixed stale bone rendering in prefab isolation view.
 - Updated constraints to have a transform sync scene to stream toggle only on inputs.
 - Fixed Twist Correction component to have twist nodes with weight varying between [-1, 1]
@@ -94,14 +101,14 @@ All notable changes to this package will be documented in this file.
 
 ## [0.1.2] - 2018-11-29
 
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Added constraint examples to Sample folder (Samples/ConstraintExamples/AnimationRiggingExamples.unitypackage)
 - Fixed links in documentation
 - Updated package description
 
 ## [0.1.1] - 2018-11-26
 
-### Patch Update of *Unity Package Animation Rigging*.
+### Patch Update of *Animation Rigging*.
 - Improved blend constraint UI layout
 - Fixed jittering of DampedTransform when constraint weight was in between 0 and 1
 - Made generic interface of Get/Set AnimationJobCache functions
@@ -120,7 +127,7 @@ All notable changes to this package will be documented in this file.
 
 ## [0.1.0] - 2018-11-01
 
-### This is the first release of *Unity Package Animation Rigging*.
+### This is the first release of *Animation Rigging*.
 ### Added
 - RigBuilder component.
 - Rig component.
