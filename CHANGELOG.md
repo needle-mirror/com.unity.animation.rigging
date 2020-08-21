@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.0.3] - 2020-08-21
+### Patch Update of *Animation Rigging*.
+- Updated Burst to version 1.3.4.
+
 ## [1.0.2] - 2020-07-02
 ### Patch Update of *Animation Rigging*.
 - Updated minimum unity release to 2020.2.0a16.
