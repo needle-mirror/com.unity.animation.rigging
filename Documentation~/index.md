@@ -1,15 +1,16 @@
 
 # Animation Rigging
 
-Use Animation Rigging to create and organize sets of constraints to address your rigging needs. For example, you can create deform rigs with procedural secondary animation to control character armor, props, and accessories. You can create world interaction rigs (sets of IK and Aim constraints) for interactive adjustments, targeting, and animation compression correction.
+Use Animation Rigging to create and organize **animation rigs**, or sets of constraints for adding procedural motion to animated objects. Examples include:
+* _Deformation rigs_ to control secondary animation of character armor, props, and accessories.
+* _World Interaction rigs_ (sets of IK and Aim constraints) to make interactive adjustments for targeting or for correcting animation compression artifacts.
 
-This documentation describes how to setup a simple Animation Rig. This documentation also includes detailed information on the constraints included in the Animation Rigging package.
+This documentation describes how to set up a simple Animation Rig for use in a variety of workflows. It also includes detailed information on the constraints included in the Animation Rigging package.
 
-To get started, consult [Rigging Workflow](RiggingWorkflow.md) for the main components necessary for defining and using an Animation Rig. The Rigging workflow topic includes suggestions on additional components and constraints that you can define for props, accessories, or additional rig controls. 
-
-The [Animation Rigging Menu](AnimationRiggingMenu.md) topic describes utilities that help with the rigging workflow. The [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md) topic describes an additional workflow option for transferring motion back and forth between an animation rig and a skeleton.
-
-The Animation Rigging package includes predefined constraints for defining your own animation rigs. See [Constraint Components](ConstraintComponents.md) for detailed information on each predefined Constraint component. 
+* The [Rigging Workflow](RiggingWorkflow.md) topic is the best place to get started. It describes the main components necessary for defining and using an animation rig. It includes suggestions on additional components and constraints that you can define for props, accessories, or other rig controls. 
+* The [Animation Rigging Menu](AnimationRiggingMenu.md) topic describes utilities that help with the rigging workflow.
+* The [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md) topic describes an additional workflow option for transferring motion back and forth between an animation rig and a skeleton.
+* The [Constraint Components](ConstraintComponents.md) topic contains detailed information on all of the built-in Constraint components.
 
 # Technical details
 
@@ -17,7 +18,7 @@ The Animation Rigging package includes predefined constraints for defining your 
 
 This version of Animation Rigging is compatible with the following versions of the Unity Editor:
 
-* 2020.1 and later with .Net 4.x scripting runtime
+* 2020.2 and later
 
 ## Document revision history
 

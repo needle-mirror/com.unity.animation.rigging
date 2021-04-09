@@ -4,6 +4,7 @@ namespace UnityEngine.Animations.Rigging
 {
     /// <summary>
     /// This interface represents classes that hold and serialize effectors.
+    /// Effectors do nothing during runtime.
     /// </summary>
     public interface IRigEffectorHolder
     {

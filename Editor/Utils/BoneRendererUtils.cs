@@ -107,13 +107,18 @@ namespace UnityEditor.Animations.Rigging
 
         private static int s_ButtonHash = "BoneHandle".GetHashCode();
 
+        private static int s_VisibleLayersCache = 0;
+
         static BoneRendererUtils()
         {
             BoneRenderer.onAddBoneRenderer += OnAddBoneRenderer;
             BoneRenderer.onRemoveBoneRenderer += OnRemoveBoneRenderer;
             SceneVisibilityManager.visibilityChanged += OnVisibilityChanged;
+            EditorApplication.hierarchyChanged += OnHierarchyChanged;
 
             SceneView.duringSceneGui += DrawSkeletons;
+
+            s_VisibleLayersCache = Tools.visibleLayers;
         }
 
         private static Material material
@@ -270,6 +275,12 @@ namespace UnityEditor.Animations.Rigging
 
         static void DrawSkeletons(SceneView sceneview)
         {
+            if (Tools.visibleLayers != s_VisibleLayersCache)
+            {
+                OnVisibilityChanged();
+                s_VisibleLayersCache = Tools.visibleLayers;
+            }
+
             var gizmoColor = Gizmos.color;
 
             pyramidMeshRenderer.Clear();
@@ -470,6 +481,18 @@ namespace UnityEditor.Animations.Rigging
             {
                 boneRenderer.Invalidate();
             }
+
+            SceneView.RepaintAll();
+        }
+
+        public static void OnHierarchyChanged()
+        {
+            foreach(var boneRenderer in s_BoneRendererComponents)
+            {
+                boneRenderer.Invalidate();
+            }
+
+            SceneView.RepaintAll();
         }
     }
 }

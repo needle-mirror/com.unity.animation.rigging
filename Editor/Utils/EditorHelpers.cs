@@ -48,11 +48,11 @@ namespace UnityEditor.Animations.Rigging
     /// <summary>
     /// Helper class to manage WeightedTransform and WeightedTransformArray appearance in the editor.
     /// </summary>
+    [Obsolete("This is now handled automatically in the inspector for WeightedTransformArray.", false)]
     public static class WeightedTransformHelper
     {
         const int k_NoHeaderHeight = 2;
         const int k_ElementHeightPadding = 2;
-        const int k_TransformPadding = 6;
 
         /// <summary>
         /// Creates a ReorderableList using a WeightedTransformArray as source.
@@ -125,32 +125,8 @@ namespace UnityEditor.Animations.Rigging
         /// <param name="rect">Rectangle on the screen to use for the WeightedTransform.</param>
         /// <param name="property">Serialized property </param>
         /// <param name="range">Range attribute given for weights in WeightedTransform. No boundaries are set if null.</param>
-        public static void WeightedTransformOnGUI(Rect rect, SerializedProperty property, RangeAttribute range = null)
-        {
-            EditorGUI.BeginProperty(rect, GUIContent.none, property);
-
-            var w = rect.width * 0.65f;
-            var weightRect = new Rect(rect.x + w, rect.y, rect.width - w, rect.height);
-            rect.width = w;
-
-            var transformRect = new Rect(rect.x, rect.y, rect.width - k_TransformPadding, EditorGUIUtility.singleLineHeight);
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.PropertyField(transformRect, property.FindPropertyRelative("transform"), GUIContent.none);
-
-            var indentLvl = EditorGUI.indentLevel;
-            EditorGUI.indentLevel = 0;
-            if (range != null)
-                EditorGUI.Slider(weightRect, property.FindPropertyRelative("weight"), range.min, range.max, GUIContent.none);
-            else
-                EditorGUI.PropertyField(weightRect, property.FindPropertyRelative("weight"), GUIContent.none);
-            EditorGUI.indentLevel = indentLvl;
-
-            if (EditorGUI.EndChangeCheck())
-                property.serializedObject.ApplyModifiedProperties();
-
-            EditorGUI.EndProperty();
-        }
+        public static void WeightedTransformOnGUI(Rect rect, SerializedProperty property, RangeAttribute range = null) =>
+            WeightedTransformDrawer.DoGUI(rect, property, range?.min ?? float.NaN, range?.max ?? float.NaN);
     }
 
     internal static class MaintainOffsetHelper

@@ -198,7 +198,7 @@ namespace UnityEngine.Animations.Rigging
 
                         job.constraintWeightSyncer.BindAt(constraintIdx, animator, constraint.component, ConstraintProperties.s_Weight);
                         job.modulatedConstraintWeights[constraintIdx++] = animator.BindCustomStreamProperty(
-                            PropertyUtils.ConstructCustomPropertyName(constraint.component, ConstraintProperties.s_Weight),
+                            ConstraintsUtils.ConstructCustomPropertyName(constraint.component, ConstraintProperties.s_Weight),
                             CustomStreamPropertyType.Float
                             );
 

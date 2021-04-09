@@ -5,6 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(ChainIKConstraint))]
+    [CanEditMultipleObjects]
     class ChainIKConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectLabel = new GUIContent("Source Object");
@@ -22,14 +23,12 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_MaintainTargetPositionOffset;
         SerializedProperty m_MaintainTargetRotationOffset;
 
-        SerializedProperty m_SourceObjectsToggle;
-        SerializedProperty m_SettingsToggle;
+        readonly FoldoutState m_SourceObjectsToggle = FoldoutState.ForSourceObjects<ChainIKConstraintEditor>();
+        readonly FoldoutState m_SettingsToggle = FoldoutState.ForSettings<ChainIKConstraintEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
-            m_SettingsToggle = serializedObject.FindProperty("m_SettingsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_Root = data.FindPropertyRelative("m_Root");
@@ -51,16 +50,17 @@ namespace UnityEditor.Animations.Rigging
             EditorGUILayout.PropertyField(m_Root);
             EditorGUILayout.PropertyField(m_Tip);
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectLabel);
-            if (m_SourceObjectsToggle.boolValue)
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectLabel);
+            if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_Target);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.boolValue = EditorGUILayout.Foldout(m_SettingsToggle.boolValue, k_SettingsLabel);
-            if (m_SettingsToggle.boolValue)
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 MaintainOffsetHelper.DoDropdown(k_MaintainTargetOffsetLabel, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
@@ -70,6 +70,7 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_Tolerance);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
         }

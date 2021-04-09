@@ -1,63 +1,32 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEditorInternal;
-using System.Reflection;
 using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(TwistCorrection))]
+    [CanEditMultipleObjects]
     class TwistCorrectionEditor : Editor
     {
         static readonly GUIContent k_TwistNodesLabel = new GUIContent("Twist Nodes");
+        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
 
         SerializedProperty m_Weight;
         SerializedProperty m_Source;
         SerializedProperty m_TwistAxis;
         SerializedProperty m_TwistNodes;
+        SerializedProperty m_TwistNodesLength;
 
-        SerializedProperty m_TwistNodesToggle;
-        ReorderableList m_ReorderableList;
-        TwistCorrection m_Constraint;
-        WeightedTransformArray m_TwistNodesArray;
+        readonly FoldoutState m_SourceObjectsToggle = FoldoutState.ForSourceObjects<TwistChainConstraintEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_TwistNodesToggle = serializedObject.FindProperty("m_TwistNodesGUIToggle");
-
             var data = serializedObject.FindProperty("m_Data");
             m_Source = data.FindPropertyRelative("m_Source");
             m_TwistAxis = data.FindPropertyRelative("m_TwistAxis");
             m_TwistNodes = data.FindPropertyRelative("m_TwistNodes");
-
-            m_Constraint = (TwistCorrection)serializedObject.targetObject;
-            m_TwistNodesArray = m_Constraint.data.twistNodes;
-
-            var dataType = m_Constraint.data.GetType();
-            var fieldInfo = dataType.GetField("m_TwistNodes", BindingFlags.NonPublic | BindingFlags.Instance);
-            var range = fieldInfo.GetCustomAttribute<RangeAttribute>();
-
-            if (m_TwistNodesArray.Count == 0)
-            {
-                m_TwistNodesArray.Add(WeightedTransform.Default(0f));
-                m_Constraint.data.twistNodes = m_TwistNodesArray;
-            }
-
-            m_ReorderableList = WeightedTransformHelper.CreateReorderableList(m_TwistNodes, ref m_TwistNodesArray, range);
-
-            m_ReorderableList.onChangedCallback = (ReorderableList reorderableList) =>
-            {
-                Undo.RegisterCompleteObjectUndo(m_Constraint, "Edit TwistCorrection");
-                m_Constraint.data.twistNodes = (WeightedTransformArray)reorderableList.list;
-                if (PrefabUtility.IsPartOfPrefabInstance(m_Constraint))
-                    EditorUtility.SetDirty(m_Constraint);
-            };
-
-            Undo.undoRedoPerformed += () =>
-            {
-                m_ReorderableList.list = m_Constraint.data.twistNodes;
-            };
+            m_TwistNodesLength = m_TwistNodes.FindPropertyRelative("m_Length");
         }
 
         public override void OnInspectorGUI()
@@ -65,17 +34,25 @@ namespace UnityEditor.Animations.Rigging
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_Source);
+
+            // by default, the first WeightedTransform element a user adds has a weight of 1
+            // for this constraint, the first twist node usually should not have a value of 1
+            // TODO: make drag/drop auto-distribute weights
+            EditorGUI.BeginChangeCheck();
+            var oldLength = m_TwistNodesLength.intValue;
+            EditorGUILayout.PropertyField(m_TwistNodes, k_TwistNodesLabel);
+            if (EditorGUI.EndChangeCheck() && oldLength == 0 && m_TwistNodesLength.intValue != oldLength)
+                m_TwistNodes.FindPropertyRelative("m_Item0.weight").floatValue = 0f;
+
             EditorGUILayout.PropertyField(m_TwistAxis);
 
-            m_TwistNodesToggle.boolValue = EditorGUILayout.Foldout(m_TwistNodesToggle.boolValue, k_TwistNodesLabel);
-            if (m_TwistNodesToggle.boolValue)
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
             {
-                EditorGUI.indentLevel++;
-
-                m_ReorderableList.DoLayoutList();
-                EditorGUI.indentLevel--;
+                ++EditorGUI.indentLevel;
+                EditorGUILayout.PropertyField(m_Source);
+                --EditorGUI.indentLevel;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
         }

@@ -42,17 +42,8 @@ namespace UnityEditor.Animations.Rigging
         {
             jobWeight.Set(stream, 1f);
 
-            var drivenLocalTx = new AffineTransform(driven.GetLocalPosition(stream), driven.GetLocalRotation(stream));
-            var parentTx = new AffineTransform();
-
-            // Convert accumTx to local space
-            if (drivenParent.IsValid(stream))
-            {
-                drivenParent.GetGlobalTR(stream, out Vector3 parentWPos, out Quaternion parentWRot);
-                parentTx = new AffineTransform(parentWPos, parentWRot);
-            }
-
-            var drivenTx = parentTx * drivenLocalTx;
+            driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
+            var drivenTx = new AffineTransform(currentWPos, currentWRot);
 
             for (int i = 0; i < sourceTransforms.Length; ++i)
             {

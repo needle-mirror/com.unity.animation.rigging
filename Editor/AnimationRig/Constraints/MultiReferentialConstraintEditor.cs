@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEditorInternal;
 
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(MultiReferentialConstraint))]
+    [CanEditMultipleObjects]
     class MultiReferentialConstraintEditor : Editor
     {
         static readonly GUIContent k_DrivingLabel = new GUIContent("Driving");
@@ -15,31 +15,22 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_Weight;
         SerializedProperty m_Driver;
         SerializedProperty m_SourceObjects;
+        SerializedProperty m_SourceObjectsSize;
 
-        SerializedProperty m_SourceObjectsToggle;
-        List<string> m_DrivingLabels;
-        ReorderableList m_ReorderableList;
+        GUIContent[] m_DrivingLabels = Array.Empty<GUIContent>();
+        int m_PreviousSourceSize;
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_Driver = data.FindPropertyRelative("m_Driver");
             m_SourceObjects = data.FindPropertyRelative("m_SourceObjects");
+            m_SourceObjectsSize = m_SourceObjects.FindPropertyRelative("Array.size");
+            m_PreviousSourceSize = m_SourceObjectsSize.intValue;
 
-            m_ReorderableList = ReorderableListHelper.Create(serializedObject, m_SourceObjects, false);
-
-            m_DrivingLabels = new List<string>();
-            UpdateDrivingList(m_ReorderableList.count);
-            if (m_ReorderableList.count == 0)
-                ((MultiReferentialConstraint)serializedObject.targetObject).data.sourceObjects.Add(null);
-
-            m_ReorderableList.onAddCallback = (ReorderableList list) =>
-            {
-                ((MultiReferentialConstraint)serializedObject.targetObject).data.sourceObjects.Add(null);
-            };
+            UpdateDrivingLabels();
         }
 
         public override void OnInspectorGUI()
@@ -48,49 +39,34 @@ namespace UnityEditor.Animations.Rigging
 
             EditorGUILayout.PropertyField(m_Weight);
 
-            UpdateDrivingList(m_ReorderableList.count);
-            UpdateDrivingLabels();
-
             Rect rect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(rect, k_DrivingLabel, m_Driver);
-            m_Driver.intValue = EditorGUI.Popup(rect, k_DrivingLabel.text, m_Driver.intValue, m_DrivingLabels.ToArray());
+            EditorGUI.BeginChangeCheck();
+            var newValue = EditorGUI.Popup(rect, k_DrivingLabel, m_Driver.intValue, m_DrivingLabels);
+            if (EditorGUI.EndChangeCheck())
+                m_Driver.intValue = newValue;
             EditorGUI.EndProperty();
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_ReferenceObjectsLabel);
-            if (m_SourceObjectsToggle.boolValue)
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_SourceObjects, k_ReferenceObjectsLabel);
+            // also check if size has changed, because drag/drop on default control and Reset do not trigger change
+            if (EditorGUI.EndChangeCheck() || m_PreviousSourceSize != m_SourceObjectsSize.intValue)
             {
-                EditorGUI.indentLevel++;
-                m_ReorderableList.DoLayoutList();
-                EditorGUI.indentLevel--;
+                UpdateDrivingLabels();
+                m_PreviousSourceSize = m_SourceObjectsSize.intValue;
             }
 
             serializedObject.ApplyModifiedProperties();
         }
 
-        void UpdateDrivingList(int size)
-        {
-            int count = m_DrivingLabels.Count;
-            if (count == size)
-                return;
-
-            if (size < count)
-                m_DrivingLabels.RemoveRange(size, count - size);
-            else if (size > count)
-            {
-                if (size > m_DrivingLabels.Capacity)
-                    m_DrivingLabels.Capacity = size;
-                m_DrivingLabels.AddRange(Enumerable.Repeat("", size - count));
-            }
-        }
-
         void UpdateDrivingLabels()
         {
-            int count = Mathf.Min(m_DrivingLabels.Count, m_SourceObjects.arraySize);
-            for (int i = 0; i < count; ++i)
+            Array.Resize(ref m_DrivingLabels, m_SourceObjects.arraySize);
+            for (int i = 0; i < m_DrivingLabels.Length; ++i)
             {
                 var element = m_SourceObjects.GetArrayElementAtIndex(i);
                 var name = element.objectReferenceValue == null ? "None" : element.objectReferenceValue.name;
-                m_DrivingLabels[i] = i + " : " + name;
+                m_DrivingLabels[i] = new GUIContent($"{i} : {name}");
             }
         }
 

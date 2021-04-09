@@ -9,6 +9,8 @@ Both **“Transfer motion to skeleton”** and **“Transfer motion to constrain
 
 ![Bidirectional baking menu](images/bidirectional_baking/baking_option_menu.png)
 
+Bidirectional motion transfer can be used on generic character hierarchies. Humanoid is not supported at the moment.
+
 Not all constraints can Transfer motion to constraints. Physics-based constraints like Damped Transform cannot be inferred from existing motion. 
 
 Other constraints can be transferred but with limitations. For example, the Twist Chain constraint constrains rotations. It overrides positions and in-between chain rotations. The result of transferring motion does not precisely represent the source animation.

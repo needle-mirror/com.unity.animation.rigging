@@ -105,6 +105,7 @@ namespace UnityEngine.Animations.Rigging
                         hintR.x *= hintWeight;
                         hintR.y *= hintWeight;
                         hintR.z *= hintWeight;
+                        hintR = QuaternionExt.NormalizeSafe(hintR);
                         root.SetRotation(stream, hintR * root.GetRotation(stream));
                     }
                 }

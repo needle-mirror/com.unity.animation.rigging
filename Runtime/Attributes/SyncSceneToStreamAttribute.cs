@@ -38,16 +38,33 @@ namespace UnityEngine.Animations.Rigging
         public Property[] properties;
     }
 
-    internal static class PropertyUtils
+    /// <summary>
+    /// Utility functions for constraints (deprecated).
+    /// </summary>
+    [Obsolete("PropertyUtils is deprecated. Use ConstraintsUtils instead. (UnityUpgradable) -> ConstraintsUtils")]
+    public static class PropertyUtils
     {
+        /// <summary>
+        /// Prepends RigConstraint data property to specified property name.
+        /// </summary>
+        /// <param name="property">Property name.</param>
+        /// <returns>Return a complete property name.</returns>
+        [Obsolete("ConstructConstraintDataPropertyName is deprecated. Use ConstraintsUtils.ConstructConstraintDataPropertyName instead.")]
         public static string ConstructConstraintDataPropertyName(string property)
         {
-            return "m_Data." + property;
+            return ConstraintsUtils.ConstructConstraintDataPropertyName(property);
         }
 
+        /// <summary>
+        /// Builds a unique property name for a custom property.
+        /// </summary>
+        /// <param name="component">Associated component.</param>
+        /// <param name="property">Property name.</param>
+        /// <returns>Returns a custom property name.</returns>
+        [Obsolete("ConstructCustomPropertyName is deprecated. Use ConstraintsUtils.ConstructCustomPropertyName instead.")]
         public static string ConstructCustomPropertyName(Component component, string property)
         {
-            return component.transform.GetInstanceID() + "/" + component.GetType() + "/" + property;
+            return ConstraintsUtils.ConstructCustomPropertyName(component, property);
         }
     }
 }

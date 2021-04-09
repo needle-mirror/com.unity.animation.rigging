@@ -5,6 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(DampedTransform))]
+    [CanEditMultipleObjects]
     class DampedTransformEditor : Editor
     {
         static readonly GUIContent k_SourceObjectLabel = new GUIContent("Source Object");
@@ -17,14 +18,12 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_DampRotation;
         SerializedProperty m_MaintainAim;
 
-        SerializedProperty m_SourceObjectsToggle;
-        SerializedProperty m_SettingsToggle;
+        readonly FoldoutState m_SourceObjectsToggle = FoldoutState.ForSourceObjects<DampedTransformEditor>();
+        readonly FoldoutState m_SettingsToggle = FoldoutState.ForSettings<DampedTransformEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
-            m_SettingsToggle = serializedObject.FindProperty("m_SettingsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_ConstrainedObject = data.FindPropertyRelative("m_ConstrainedObject");
@@ -41,16 +40,17 @@ namespace UnityEditor.Animations.Rigging
             EditorGUILayout.PropertyField(m_Weight);
             EditorGUILayout.PropertyField(m_ConstrainedObject);
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectLabel);
-            if (m_SourceObjectsToggle.boolValue)
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectLabel);
+            if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_Source);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.boolValue = EditorGUILayout.Foldout(m_SettingsToggle.boolValue, k_SettingsLabel);
-            if (m_SettingsToggle.boolValue)
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_DampPosition);
@@ -58,6 +58,7 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_MaintainAim);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
         }

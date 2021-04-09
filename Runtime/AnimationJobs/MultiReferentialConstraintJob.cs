@@ -59,6 +59,8 @@ namespace UnityEngine.Animations.Rigging
 
                     sources[i] = src;
                 }
+
+                AnimationRuntimeUtils.PassThrough(stream, sources[driverIdx]);
             }
             else
             {

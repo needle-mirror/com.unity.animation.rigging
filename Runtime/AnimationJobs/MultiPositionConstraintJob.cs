@@ -59,7 +59,9 @@ namespace UnityEngine.Animations.Rigging
 
                 float weightScale = sumWeights > 1f ? 1f / sumWeights : 1f;
 
-                Vector3 currentWPos = driven.GetPosition(stream);
+                var currentWPos = driven.GetPosition(stream);
+                var drivenPos = currentWPos;
+
                 Vector3 accumPos = currentWPos;
                 for (int i = 0; i < sourceTransforms.Length; ++i)
                 {
@@ -74,19 +76,24 @@ namespace UnityEngine.Animations.Rigging
                     sourceTransforms[i] = sourceTransform;
                 }
 
-                // Convert accumPos to local space
+                var parentTx = AffineTransform.identity;
+
+                // Convert accumPos and drivenPos to local space
                 if (drivenParent.IsValid(stream))
                 {
                     drivenParent.GetGlobalTR(stream, out Vector3 parentWPos, out Quaternion parentWRot);
-                    var parentTx = new AffineTransform(parentWPos, parentWRot);
+                    parentTx = new AffineTransform(parentWPos, parentWRot);
                     accumPos = parentTx.InverseTransform(accumPos);
+                    drivenPos = parentTx.InverseTransform(drivenPos);
                 }
 
-                Vector3 currentLPos = driven.GetLocalPosition(stream);
                 if (Vector3.Dot(axesMask, axesMask) < 3f)
-                    accumPos = AnimationRuntimeUtils.Lerp(currentLPos, accumPos, axesMask);
+                    accumPos = AnimationRuntimeUtils.Lerp(drivenPos, accumPos, axesMask);
 
-                driven.SetLocalPosition(stream, Vector3.Lerp(currentLPos, accumPos + drivenOffset.Get(stream), w));
+                // Convert accumPos back to world space
+                accumPos = parentTx * (accumPos + drivenOffset.Get(stream));
+
+                driven.SetPosition(stream, Vector3.Lerp(currentWPos, accumPos, w));
             }
             else
                 AnimationRuntimeUtils.PassThrough(stream, driven);

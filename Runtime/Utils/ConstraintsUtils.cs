@@ -80,5 +80,27 @@ namespace UnityEngine.Animations.Rigging
 
             return steps;
         }
+
+        /// <summary>
+        /// Prepends RigConstraint data property to specified property name.
+        /// </summary>
+        /// <param name="property">Property name.</param>
+        /// <returns>Return a complete property name.</returns>
+        public static string ConstructConstraintDataPropertyName(string property)
+        {
+            return "m_Data." + property;
+        }
+
+        /// <summary>
+        /// Builds a unique property name for a custom property.
+        /// </summary>
+        /// <param name="component">Associated component.</param>
+        /// <param name="property">Property name.</param>
+        /// <returns>Returns a custom property name.</returns>
+        public static string ConstructCustomPropertyName(Component component, string property)
+        {
+            return component.transform.GetInstanceID() + "/" + component.GetType() + "/" + property;
+        }
+
     }
 }

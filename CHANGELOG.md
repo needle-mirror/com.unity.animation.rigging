@@ -1,6 +1,35 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.1.0] - 2021-04-09
+### Patch Update of *Animation Rigging*.
+- Fixed Auto Setup on TwoBoneIK throwing an ArgumentNullException instead of a warning message.
+- Fixed MultiReferential constraint not writing driver transform to stream.
+- Added exceptions in ReadWriteTransformHandle and ReadOnlyTransformHandle to cover invalid Transform references (case 1275002).
+- Added functions ConstructConstraintDataPropertyName and ConstructCustomPropertyName to ConstraintsUtils public API.
+- Fixed Gizmo icons reimporting when switching platforms.
+- Added missing icon to TwistChainConstraint.
+- Built-in RigConstraint components now support multi-object editing in the Inspector.
+- Fixed bug causing multi-target constraints to add a new target simply by viewing them in the Inspector.
+- Fixed collapsing Source Objects and Settings foldouts in the Inspector going on the undo stack.
+	- Appearance of foldout groups now matches other Unity components.
+- Appearance of WeightedTransformArray in the Inspector now matches default array control.
+	- Header now supports dragging and dropping Transforms.
+- Validate constraint weights and source object weights are within supported range when deserializing built-in constraints in the Editor.
+- Improvements to help when creating custom constraints:
+    - RigConstraint m_Data field no longer displays nested under a foldout in the Inspector by default.
+    - RigConstraint.OnValidate() is now overridable in sub-classes.
+	- Added WeightedTransformArray.OnValidate().
+	- Added default PropertyDrawer for WeightedTransformArray that supports multi-select.
+	- Added optional WeightRangeAttribute. It should now be used in conjunction with WeightedTransformArray fields instead of RangeAttribute to specify the control should use a slider.
+- Updated samples to standard Samples/PackageName/Version/SampleName structure (case 1276329).
+- Fixed BoneRenderer and RigEffectors not respecting layer visibility flags (case 1238204).
+- Added support for nested struct properties tagged with the SyncSceneToStream attribute.
+- Fixed MultiParent and MultiPosition constraints evaluating with an offset when root game object scale is not one (case 1246893).
+- Fixed unnormalized rotation in TwoBoneIK constraint when hint weight is lower than one (case 1311769).
+- Removed editor only conditional compilation on serialized data (case 1324071).
+- Updated Burst to version 1.4.1.
+
 ## [1.0.3] - 2020-08-21
 ### Patch Update of *Animation Rigging*.
 - Updated Burst to version 1.3.4.

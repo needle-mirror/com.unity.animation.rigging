@@ -8,7 +8,7 @@ namespace UnityEngine.Animations.Rigging
     {
         [SerializeField] Transform m_ConstrainedObject;
 
-        [SerializeField, SyncSceneToStream, Range(0, 1)] private WeightedTransformArray m_SourceObjects;
+        [SerializeField, SyncSceneToStream, WeightRange(0f, 1f)] WeightedTransformArray m_SourceObjects;
 
         [NotKeyable, SerializeField] Vector3Bool m_ConstrainedPositionAxes;
         [NotKeyable, SerializeField] Vector3Bool m_ConstrainedRotationAxes;
@@ -44,7 +44,7 @@ namespace UnityEngine.Animations.Rigging
         public bool constrainedRotationZAxis { get => m_ConstrainedRotationAxes.z; set => m_ConstrainedRotationAxes.z = value; }
 
         /// <inheritdoc />
-        string IMultiParentConstraintData.sourceObjectsProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
+        string IMultiParentConstraintData.sourceObjectsProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid()
@@ -75,17 +75,20 @@ namespace UnityEngine.Animations.Rigging
     /// MultiParent constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Parent Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/MultiParentConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/MultiParentConstraint.html")]
     public class MultiParentConstraint : RigConstraint<
         MultiParentConstraintJob,
         MultiParentConstraintData,
         MultiParentConstraintJobBinder<MultiParentConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            var weights = m_Data.sourceObjects;
+            WeightedTransformArray.OnValidate(ref weights);
+            m_Data.sourceObjects = weights;
+        }
     }
 }

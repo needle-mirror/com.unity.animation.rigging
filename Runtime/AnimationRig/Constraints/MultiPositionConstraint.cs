@@ -8,7 +8,7 @@ namespace UnityEngine.Animations.Rigging
     {
         [SerializeField] Transform m_ConstrainedObject;
 
-        [SyncSceneToStream, SerializeField, Range(0, 1)] WeightedTransformArray m_SourceObjects;
+        [SyncSceneToStream, SerializeField, WeightRange(0f, 1f)] WeightedTransformArray m_SourceObjects;
         [SyncSceneToStream, SerializeField] Vector3 m_Offset;
 
         [NotKeyable, SerializeField] Vector3Bool m_ConstrainedAxes;
@@ -38,9 +38,9 @@ namespace UnityEngine.Animations.Rigging
         public bool constrainedZAxis { get => m_ConstrainedAxes.z; set => m_ConstrainedAxes.z = value; }
 
         /// <inheritdoc />
-        string IMultiPositionConstraintData.offsetVector3Property => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_Offset));
+        string IMultiPositionConstraintData.offsetVector3Property => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_Offset));
         /// <inheritdoc />
-        string IMultiPositionConstraintData.sourceObjectsProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
+        string IMultiPositionConstraintData.sourceObjectsProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid()
@@ -70,17 +70,20 @@ namespace UnityEngine.Animations.Rigging
     /// MultiPosition constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Position Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/MultiPositionConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/MultiPositionConstraint.html")]
     public class MultiPositionConstraint : RigConstraint<
         MultiPositionConstraintJob,
         MultiPositionConstraintData,
         MultiPositionConstraintJobBinder<MultiPositionConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            var weights = m_Data.sourceObjects;
+            WeightedTransformArray.OnValidate(ref weights);
+            m_Data.sourceObjects = weights;
+        }
     }
 }

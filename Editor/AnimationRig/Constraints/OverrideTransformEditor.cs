@@ -5,6 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(OverrideTransform))]
+    [CanEditMultipleObjects]
     class OverrideTransformEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
@@ -19,14 +20,12 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_PositionWeight;
         SerializedProperty m_RotationWeight;
 
-        SerializedProperty m_SourceObjectsToggle;
-        SerializedProperty m_SettingsToggle;
+        readonly FoldoutState m_SourceObjectsToggle = FoldoutState.ForSourceObjects<OverrideTransformEditor>();
+        readonly FoldoutState m_SettingsToggle = FoldoutState.ForSettings<OverrideTransformEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
-            m_SettingsToggle = serializedObject.FindProperty("m_SettingsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_ConstrainedObject = data.FindPropertyRelative("m_ConstrainedObject");
@@ -45,8 +44,8 @@ namespace UnityEditor.Animations.Rigging
             EditorGUILayout.PropertyField(m_Weight);
             EditorGUILayout.PropertyField(m_ConstrainedObject);
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectsLabel);
-            if (m_SourceObjectsToggle.boolValue)
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_OverrideSource);
@@ -57,9 +56,10 @@ namespace UnityEditor.Animations.Rigging
                 }
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.boolValue = EditorGUILayout.Foldout(m_SettingsToggle.boolValue, k_SettingsLabel);
-            if (m_SettingsToggle.boolValue)
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_Space);
@@ -67,6 +67,7 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_RotationWeight);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
         }

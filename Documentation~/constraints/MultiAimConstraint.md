@@ -2,35 +2,40 @@
 
 ![Example](../images/constraint_multi_aim/multi_aim.gif)
 
-A Multi-Aim Constraint rotates a GameObject to face its source GameObject. It is typically applied on a GameObject
-to follow around one or more GameObjects. You can specify the aim direction by specifying the Aim Axis to the desired
-vector (X, -X, Y, -Y, Z, -Z).  Optionally, you can also specify the world up direction to help the constrained GameObject
-maintain its upward position.
+A Multi-Aim Constraint rotates a Constrained Object to face a target position specified by one or more Source Objects.
+It is typically used to make a GameObject look at objects of interest, such as nearby interactable props or the position of the cursor.
+You can specify the aim direction by selecting which Aim Axis to use on the Constrained Object (X, -X, Y, -Y, Z, -Z).
+You can optionally specify World Up parameters to help the Constrained Object maintain stable roll orientation.
+
+_Note that this constraint's handling of multiple targets is different from that of most third-party 3D animation software.
+Specifically, it calculates an aim rotation to each target, and then produces a weighted sum of all these rotations.
+This approach allows you to easily blend in or out the effects of individual targets, since their weight values are not normalized prior to calculation.
+To replicate the behavior of other 3D animation software, you should use a single Source Object that is constrained to multiple targets via a [MultiPositionConstraint](./MultiPositionConstraint.md)._
 
 ![Component](../images/constraint_multi_aim/multi_aim_component.png)
 
 |Properties|Description|
 |---|---|
-|Weight|The weight of the constraint. If set to 0, the constraint has no influence on the Constrained GameObject while when set to 1, it applies full influence given the specified settings.|
-|Constrained Object|The GameObject affected by the constraint Source GameObjects|
-|Aim Axis|Specifies the local aim axis of the constrained Object to use in order to orient its forward direction to the Source Objects.|
-|Up Axis|Specifies the local up axis of the constrained Object to use in order to orient its upward direction to the Source Objects.|
-|World Up Type|Specifies which mode to use to keep the upward direction of the constrained Object.|
-|World Up Vector|A static vector in world coordinates that is the general upward direction.  This is used when World Up Type is set to WorldUpType.Vector.|
-|World Up Object|A GameObject used to calculate the upward direction.  This is used when World Up Type is set to WorldUpType.ObjectUp or WorldUpType.ObjectRotationUp.|
-|Source Objects|The list of GameObjects that influence the constrained GameObject orientation. Unity evaluates source GameObjects in the order that they appear in this list. This order affects how this constraint rotates the constrained GameObject. To get the result you want, drag and drop items in this list. Each source has a weight from 0 to 1.|
-|Maintain Rotation Offset|Maintain the current rotation offset from the constrained GameObject to the source GameObjects|
-|Offset|Apply and extra post rotation offset to the constrained object. Specified in local space.|
-|Constrained Axis|Check X, Y, or Z to allow the constraint to control the corresponding axis. Uncheck an axis to stop the constraint from controlling it.|
-|Min Limit|Clamps the minimum value of the rotation axis along which the constraint GameObject rotates|
-|Max Limit|Clamps the maximum value of the rotation axis along which the constraint GameObject rotates|
+|Weight|The overall weight of the constraint. If set to 0, the constraint has no influence on the Constrained Object. When set to 1, it applies full influence with the current settings. Intermediate values are interpolated linearly.|
+|Constrained Object|The GameObject affected by the Source Objects.|
+|Aim Axis|Specifies the local aim axis of the Constrained Object to use in order to orient its forward direction to the Source Objects.|
+|Up Axis|Specifies the local up axis of the Constrained Object to use in order to orient its upward direction (i.e., roll orientation).|
+|World Up Type|Specifies which mode to use to stabilize the upward direction (i.e., roll orientation) of the Constrained Object.|
+|World Up Axis|A vector in some reference frame that is used to stabilize the upward direction of the Constrained Object. This value is used when World Up Type is either Vector or Object Rotation Up, in which case the reference frame is either the world or another object, respectively.
+|World Up Object|A GameObject used as a reference frame for World Up Axis. This value is used when World Up Type is either Object Up or Object Rotation Up.|
+|Source Objects|The list of GameObjects that influence the Constrained Object's orientation, and the amount of weight they contribute to the final pose. The constraint calculates rotation toward each target to produce a weighted sum. _The order of Source Objects does not affect the result._|
+|Maintain Rotation Offset|Specifies whether to maintain the initial rotation offset between the Constrained Object and the Source Objects.|
+|Offset|Specifies an additional local space rotation offset to apply to the Constrained Object, after it has been rotated toward its target.|
+|Constrained Axes|Specifies the axes to which the constraint can apply rotation.|
+|Min Limit|Clamps the minimum rotation that may be applied about any of the constrained axes of rotation.|
+|Max Limit|Clamps the maximum rotation that may be applied about any of the constrained axes of rotation.|
 
 World Up Type can have the following values:
 
 |Values|Description|
 |---|---|
 |None|Do not use a World Up vector.|
-|Scene Up|The Y axis of the scene.|
-|Object Up|The Y axis of the GameObject referred to by __World Up Object__.|
-|Object Up Rotation|The axis specified by __World Up Vector__ of the GameObject referred to by __World Up Object__.|
+|Scene Up|The Y-axis of the scene.|
+|Object Up|The Y-axis of the GameObject specified by World Up Object.|
+|Object Up Rotation|The axis specified by World Up Vector, in the space of the GameObject specified by World Up Object.|
 |Vector|The World Up Vector.|

@@ -42,17 +42,12 @@ namespace UnityEngine.Animations.Rigging
     /// TwistChain constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Twist Chain Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/TwistChainConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/TwistChainConstraint.html")]
     public class TwistChainConstraint : RigConstraint<
         TwistChainConstraintJob,
         TwistChainConstraintData,
         TwistChainConstraintJobBinder<TwistChainConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-            [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-            [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
     }
 }

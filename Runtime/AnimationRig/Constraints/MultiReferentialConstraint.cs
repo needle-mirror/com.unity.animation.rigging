@@ -41,7 +41,7 @@ namespace UnityEngine.Animations.Rigging
         /// <inheritdoc />
         int IMultiReferentialConstraintData.driverValue => m_Driver;
         /// <inheritdoc />
-        string IMultiReferentialConstraintData.driverIntProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_Driver));
+        string IMultiReferentialConstraintData.driverIntProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_Driver));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid()
@@ -74,20 +74,17 @@ namespace UnityEngine.Animations.Rigging
     /// MultiReferential constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Referential Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/MultiReferentialConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/MultiReferentialConstraint.html")]
     public class MultiReferentialConstraint : RigConstraint<
         MultiReferentialConstraintJob,
         MultiReferentialConstraintData,
         MultiReferentialConstraintJobBinder<MultiReferentialConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-    #endif
-
-        private void OnValidate()
+        /// <inheritdoc />
+        protected override void OnValidate()
         {
+            base.OnValidate();
             m_Data.UpdateDriver();
         }
     }

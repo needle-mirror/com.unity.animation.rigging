@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace UnityEngine.Animations.Rigging
@@ -51,7 +52,7 @@ namespace UnityEngine.Animations.Rigging
         private static bool ExtractTransformType(
             Animator animator,
             FieldInfo field,
-            ref IAnimationJobData data,
+            object data,
             List<Transform> syncableTransforms
             )
         {
@@ -79,15 +80,16 @@ namespace UnityEngine.Animations.Rigging
 
         private static bool ExtractPropertyType(
             FieldInfo field,
-            ref IAnimationJobData data,
-            List<Property> syncableProperties
+            object data,
+            List<Property> syncableProperties,
+            string namePrefix = ""
             )
         {
             if (!s_SupportedPropertyTypeToDescriptor.TryGetValue(field.FieldType, out PropertyDescriptor descriptor))
                 return false;
 
             syncableProperties.Add(
-                new Property { name = PropertyUtils.ConstructConstraintDataPropertyName(field.Name), descriptor = descriptor }
+                new Property { name = ConstraintsUtils.ConstructConstraintDataPropertyName(namePrefix + field.Name), descriptor = descriptor }
                 );
 
             return true;
@@ -96,7 +98,7 @@ namespace UnityEngine.Animations.Rigging
         private static bool ExtractWeightedTransforms(
                 Animator animator,
                 FieldInfo field,
-                ref IAnimationJobData data,
+                object data,
                 List<Transform> syncableTransforms,
                 List<Property> syncableProperties)
         {
@@ -110,7 +112,7 @@ namespace UnityEngine.Animations.Rigging
                     syncableTransforms.Add(value);
 
                 syncableProperties.Add(
-                    new Property { name = PropertyUtils.ConstructConstraintDataPropertyName(field.Name + ".weight"), descriptor = s_SupportedPropertyTypeToDescriptor[typeof(float)] }
+                    new Property { name = ConstraintsUtils.ConstructConstraintDataPropertyName(field.Name + ".weight"), descriptor = s_SupportedPropertyTypeToDescriptor[typeof(float)] }
                     );
             }
             else if (fieldType == typeof(WeightedTransformArray))
@@ -123,7 +125,7 @@ namespace UnityEngine.Animations.Rigging
                         syncableTransforms.Add(element.transform);
 
                     syncableProperties.Add(
-                        new Property { name = PropertyUtils.ConstructConstraintDataPropertyName(field.Name + ".m_Item" + index + ".weight"), descriptor = s_SupportedPropertyTypeToDescriptor[typeof(float)] }
+                        new Property { name = ConstraintsUtils.ConstructConstraintDataPropertyName(field.Name + ".m_Item" + index + ".weight"), descriptor = s_SupportedPropertyTypeToDescriptor[typeof(float)] }
                         );
 
                     ++index;
@@ -133,6 +135,43 @@ namespace UnityEngine.Animations.Rigging
                 handled = false;
 
             return handled;
+        }
+
+        private static bool ExtractNestedPropertyType(
+            Animator animator,
+            FieldInfo field,
+            object data,
+            List<Transform> syncableTransforms,
+            List<Property> syncableProperties,
+            string namePrefix = "")
+        {
+            Type fieldType = field.FieldType;
+            var fieldData = field.GetValue(data);
+            var fieldName = namePrefix + field.Name + ".";
+
+            // Only structs
+            if (!fieldType.IsValueType || fieldType.IsPrimitive)
+                return false;
+
+            var fields = fieldType.GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+            ).Where(info => info.GetCustomAttribute<SyncSceneToStreamAttribute>() != null);
+
+            foreach (var childField in fields)
+            {
+                if (ExtractTransformType(animator, childField, fieldData, syncableTransforms))
+                    continue;
+
+                if (ExtractPropertyType(childField, fieldData, syncableProperties, fieldName))
+                    continue;
+
+                if (ExtractNestedPropertyType(animator, childField, fieldData, syncableTransforms, syncableProperties, fieldName))
+                    continue;
+
+                throw new NotSupportedException("Field type [" + field.FieldType + "] is not a supported syncable property type.");
+            }
+
+            return true;
         }
 
         private static void ExtractAllSyncableData(Animator animator, IList<IRigLayer> layers, out List<Transform> syncableTransforms, out List<SyncableProperties> syncableProperties)
@@ -172,11 +211,13 @@ namespace UnityEngine.Animations.Rigging
                     List<Property> properties = new List<Property>(syncableFields.Length);
                     foreach (var field in syncableFields)
                     {
-                        if (ExtractWeightedTransforms(animator, field, ref data, syncableTransforms, properties))
+                        if (ExtractWeightedTransforms(animator, field, data, syncableTransforms, properties))
                             continue;
-                        if (ExtractTransformType(animator, field, ref data, syncableTransforms))
+                        if (ExtractTransformType(animator, field, data, syncableTransforms))
                             continue;
-                        if (ExtractPropertyType(field, ref data, properties))
+                        if (ExtractPropertyType(field, data, properties))
+                            continue;
+                        if (ExtractNestedPropertyType(animator, field, data, syncableTransforms, properties))
                             continue;
 
                         throw new NotSupportedException("Field type [" + field.FieldType + "] is not a supported syncable property type.");

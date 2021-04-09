@@ -294,7 +294,9 @@ namespace UnityEngine.Animations.Rigging
 
             job.worldUpType = (MultiAimConstraintJob.WorldUpType)data.worldUpType;
             job.worldUpAxis = data.worldUpAxis;
-            job.worldUpObject = ReadOnlyTransformHandle.Bind(animator, data.worldUpObject);
+
+            if (data.worldUpObject != null)
+                job.worldUpObject = ReadOnlyTransformHandle.Bind(animator, data.worldUpObject);
 
             WeightedTransformArray sourceObjects = data.sourceObjects;
 

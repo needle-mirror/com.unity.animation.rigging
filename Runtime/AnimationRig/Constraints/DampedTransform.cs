@@ -34,9 +34,9 @@ namespace UnityEngine.Animations.Rigging
         public bool maintainAim { get => m_MaintainAim; set => m_MaintainAim = value; }
 
         /// <inheritdoc />
-        string IDampedTransformData.dampPositionFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_DampPosition));
+        string IDampedTransformData.dampPositionFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_DampPosition));
         /// <inheritdoc />
-        string IDampedTransformData.dampRotationFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_DampRotation));
+        string IDampedTransformData.dampRotationFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_DampRotation));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid() => !(m_ConstrainedObject == null || m_Source == null);
@@ -56,17 +56,19 @@ namespace UnityEngine.Animations.Rigging
     /// DampedTransform constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Damped Transform")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/DampedTransform.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/DampedTransform.html")]
     public class DampedTransform : RigConstraint<
         DampedTransformJob,
         DampedTransformData,
         DampedTransformJobBinder<DampedTransformData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Data.dampPosition = Mathf.Clamp01(m_Data.dampPosition);
+            m_Data.dampRotation = Mathf.Clamp01(m_Data.dampRotation);
+        }
     }
 }

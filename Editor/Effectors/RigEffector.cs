@@ -80,6 +80,10 @@ namespace UnityEditor.Animations.Rigging
             if (SceneVisibilityManager.instance.IsHidden(transform.gameObject, false))
                 return;
 
+            var mask = UnityEditor.Tools.visibleLayers;
+            if ((mask & (1 << transform.gameObject.layer)) == 0)
+                return;
+
             int id = GUIUtility.GetControlID(s_ButtonHash, FocusType.Passive);
             Event evt = Event.current;
 

@@ -44,17 +44,19 @@ namespace UnityEditor.Animations.Rigging
         {
             jobWeight.Set(stream, 1f);
 
-            var drivenPos = driven.GetLocalPosition(stream);
-            var offset = drivenOffset.Get(stream);
-
-            var lPos = drivenPos - offset;
-
             var parentTx = new AffineTransform();
             if (drivenParent.IsValid(stream))
             {
                 drivenParent.GetGlobalTR(stream, out Vector3 parentWPos, out Quaternion parentWRot);
                 parentTx = new AffineTransform(parentWPos, parentWRot);
             }
+
+            var drivenPos = driven.GetPosition(stream);
+            drivenPos = parentTx.InverseTransform(drivenPos);
+
+            var offset = drivenOffset.Get(stream);
+
+            var lPos = drivenPos - offset;
 
             var wPos = parentTx.Transform(lPos);
             for (int i = 0; i < sourceTransforms.Length; ++i)

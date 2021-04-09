@@ -6,6 +6,11 @@ namespace UnityEngine.Animations.Rigging
     [System.Serializable]
     public struct ChainIKConstraintData : IAnimationJobData, IChainIKConstraintData
     {
+        internal const int k_MinIterations = 1;
+        internal const int k_MaxIterations = 50;
+        internal const float k_MinTolerance = 0f;
+        internal const float k_MaxTolerance = 0.01f;
+
         [SerializeField] Transform m_Root;
         [SerializeField] Transform m_Tip;
 
@@ -13,8 +18,8 @@ namespace UnityEngine.Animations.Rigging
         [SyncSceneToStream, SerializeField, Range(0f, 1f)] float m_ChainRotationWeight;
         [SyncSceneToStream, SerializeField, Range(0f, 1f)] float m_TipRotationWeight;
 
-        [NotKeyable, SerializeField, Range(1, 50)] int m_MaxIterations;
-        [NotKeyable, SerializeField, Range(0f, 0.01f)] float m_Tolerance;
+        [NotKeyable, SerializeField, Range(k_MinIterations, k_MaxIterations)] int m_MaxIterations;
+        [NotKeyable, SerializeField, Range(k_MinTolerance, k_MaxTolerance)] float m_Tolerance;
         [NotKeyable, SerializeField] bool m_MaintainTargetPositionOffset;
         [NotKeyable, SerializeField] bool m_MaintainTargetRotationOffset;
 
@@ -29,18 +34,18 @@ namespace UnityEngine.Animations.Rigging
         /// <summary>The weight for which ChainIK target has and effect on tip Transform. This is a value in between 0 and 1.</summary>
         public float tipRotationWeight { get => m_TipRotationWeight; set => m_TipRotationWeight = Mathf.Clamp01(value); }
         /// <inheritdoc />
-        public int maxIterations { get => m_MaxIterations; set => m_MaxIterations = Mathf.Clamp(value, 1, 50); }
+        public int maxIterations { get => m_MaxIterations; set => m_MaxIterations = Mathf.Clamp(value, k_MinIterations, k_MaxIterations); }
         /// <inheritdoc />
-        public float tolerance { get => m_Tolerance; set => m_Tolerance = Mathf.Clamp(value, 0f, 0.01f); }
+        public float tolerance { get => m_Tolerance; set => m_Tolerance = Mathf.Clamp(value, k_MinTolerance, k_MaxTolerance); }
         /// <inheritdoc />
         public bool maintainTargetPositionOffset { get => m_MaintainTargetPositionOffset; set => m_MaintainTargetPositionOffset = value; }
         /// <inheritdoc />
         public bool maintainTargetRotationOffset { get => m_MaintainTargetRotationOffset; set => m_MaintainTargetRotationOffset = value; }
 
         /// <inheritdoc />
-        string IChainIKConstraintData.chainRotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_ChainRotationWeight));
+        string IChainIKConstraintData.chainRotationWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_ChainRotationWeight));
         /// <inheritdoc />
-        string IChainIKConstraintData.tipRotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TipRotationWeight));
+        string IChainIKConstraintData.tipRotationWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_TipRotationWeight));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid()
@@ -78,17 +83,25 @@ namespace UnityEngine.Animations.Rigging
     /// ChainIK constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Chain IK Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/ChainIKConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/ChainIKConstraint.html")]
     public class ChainIKConstraint : RigConstraint<
         ChainIKConstraintJob,
         ChainIKConstraintData,
         ChainIKConstraintJobBinder<ChainIKConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Data.chainRotationWeight = Mathf.Clamp01(m_Data.chainRotationWeight);
+            m_Data.tipRotationWeight = Mathf.Clamp01(m_Data.tipRotationWeight);
+            m_Data.maxIterations = Mathf.Clamp(
+                m_Data.maxIterations, ChainIKConstraintData.k_MinIterations, ChainIKConstraintData.k_MaxIterations
+            );
+            m_Data.tolerance = Mathf.Clamp(
+                m_Data.tolerance, ChainIKConstraintData.k_MinTolerance, ChainIKConstraintData.k_MaxTolerance
+            );
+        }
     }
 }

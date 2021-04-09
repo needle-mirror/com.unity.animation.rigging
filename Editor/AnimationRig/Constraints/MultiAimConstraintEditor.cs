@@ -1,12 +1,12 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEditorInternal;
-using System.Reflection;
-using System.Collections.Generic;
 
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(MultiAimConstraint))]
+    [CanEditMultipleObjects]
     class MultiAimConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
@@ -16,7 +16,7 @@ namespace UnityEditor.Animations.Rigging
         static readonly GUIContent k_WorldUpAxisLabel = new GUIContent("World Up Axis");
         static readonly GUIContent k_WorldUpType = new GUIContent("World Up Type");
         static readonly GUIContent k_WorldUpObject = new GUIContent("World Up Object");
-        static readonly string[] k_AxisLabels = { "X", "-X", "Y", "-Y", "Z", "-Z" };
+        static readonly GUIContent[] k_AxisLabels = new []{ "X", "-X", "Y", "-Y", "Z", "-Z" }.Select(s => new GUIContent(s)).ToArray();
         static readonly GUIContent k_MaintainOffsetLabel = new GUIContent("Maintain Rotation Offset");
 
         SerializedProperty m_Weight;
@@ -33,17 +33,11 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_MinLimit;
         SerializedProperty m_MaxLimit;
 
-        SerializedProperty m_SourceObjectsToggle;
-        SerializedProperty m_SettingsToggle;
-        ReorderableList m_ReorderableList;
-        MultiAimConstraint m_Constraint;
-        WeightedTransformArray m_SourceObjectsArray;
+        readonly FoldoutState m_SettingsToggle = FoldoutState.ForSettings<MultiAimConstraintEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
-            m_SettingsToggle = serializedObject.FindProperty("m_SettingsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_ConstrainedObject = data.FindPropertyRelative("m_ConstrainedObject");
@@ -58,34 +52,6 @@ namespace UnityEditor.Animations.Rigging
             m_ConstrainedAxes = data.FindPropertyRelative("m_ConstrainedAxes");
             m_MinLimit = data.FindPropertyRelative("m_MinLimit");
             m_MaxLimit = data.FindPropertyRelative("m_MaxLimit");
-
-            m_Constraint = (MultiAimConstraint)serializedObject.targetObject;
-            m_SourceObjectsArray = m_Constraint.data.sourceObjects;
-
-            var dataType = m_Constraint.data.GetType();
-            var fieldInfo = dataType.GetField("m_SourceObjects", BindingFlags.NonPublic | BindingFlags.Instance);
-            var range = fieldInfo.GetCustomAttribute<RangeAttribute>();
-
-            if (m_SourceObjectsArray.Count == 0)
-            {
-                m_SourceObjectsArray.Add(WeightedTransform.Default(1f));
-                m_Constraint.data.sourceObjects = m_SourceObjectsArray;
-            }
-
-            m_ReorderableList = WeightedTransformHelper.CreateReorderableList(m_SourceObjects, ref m_SourceObjectsArray, range);
-
-            m_ReorderableList.onChangedCallback = (ReorderableList reorderableList) =>
-            {
-                Undo.RegisterCompleteObjectUndo(m_Constraint, "Edit MultiAim");
-                m_Constraint.data.sourceObjects = (WeightedTransformArray)reorderableList.list;
-                if (PrefabUtility.IsPartOfPrefabInstance(m_Constraint))
-                    EditorUtility.SetDirty(m_Constraint);
-            };
-
-            Undo.undoRedoPerformed += () =>
-            {
-                m_ReorderableList.list = m_Constraint.data.sourceObjects;
-            };
         }
 
         public override void OnInspectorGUI()
@@ -93,48 +59,33 @@ namespace UnityEditor.Animations.Rigging
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(m_Weight);
+
             EditorGUILayout.PropertyField(m_ConstrainedObject);
 
-            Rect rect = EditorGUILayout.GetControlRect();
-            EditorGUI.BeginProperty(rect, k_AimAxisLabel, m_AimAxis);
-            m_AimAxis.enumValueIndex = EditorGUI.Popup(rect, m_AimAxis.displayName, m_AimAxis.enumValueIndex, k_AxisLabels);
-            EditorGUI.EndProperty();
+            ++EditorGUI.indentLevel;
+            DoAxisField(m_AimAxis, k_AimAxisLabel);
+            DoAxisField(m_UpAxis, k_UpAxisLabel);
+            --EditorGUI.indentLevel;
 
-            rect = EditorGUILayout.GetControlRect();
-            EditorGUI.BeginProperty(rect, k_UpAxisLabel, m_UpAxis);
-            m_UpAxis.enumValueIndex = EditorGUI.Popup(rect, m_UpAxis.displayName, m_UpAxis.enumValueIndex, k_AxisLabels);
-            EditorGUI.EndProperty();
-
-            EditorGUILayout.PropertyField(m_WorldUpType);
+            EditorGUILayout.PropertyField(m_WorldUpType, k_WorldUpType);
 
             var worldUpType = (MultiAimConstraintData.WorldUpType)m_WorldUpType.intValue;
 
+            ++EditorGUI.indentLevel;
             using (new EditorGUI.DisabledGroupScope(worldUpType != MultiAimConstraintData.WorldUpType.ObjectRotationUp && worldUpType != MultiAimConstraintData.WorldUpType.Vector))
             {
-                rect = EditorGUILayout.GetControlRect();
-                EditorGUI.BeginProperty(rect, k_UpAxisLabel, m_WorldUpAxis);
-                m_WorldUpAxis.enumValueIndex = EditorGUI.Popup(rect, m_WorldUpAxis.displayName, m_WorldUpAxis.enumValueIndex, k_AxisLabels);
-                EditorGUI.EndProperty();
+                DoAxisField(m_WorldUpAxis, k_WorldUpAxisLabel);
             }
-
             using (new EditorGUI.DisabledGroupScope(worldUpType != MultiAimConstraintData.WorldUpType.ObjectUp && worldUpType != MultiAimConstraintData.WorldUpType.ObjectRotationUp))
             {
-                EditorGUILayout.PropertyField(m_WorldUpObject);
+                EditorGUILayout.PropertyField(m_WorldUpObject, k_WorldUpObject);
             }
+            --EditorGUI.indentLevel;
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectsLabel);
-            if (m_SourceObjectsToggle.boolValue)
-            {
-                // Sync list with sourceObjects.
-                m_ReorderableList.list = m_Constraint.data.sourceObjects;
+            EditorGUILayout.PropertyField(m_SourceObjects, k_SourceObjectsLabel);
 
-                EditorGUI.indentLevel++;
-                m_ReorderableList.DoLayoutList();
-                EditorGUI.indentLevel--;
-            }
-
-            m_SettingsToggle.boolValue = EditorGUILayout.Foldout(m_SettingsToggle.boolValue, k_SettingsLabel);
-            if (m_SettingsToggle.boolValue)
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_MaintainOffset, k_MaintainOffsetLabel);
@@ -144,8 +95,20 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_MaxLimit);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        static void DoAxisField(SerializedProperty property, GUIContent label)
+        {
+            var rect = EditorGUILayout.GetControlRect();
+            EditorGUI.BeginProperty(rect, label, property);
+            EditorGUI.BeginChangeCheck();
+            var newValue = EditorGUI.Popup(rect, label, property.intValue, k_AxisLabels);
+            if (EditorGUI.EndChangeCheck())
+                property.intValue = newValue;
+            EditorGUI.EndProperty();
         }
 
         [MenuItem("CONTEXT/MultiAimConstraint/Transfer motion to constraint", false, 611)]

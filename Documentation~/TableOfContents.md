@@ -1,7 +1,7 @@
 * [Animation Rigging](index.md)
 * [Rigging workflow](RiggingWorkflow.md)
-* [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md)
 * [Animation Rigging Menu](AnimationRiggingMenu.md)
+* [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md)
 * [Constraint components](ConstraintComponents.md)
     * [Blend Constraint](constraints/BlendConstraint.md)
     * [Chain IK Constraint](constraints/ChainIKConstraint.md)

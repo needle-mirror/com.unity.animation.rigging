@@ -21,7 +21,7 @@ namespace UnityEngine.Animations.Rigging
         /// <summary>
         /// The constraint data.
         /// </summary>
-        [SerializeField]
+        [SerializeField, ExpandChildren]
         protected TData m_Data;
 
         static readonly TBinder s_Binder = new TBinder();
@@ -40,6 +40,12 @@ namespace UnityEngine.Animations.Rigging
         /// </summary>
         /// <returns>Returns true if constraint data can be successfully evaluated. Returns false otherwise.</returns>
         public bool IsValid() => m_Data.IsValid();
+
+        /// <summary>
+        /// This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
+        /// You can use this to ensure that when you modify data in an editor, that data stays within a certain range.
+        /// </summary>
+        protected virtual void OnValidate() => m_Weight = Mathf.Clamp01(m_Weight);
 
         /// <summary>
         /// The data container for the constraint.
@@ -63,7 +69,7 @@ namespace UnityEngine.Animations.Rigging
             // Bind constraint job weight property
             job.jobWeight = FloatProperty.BindCustom(
                 animator,
-                PropertyUtils.ConstructCustomPropertyName(this, ConstraintProperties.s_Weight)
+                ConstraintsUtils.ConstructCustomPropertyName(this, ConstraintProperties.s_Weight)
                 );
 
             return job;

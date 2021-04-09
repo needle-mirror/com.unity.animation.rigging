@@ -8,9 +8,9 @@ namespace UnityEngine.Animations.Rigging
     /// This struct defines a List of WeightedTransform.
     /// WeightedTransformArray can be animated (as opposed to System.List and C# arrays) and is implemented
     /// with a hard limit of eight WeightedTransform elements.
+    /// See also <seealso cref="WeightedTransform"/> and <seealso cref="WeightRangeAttribute"/>.
     /// </summary>
-    /// <seealso cref="WeightedTransform"/>
-    [System.Serializable]
+    [Serializable]
     public struct WeightedTransformArray : IList<WeightedTransform>, IList
     {
         /// <summary>Maximum number of elements in WeightedTransformArray.</summary>
@@ -376,6 +376,19 @@ namespace UnityEngine.Animations.Rigging
         public Transform GetTransform(int index)
         {
             return Get(index).transform;
+        }
+
+        /// <summary>
+        /// Method to call from a provider's OnValidate() callback to ensure all weight values are within the valid range.
+        /// See also <seealso cref="WeightRangeAttribute"/>.
+        /// </summary>
+        /// <param name="array">WeightedTransformArray to adjust.</param>
+        /// <param name="min">Minimum value to clamp array values with.</param>
+        /// <param name="max">Maximum value to clamp array values with.</param>
+        public static void OnValidate(ref WeightedTransformArray array, float min = 0f, float max = 1f)
+        {
+            for (var i = 0; i < k_MaxLength; ++i)
+                array.SetWeight(i, Mathf.Clamp(array.GetWeight(i), min, max));
         }
 
         /// <summary>

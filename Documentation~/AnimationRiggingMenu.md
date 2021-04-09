@@ -1,7 +1,7 @@
 
 # Animation Rigging Menu
 
-The Animation Rigging menu contains useful utilities to help with the rigging workflow.
+The top-level Animation Rigging menu contains useful utilities to help with rigging workflows.
 
 ## Align
 
@@ -16,14 +16,14 @@ To use Align, select the GameObject you want to align and then select the GameOb
 
 ## Restore Bind Pose
 
-Use the Restore Bind Pose option to restore the Skinned Mesh Renderer bind pose that was originally imported. This is useful for restoring the original character pose of a skinned mesh. This option will only restore poses for bones that are used by skinning. The restore bind pose option may not work as expected for setups where the mesh is only skinned to twist bones.
+Use the Restore Bind Pose option to restore the Skinned Mesh Renderer bind pose that was originally imported. This is useful for restoring the original character pose of a skinned mesh. This option will only restore poses for bones that are used by skinning. The restore bind pose option may not work as expected for setups where the mesh is only skinned to some bones in the hierarchy.
 
 ## Rig Setup
 
 Use the Rig Setup option to set up the required components for Animation Rigging on the selected object.
 
 To use Rig Setup, select a GameObject hierarchy with an Animator component on which you want to create the constraints. Then, select the Rig Setup option.
-This creates a RigBuilder component on the selected GameObject and a child GameObject named "Rig 1" with a Rig component that will be added to the RigBuilder layers.
+This creates a RigBuilder component on the selected GameObject and a child GameObject named "Rig 1" with a Rig component that will be assigned to the RigBuilder layers.
 
 Note: Rig Setup is also found in the Animator component options.
 

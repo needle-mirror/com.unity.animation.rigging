@@ -5,6 +5,7 @@ using UnityEngine.Animations.Rigging;
 namespace UnityEditor.Animations.Rigging
 {
     [CustomEditor(typeof(TwoBoneIKConstraint))]
+    [CanEditMultipleObjects]
     class TwoBoneIKConstraintEditor : Editor
     {
         static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
@@ -23,14 +24,12 @@ namespace UnityEditor.Animations.Rigging
         SerializedProperty m_MaintainTargetPositionOffset;
         SerializedProperty m_MaintainTargetRotationOffset;
 
-        SerializedProperty m_SourceObjectsToggle;
-        SerializedProperty m_SettingsToggle;
+        readonly FoldoutState m_SourceObjectsToggle = FoldoutState.ForSourceObjects<TwoBoneIKConstraintEditor>();
+        readonly FoldoutState m_SettingsToggle = FoldoutState.ForSettings<TwoBoneIKConstraintEditor>();
 
         void OnEnable()
         {
             m_Weight = serializedObject.FindProperty("m_Weight");
-            m_SourceObjectsToggle = serializedObject.FindProperty("m_SourceObjectsGUIToggle");
-            m_SettingsToggle = serializedObject.FindProperty("m_SettingsGUIToggle");
 
             var data = serializedObject.FindProperty("m_Data");
             m_Root = data.FindPropertyRelative("m_Root");
@@ -54,17 +53,18 @@ namespace UnityEditor.Animations.Rigging
             EditorGUILayout.PropertyField(m_Mid);
             EditorGUILayout.PropertyField(m_Tip);
 
-            m_SourceObjectsToggle.boolValue = EditorGUILayout.Foldout(m_SourceObjectsToggle.boolValue, k_SourceObjectsLabel);
-            if (m_SourceObjectsToggle.boolValue)
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(m_Target);
                 EditorGUILayout.PropertyField(m_Hint);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.boolValue = EditorGUILayout.Foldout(m_SettingsToggle.boolValue, k_SettingsLabel);
-            if (m_SettingsToggle.boolValue)
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
                 MaintainOffsetHelper.DoDropdown(k_MaintainTargetOffsetLabel, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
@@ -73,6 +73,7 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_HintWeight);
                 EditorGUI.indentLevel--;
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -113,18 +114,21 @@ namespace UnityEditor.Animations.Rigging
                 var constraintInSelection = false;
 
                 // Take transform from selection that is part of the animator hierarchy & not the constraint transform.
-                for (int i = 0; i < selection.Length; i++)
+                if (animator)
                 {
-                    if (selection[i].IsChildOf(animator))
+                    for (int i = 0; i < selection.Length; i++)
                     {
-                        if (selection[i] != constraint.transform)
+                        if (selection[i].IsChildOf(animator))
                         {
-                            tip = selection[i];
-                            break;
-                        }
-                        else
-                        {
-                            constraintInSelection = true;
+                            if (selection[i] != constraint.transform)
+                            {
+                                tip = selection[i];
+                                break;
+                            }
+                            else
+                            {
+                                constraintInSelection = true;
+                            }
                         }
                     }
                 }
@@ -141,7 +145,7 @@ namespace UnityEditor.Animations.Rigging
                 }
                 else
                 {
-                    Undo.RecordObject(constraint, "Setup tip bone from use selection");
+                    Undo.RecordObject(constraint, "Setup tip bone from user selection");
                     constraint.data.tip = tip;
                     dirty = true;
                 }

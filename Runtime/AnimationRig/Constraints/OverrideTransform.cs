@@ -49,13 +49,13 @@ namespace UnityEngine.Animations.Rigging
         /// <inheritdoc />
         int IOverrideTransformData.space => (int)m_Space;
         /// <inheritdoc />
-        string IOverrideTransformData.positionWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_PositionWeight));
+        string IOverrideTransformData.positionWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_PositionWeight));
         /// <inheritdoc />
-        string IOverrideTransformData.rotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_RotationWeight));
+        string IOverrideTransformData.rotationWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_RotationWeight));
         /// <inheritdoc />
-        string IOverrideTransformData.positionVector3Property => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_OverridePosition));
+        string IOverrideTransformData.positionVector3Property => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_OverridePosition));
         /// <inheritdoc />
-        string IOverrideTransformData.rotationVector3Property => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_OverrideRotation));
+        string IOverrideTransformData.rotationVector3Property => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_OverrideRotation));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid() => m_ConstrainedObject != null;
@@ -77,17 +77,19 @@ namespace UnityEngine.Animations.Rigging
     /// OverrideTransform constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Override Transform")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/OverrideTransform.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/OverrideTransform.html")]
     public class OverrideTransform : RigConstraint<
         OverrideTransformJob,
         OverrideTransformData,
         OverrideTransformJobBinder<OverrideTransformData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Data.positionWeight = Mathf.Clamp01(m_Data.positionWeight);
+            m_Data.rotationWeight = Mathf.Clamp01(m_Data.rotationWeight);
+        }
     }
 }

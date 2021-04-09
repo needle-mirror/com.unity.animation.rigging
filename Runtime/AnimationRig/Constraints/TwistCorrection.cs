@@ -22,7 +22,7 @@ namespace UnityEngine.Animations.Rigging
         [SyncSceneToStream, SerializeField] Transform m_Source;
 
         [NotKeyable, SerializeField] Axis m_TwistAxis;
-        [SyncSceneToStream, SerializeField, Range(-1, 1)] WeightedTransformArray m_TwistNodes;
+        [SyncSceneToStream, SerializeField, WeightRange(-1f, 1f)] WeightedTransformArray m_TwistNodes;
 
         /// <summary>The source Transform that influences the twist nodes.</summary>
         public Transform sourceObject { get => m_Source; set => m_Source = value; }
@@ -43,7 +43,7 @@ namespace UnityEngine.Animations.Rigging
         Vector3 ITwistCorrectionData.twistAxis => Convert(m_TwistAxis);
 
         /// <inheritdoc />
-        string ITwistCorrectionData.twistNodesProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TwistNodes));
+        string ITwistCorrectionData.twistNodesProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_TwistNodes));
 
         static Vector3 Convert(Axis axis)
         {
@@ -82,16 +82,20 @@ namespace UnityEngine.Animations.Rigging
     /// TwistCorrection constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Twist Correction")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/TwistCorrection.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/TwistCorrection.html")]
     public class TwistCorrection : RigConstraint<
         TwistCorrectionJob,
         TwistCorrectionData,
         TwistCorrectionJobBinder<TwistCorrectionData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_TwistNodesGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            var weights = m_Data.twistNodes;
+            WeightedTransformArray.OnValidate(ref weights, -1f, 1f);
+            m_Data.twistNodes = weights;
+        }
     }
 }

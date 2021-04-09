@@ -16,12 +16,6 @@ namespace UnityEditor.Animations.Rigging
         MultiParentInverseConstraintJobBinder<MultiParentConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
-
         /// <summary>
         /// Constructor.
         /// </summary>

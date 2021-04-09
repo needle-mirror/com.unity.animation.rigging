@@ -1,3 +1,5 @@
+using System;
+
 namespace UnityEngine.Animations.Rigging
 {
     /// <summary>
@@ -139,11 +141,16 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="animator">The Animator on which to bind the new handle.</param>
         /// <param name="transform">The Transform to bind.</param>
         /// <returns>Returns the ReadWriteTransformHandle that represents the new binding.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if transform is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if transform is not a child in the Animator hierarchy.</exception>
         public static ReadWriteTransformHandle Bind(Animator animator, Transform transform)
         {
             ReadWriteTransformHandle handle = new ReadWriteTransformHandle();
-            if (transform == null || !transform.IsChildOf(animator.transform))
-                return handle;
+            if (transform == null)
+                throw new ArgumentNullException(nameof(transform));
+
+            if (!transform.IsChildOf(animator.transform))
+                throw new InvalidOperationException($"Transform '{transform.name}' is not a child of the Animator hierarchy, and cannot be written to.");
 
             handle.m_Handle = animator.BindStreamTransform(transform);
             return handle;
@@ -268,11 +275,12 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="animator">The Animator on which to bind the new handle.</param>
         /// <param name="transform">The Transform to bind.</param>
         /// <returns>Returns the ReadOnlyTransformHandle that represents the new binding.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if transform is null.</exception>
         public static ReadOnlyTransformHandle Bind(Animator animator, Transform transform)
         {
             ReadOnlyTransformHandle handle = new ReadOnlyTransformHandle();
             if (transform == null)
-                return handle;
+                throw new ArgumentNullException(nameof(transform));
 
             handle.m_InStream = (byte)(transform.IsChildOf(animator.transform) ? 1 : 0);
             if (handle.m_InStream == 1)

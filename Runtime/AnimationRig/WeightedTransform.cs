@@ -26,8 +26,9 @@ namespace UnityEngine.Animations.Rigging
 
     /// <summary>
     /// Tuple of a Reference to a Transform component and a weight number.
+    /// See also <seealso cref="WeightedTransformArray"/> and <seealso cref="WeightRangeAttribute"/>.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct WeightedTransform : ITransformProvider, IWeightProvider, IEquatable<WeightedTransform>
     {
         /// <summary>Reference to a Transform component.</summary>

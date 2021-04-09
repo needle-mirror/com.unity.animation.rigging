@@ -44,13 +44,13 @@ namespace UnityEngine.Animations.Rigging
         public bool maintainRotationOffsets { get => m_MaintainRotationOffsets; set => m_MaintainRotationOffsets = value; }
 
         /// <inheritdoc />
-        string IBlendConstraintData.blendPositionBoolProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_BlendPosition));
+        string IBlendConstraintData.blendPositionBoolProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_BlendPosition));
         /// <inheritdoc />
-        string IBlendConstraintData.blendRotationBoolProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_BlendRotation));
+        string IBlendConstraintData.blendRotationBoolProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_BlendRotation));
         /// <inheritdoc />
-        string IBlendConstraintData.positionWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_PositionWeight));
+        string IBlendConstraintData.positionWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_PositionWeight));
         /// <inheritdoc />
-        string IBlendConstraintData.rotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_RotationWeight));
+        string IBlendConstraintData.rotationWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_RotationWeight));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid() => !(m_ConstrainedObject == null || m_SourceA == null || m_SourceB == null);
@@ -74,17 +74,19 @@ namespace UnityEngine.Animations.Rigging
     /// Blend constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Blend Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/BlendConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/BlendConstraint.html")]
     public class BlendConstraint : RigConstraint<
         BlendConstraintJob,
         BlendConstraintData,
         BlendConstraintJobBinder<BlendConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Data.positionWeight = Mathf.Clamp01(m_Data.positionWeight);
+            m_Data.rotationWeight = Mathf.Clamp01(m_Data.rotationWeight);
+        }
     }
 }

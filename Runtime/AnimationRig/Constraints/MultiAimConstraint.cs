@@ -42,12 +42,15 @@ namespace UnityEngine.Animations.Rigging
             Vector
         };
 
+        internal const float k_MinAngularLimit = -180f;
+        internal const float k_MaxAngularLimit = 180f;
+
         [SerializeField] Transform m_ConstrainedObject;
 
-        [SyncSceneToStream, SerializeField, Range(0, 1)] WeightedTransformArray m_SourceObjects;
+        [SyncSceneToStream, SerializeField, WeightRange(0f, 1f)] WeightedTransformArray m_SourceObjects;
         [SyncSceneToStream, SerializeField] Vector3 m_Offset;
-        [SyncSceneToStream, SerializeField, Range(-180f, 180f)] float m_MinLimit;
-        [SyncSceneToStream, SerializeField, Range(-180f, 180f)] float m_MaxLimit;
+        [SyncSceneToStream, SerializeField, Range(k_MinAngularLimit, k_MaxAngularLimit)] float m_MinLimit;
+        [SyncSceneToStream, SerializeField, Range(k_MinAngularLimit, k_MaxAngularLimit)] float m_MaxLimit;
 
         [NotKeyable, SerializeField] Axis m_AimAxis;
         [NotKeyable, SerializeField] Axis m_UpAxis;
@@ -85,8 +88,8 @@ namespace UnityEngine.Animations.Rigging
 
             set
             {
-                m_MinLimit = Mathf.Clamp(value.x, -180f, 180f);
-                m_MaxLimit = Mathf.Clamp(value.y, -180f, 180f);
+                m_MinLimit = Mathf.Clamp(value.x, k_MinAngularLimit, k_MaxAngularLimit);
+                m_MaxLimit = Mathf.Clamp(value.y, k_MinAngularLimit, k_MaxAngularLimit);
             }
         }
 
@@ -120,13 +123,13 @@ namespace UnityEngine.Animations.Rigging
         /// <inheritdoc />
         Vector3 IMultiAimConstraintData.worldUpAxis => Convert(m_WorldUpAxis);
         /// <inheritdoc />
-        string IMultiAimConstraintData.offsetVector3Property => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_Offset));
+        string IMultiAimConstraintData.offsetVector3Property => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_Offset));
         /// <inheritdoc />
-        string IMultiAimConstraintData.minLimitFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_MinLimit));
+        string IMultiAimConstraintData.minLimitFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_MinLimit));
         /// <inheritdoc />
-        string IMultiAimConstraintData.maxLimitFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_MaxLimit));
+        string IMultiAimConstraintData.maxLimitFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_MaxLimit));
         /// <inheritdoc />
-        string IMultiAimConstraintData.sourceObjectsProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
+        string IMultiAimConstraintData.sourceObjectsProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_SourceObjects));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid()
@@ -184,17 +187,28 @@ namespace UnityEngine.Animations.Rigging
     /// MultiAim constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Aim Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/MultiAimConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/MultiAimConstraint.html")]
     public class MultiAimConstraint : RigConstraint<
         MultiAimConstraintJob,
         MultiAimConstraintData,
         MultiAimConstraintJobBinder<MultiAimConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            var weights = m_Data.sourceObjects;
+            WeightedTransformArray.OnValidate(ref weights);
+            m_Data.sourceObjects = weights;
+            var limits = m_Data.limits;
+            limits.x = Mathf.Clamp(
+                limits.x, MultiAimConstraintData.k_MinAngularLimit, MultiAimConstraintData.k_MaxAngularLimit
+            );
+            limits.y = Mathf.Clamp(
+                limits.y, MultiAimConstraintData.k_MinAngularLimit, MultiAimConstraintData.k_MaxAngularLimit
+            );
+            m_Data.limits = limits;
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine.Playables;
-using UnityEngine.Experimental.Animations;
 
 namespace UnityEngine.Animations.Rigging
 {
@@ -11,7 +10,7 @@ namespace UnityEngine.Animations.Rigging
     /// </summary>
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/index.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/RiggingWorkflow.html#rig-builder-component")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [SerializeField] private List<RigLayer> m_RigLayers;
@@ -19,9 +18,9 @@ namespace UnityEngine.Animations.Rigging
         private IRigLayer[] m_RuntimeRigLayers;
         private SyncSceneToStreamLayer m_SyncSceneToStreamLayer;
 
-#if UNITY_EDITOR
         [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
 
+#if UNITY_EDITOR
         /// <inheritdoc />
         public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
 #endif

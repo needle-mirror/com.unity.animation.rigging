@@ -43,11 +43,11 @@ namespace UnityEngine.Animations.Rigging
         public bool maintainTargetRotationOffset { get => m_MaintainTargetRotationOffset; set => m_MaintainTargetRotationOffset = value; }
 
         /// <inheritdoc />
-        string ITwoBoneIKConstraintData.targetPositionWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TargetPositionWeight));
+        string ITwoBoneIKConstraintData.targetPositionWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_TargetPositionWeight));
         /// <inheritdoc />
-        string ITwoBoneIKConstraintData.targetRotationWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_TargetRotationWeight));
+        string ITwoBoneIKConstraintData.targetRotationWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_TargetRotationWeight));
         /// <inheritdoc />
-        string ITwoBoneIKConstraintData.hintWeightFloatProperty => PropertyUtils.ConstructConstraintDataPropertyName(nameof(m_HintWeight));
+        string ITwoBoneIKConstraintData.hintWeightFloatProperty => ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(m_HintWeight));
 
         /// <inheritdoc />
         bool IAnimationJobData.IsValid() => (m_Tip != null && m_Mid != null && m_Root != null && m_Target != null && m_Tip.IsChildOf(m_Mid) && m_Mid.IsChildOf(m_Root));
@@ -72,17 +72,20 @@ namespace UnityEngine.Animations.Rigging
     /// TwoBoneIK constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Two Bone IK Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.0?preview=1&subfolder=/manual/constraints/TwoBoneIKConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/TwoBoneIKConstraint.html")]
     public class TwoBoneIKConstraint : RigConstraint<
         TwoBoneIKConstraintJob,
         TwoBoneIKConstraintData,
         TwoBoneIKConstraintJobBinder<TwoBoneIKConstraintData>
         >
     {
-    #if UNITY_EDITOR
-    #pragma warning disable 0414
-        [NotKeyable, SerializeField, HideInInspector] bool m_SourceObjectsGUIToggle;
-        [NotKeyable, SerializeField, HideInInspector] bool m_SettingsGUIToggle;
-    #endif
+        /// <inheritdoc />
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Data.hintWeight = Mathf.Clamp01(m_Data.hintWeight);
+            m_Data.targetPositionWeight = Mathf.Clamp01(m_Data.targetPositionWeight);
+            m_Data.targetRotationWeight = Mathf.Clamp01(m_Data.targetRotationWeight);
+        }
     }
 }

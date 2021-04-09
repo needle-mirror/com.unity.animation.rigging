@@ -81,33 +81,39 @@ namespace UnityEngine.Animations.Rigging
                     accumWeights += normalizedWeight;
                 }
 
+                driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
+                var drivenTx = new AffineTransform(currentWPos, currentWRot);
+
                 accumTx.rotation = QuaternionExt.NormalizeSafe(accumTx.rotation);
                 if (accumWeights < 1f)
                 {
-                    driven.GetGlobalTR(stream, out Vector3 currentWPos, out Quaternion currentWRot);
                     accumTx.translation += currentWPos * (1f - accumWeights);
                     accumTx.rotation = Quaternion.Lerp(currentWRot, accumTx.rotation, accumWeights);
                 }
 
-                // Convert accumTx to local space
+                var parentTx = AffineTransform.identity;
+
+                // Convert accumTx and drivenTx to local space
                 if (drivenParent.IsValid(stream))
                 {
                     drivenParent.GetGlobalTR(stream, out Vector3 parentWPos, out Quaternion parentWRot);
-                    var parentTx = new AffineTransform(parentWPos, parentWRot);
+                    parentTx = new AffineTransform(parentWPos, parentWRot);
                     accumTx = parentTx.InverseMul(accumTx);
+                    drivenTx = parentTx.InverseMul(drivenTx);
                 }
 
-                driven.GetLocalTRS(stream, out Vector3 currentLPos, out Quaternion currentLRot, out Vector3 currentLScale);
                 if (Vector3.Dot(positionAxesMask, positionAxesMask) < 3f)
-                    accumTx.translation = AnimationRuntimeUtils.Lerp(currentLPos, accumTx.translation, positionAxesMask);
+                    accumTx.translation = AnimationRuntimeUtils.Lerp(drivenTx.translation, accumTx.translation, positionAxesMask);
                 if (Vector3.Dot(rotationAxesMask, rotationAxesMask) < 3f)
-                    accumTx.rotation = Quaternion.Euler(AnimationRuntimeUtils.Lerp(currentLRot.eulerAngles, accumTx.rotation.eulerAngles, rotationAxesMask));
+                    accumTx.rotation = Quaternion.Euler(AnimationRuntimeUtils.Lerp(drivenTx.rotation.eulerAngles, accumTx.rotation.eulerAngles, rotationAxesMask));
 
-                driven.SetLocalTRS(
+                // Convert accumTx back to world space
+                accumTx = parentTx * accumTx;
+
+                driven.SetGlobalTR(
                     stream,
-                    Vector3.Lerp(currentLPos, accumTx.translation, w),
-                    Quaternion.Lerp(currentLRot, accumTx.rotation, w),
-                    currentLScale
+                    Vector3.Lerp(currentWPos, accumTx.translation, w),
+                    Quaternion.Lerp(currentWRot, accumTx.rotation, w)
                     );
             }
             else
