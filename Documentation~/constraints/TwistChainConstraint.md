@@ -12,6 +12,6 @@ The constraint calculates interpolated rotations for intermediate transforms bet
 |Weight|The overall weight of the constraint. If set to 0, the constraint has no influence on the chain elements. When set to 1, it applies full influence with the current settings. Intermediate values are interpolated linearly.|
 |Root|The root GameObject of the chain hierarchy.|
 |Tip|The final GameObject of the chain hierarchy. It must be a descendant of the Root GameObject.|
-|RootTarget|The GameObject that specifies the desired target rotation for the chain's Root.|
-|TipTarget|The GameObject that specifies the desired target rotation for the chain's Tip.|
+|Root Target|The GameObject that specifies the desired target rotation for the chain's Root.|
+|Tip Target|The GameObject that specifies the desired target rotation for the chain's Tip.|
 |Curve|A curve with a normalized domain and range, specifying how the twist rotation should be distributed down the length of the chain.|

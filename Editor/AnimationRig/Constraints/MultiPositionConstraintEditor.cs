@@ -8,10 +8,6 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class MultiPositionConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
-        static readonly GUIContent k_MaintainOffsetLabel = new GUIContent("Maintain Position Offset");
-
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
         SerializedProperty m_ConstrainedAxes;
@@ -37,17 +33,17 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_ConstrainedObject);
-            EditorGUILayout.PropertyField(m_ConstrainedAxes);
-            EditorGUILayout.PropertyField(m_SourceObjects, k_SourceObjectsLabel);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_ConstrainedObject, CommonContent.constrainedObject);
+            EditorGUILayout.PropertyField(m_ConstrainedAxes, CommonContent.constrainedAxesPosition);
+            EditorGUILayout.PropertyField(m_SourceObjects, CommonContent.sourceObjectsWeightedPosition);
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_MaintainOffset, k_MaintainOffsetLabel);
-                EditorGUILayout.PropertyField(m_Offset);
+                EditorGUILayout.PropertyField(m_MaintainOffset, CommonContent.maintainPositionOffset);
+                EditorGUILayout.PropertyField(m_Offset, CommonContent.offsetPosition);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

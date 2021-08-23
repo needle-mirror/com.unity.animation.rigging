@@ -5,6 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace UnityEditor.Animations.Rigging
 {
+    #if !SUPPORTS_SCENE_VIEW_OVERLAYS
     static class SceneViewOverlay
     {
         public delegate void WindowFunction(Object target, SceneView sceneView);
@@ -197,4 +198,5 @@ namespace UnityEditor.Animations.Rigging
             return result;
         }
     }
+    #endif
 }

@@ -8,9 +8,39 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class ChainIKConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectLabel = new GUIContent("Source Object");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
-        static readonly GUIContent k_MaintainTargetOffsetLabel = new GUIContent("Maintain Target Offset");
+        static class Content
+        {
+            public static readonly GUIContent root = EditorGUIUtility.TrTextContent(
+                "Root",
+                "The root GameObject of the chain hierarchy."
+            );
+            public static readonly GUIContent tip = EditorGUIUtility.TrTextContent(
+                "Tip",
+                "The final GameObject of the chain hierarchy. It must be a descendant of the Root GameObject."
+            );
+            public static readonly GUIContent target = EditorGUIUtility.TrTextContent(
+                "Target",
+                "The GameObject that specifies the desired target transform for the chain's Tip."
+            );
+            public static readonly GUIContent sourceObjects = new GUIContent(CommonContent.sourceObjects.text);
+            public static readonly GUIContent chainRotationWeight = EditorGUIUtility.TrTextContent(
+                "Chain Rotation Weight",
+                "The weight of rotations applied throughout the chain."
+            );
+            public static readonly GUIContent tipRotationWeight = EditorGUIUtility.TrTextContent(
+                "Tip Rotation Weight",
+                "The weight of the rotation applied to the Tip."
+            );
+            public static readonly GUIContent maxIterations = EditorGUIUtility.TrTextContent(
+                "Max Iterations",
+                "The maximum number of solver iterations to perform to try to make the Tip reach the Target within the specified Tolerance threshold."
+            );
+            public static readonly GUIContent tolerance = EditorGUIUtility.TrTextContent(
+                "Tolerance",
+                "Distance tolerance between the Target and Tip GameObjects. " +
+                "The solver will finish its computation if the distance is less than this value at any point, even if Max Iterations has not been reached."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_Root;
@@ -46,28 +76,28 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_Root);
-            EditorGUILayout.PropertyField(m_Tip);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_Root, Content.root);
+            EditorGUILayout.PropertyField(m_Tip, Content.tip);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.sourceObjects);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_Target);
+                EditorGUILayout.PropertyField(m_Target, Content.target);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                MaintainOffsetHelper.DoDropdown(k_MaintainTargetOffsetLabel, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
-                EditorGUILayout.PropertyField(m_ChainRotationWeight);
-                EditorGUILayout.PropertyField(m_TipRotationWeight);
-                EditorGUILayout.PropertyField(m_MaxIterations);
-                EditorGUILayout.PropertyField(m_Tolerance);
+                MaintainOffsetHelper.DoDropdown(CommonContent.maintainIKTargetOffset, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
+                EditorGUILayout.PropertyField(m_ChainRotationWeight, Content.chainRotationWeight);
+                EditorGUILayout.PropertyField(m_TipRotationWeight, Content.tipRotationWeight);
+                EditorGUILayout.PropertyField(m_MaxIterations, Content.maxIterations);
+                EditorGUILayout.PropertyField(m_Tolerance, Content.tolerance);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

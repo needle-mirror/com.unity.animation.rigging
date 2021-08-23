@@ -8,9 +8,17 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class MultiParentConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
-        static readonly GUIContent k_MaintainOffsetLabel = new GUIContent("Maintain Offset");
+        static class Content
+        {
+            public static readonly GUIContent constrainedPositionAxes = new GUIContent(
+                L10n.Tr("Constrained Position Axes"),
+                CommonContent.constrainedAxesPosition.tooltip
+            );
+            public static readonly GUIContent constrainedRotationAxes = new GUIContent(
+                L10n.Tr("Constrained Rotation Axes"),
+                CommonContent.constrainedAxesRotation.tooltip
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
@@ -39,17 +47,17 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_ConstrainedObject);
-            EditorGUILayout.PropertyField(m_SourceObjects, k_SourceObjectsLabel);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_ConstrainedObject, CommonContent.constrainedObject);
+            EditorGUILayout.PropertyField(m_SourceObjects, CommonContent.sourceObjects);
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                MaintainOffsetHelper.DoDropdown(k_MaintainOffsetLabel, m_MaintainPositionOffset, m_MaintainRotationOffset);
-                EditorGUILayout.PropertyField(m_ConstrainedPositionAxes);
-                EditorGUILayout.PropertyField(m_ConstrainedRotationAxes);
+                MaintainOffsetHelper.DoDropdown(CommonContent.maintainOffset, m_MaintainPositionOffset, m_MaintainRotationOffset);
+                EditorGUILayout.PropertyField(m_ConstrainedPositionAxes, Content.constrainedPositionAxes);
+                EditorGUILayout.PropertyField(m_ConstrainedRotationAxes, Content.constrainedRotationAxes);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

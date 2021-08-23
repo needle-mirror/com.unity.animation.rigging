@@ -8,8 +8,37 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class OverrideTransformEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
+        static class Content
+        {
+            public static readonly GUIContent sourceObjects = new GUIContent(CommonContent.sourceObjects.text);
+            public static readonly GUIContent overrideSource = EditorGUIUtility.TrTextContent(
+                "Override Source",
+                "The GameObject that influences the Constrained Object's transform. " +
+                "If specified, Override Position and Override Rotation fields are ignored."
+            );
+            public static readonly GUIContent overridePosition = EditorGUIUtility.TrTextContent(
+                "Override Position",
+                "A specific position value to apply to the Constrained Object. " +
+                "This value is ignored if an Override Source is specified."
+            );
+            public static readonly GUIContent overrideRotation = EditorGUIUtility.TrTextContent(
+                "Override Rotation",
+                "A specific rotation value to apply to the Constrained Object. " +
+                "This value is ignored if an Override Source is specified."
+            );
+            public static readonly GUIContent space = EditorGUIUtility.TrTextContent(
+                "Space",
+                "Specifies how the Override Source's local transform values (or manual Override Position and Rotation) should be applied to Constrained Object."
+            );
+            public static readonly GUIContent positionWeight = EditorGUIUtility.TrTextContent(
+                "Position Weight",
+                "The weight of the position influence."
+            );
+            public static readonly GUIContent rotationWeight = EditorGUIUtility.TrTextContent(
+                "Rotation Weight",
+                "The weight of the rotation influence."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
@@ -41,30 +70,30 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_ConstrainedObject);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_ConstrainedObject, CommonContent.constrainedObject);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.sourceObjects);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_OverrideSource);
+                EditorGUILayout.PropertyField(m_OverrideSource, Content.overrideSource);
                 using (new EditorGUI.DisabledScope(m_OverrideSource.objectReferenceValue != null))
                 {
-                    EditorGUILayout.PropertyField(m_OverridePosition);
-                    EditorGUILayout.PropertyField(m_OverrideRotation);
+                    EditorGUILayout.PropertyField(m_OverridePosition, Content.overridePosition);
+                    EditorGUILayout.PropertyField(m_OverrideRotation, Content.overrideRotation);
                 }
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_Space);
-                EditorGUILayout.PropertyField(m_PositionWeight);
-                EditorGUILayout.PropertyField(m_RotationWeight);
+                EditorGUILayout.PropertyField(m_Space, Content.space);
+                EditorGUILayout.PropertyField(m_PositionWeight, Content.positionWeight);
+                EditorGUILayout.PropertyField(m_RotationWeight, Content.rotationWeight);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

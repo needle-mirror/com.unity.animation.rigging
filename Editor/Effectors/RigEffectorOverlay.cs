@@ -28,6 +28,8 @@ namespace UnityEditor.Animations.Rigging
 
         private static string s_ExpandOverlayPrefKey = "AnimationRigging.ExpandOverlay";
 
+        private static GUILayoutOption s_FixedWidth = GUILayout.Width(210f);
+
         public void Initialize(SerializedObject serializedObject)
         {
             m_SerializedObject = serializedObject;
@@ -79,7 +81,7 @@ namespace UnityEditor.Animations.Rigging
                 }
             }
 
-            GUILayout.BeginHorizontal(GUILayout.Width(210.0f));
+            GUILayout.BeginHorizontal(s_FixedWidth);
 
             EditorGUI.BeginChangeCheck();
             m_ExpandOverlay = EditorGUILayout.Toggle(m_ExpandOverlay, EditorStyles.foldout, GUILayout.Width(12));
@@ -122,10 +124,10 @@ namespace UnityEditor.Animations.Rigging
 
             if (m_ExpandOverlay)
             {
-                EditorGUILayout.LabelField(s_ShapeLabel);
-                EditorGUILayout.PropertyField(m_Shape, GUIContent.none);
+                EditorGUILayout.LabelField(s_ShapeLabel, s_FixedWidth);
+                EditorGUILayout.PropertyField(m_Shape, GUIContent.none, s_FixedWidth);
 
-                Rect rect = GUILayoutUtility.GetRect(s_ColorLabel, EditorStyles.colorField);
+                Rect rect = GUILayoutUtility.GetRect(s_ColorLabel, EditorStyles.colorField, s_FixedWidth);
 
                 // Shenanigans to bypass color picker bug.
                 var evt = Event.current;
@@ -146,9 +148,9 @@ namespace UnityEditor.Animations.Rigging
                 }
                 EditorGUI.EndProperty();
 
-                EditorGUILayout.PropertyField(m_Size, s_SizeLabel);
-                EditorGUILayout.PropertyField(m_Position, s_PositionLabel);
-                EditorGUILayout.PropertyField(m_Rotation, s_RotationLabel);
+                EditorGUILayout.PropertyField(m_Size, s_SizeLabel, s_FixedWidth);
+                EditorGUILayout.PropertyField(m_Position, s_PositionLabel, s_FixedWidth);
+                EditorGUILayout.PropertyField(m_Rotation, s_RotationLabel, s_FixedWidth);
             }
 
             if (m_SerializedObject.hasModifiedProperties)

@@ -8,9 +8,42 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class TwoBoneIKConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
-        static readonly GUIContent k_MaintainTargetOffsetLabel = new GUIContent("Maintain Target Offset");
+        static class Content
+        {
+            public static readonly GUIContent root = EditorGUIUtility.TrTextContent(
+                "Root",
+                "The root GameObject of the limb hierarchy."
+            );
+            public static readonly GUIContent mid = EditorGUIUtility.TrTextContent(
+                "Mid",
+                "The middle GameObject of the limb hierarchy. It must be a child of the Root GameObject."
+            );
+            public static readonly GUIContent tip = EditorGUIUtility.TrTextContent(
+                "Tip",
+                "The final GameObject of the limb hierarchy. It must be a child of the Mid GameObject."
+            );
+            public static readonly GUIContent sourceObjects = new GUIContent(CommonContent.sourceObjects.text);
+            public static readonly GUIContent target = EditorGUIUtility.TrTextContent(
+                "Target",
+                "Source GameObject that specifies the desired position of the Tip."
+            );
+            public static readonly GUIContent hint = EditorGUIUtility.TrTextContent(
+                "Hint",
+                "Optional Source GameObject, whose position is used to specify the direction the limb should be oriented when it bends."
+            );
+            public static readonly GUIContent targetPositionWeight = EditorGUIUtility.TrTextContent(
+                "Target Position Weight",
+                "The weight to apply for calculating the desired position when reaching for the Target."
+            );
+            public static readonly GUIContent targetRotationWeight = EditorGUIUtility.TrTextContent(
+                "Target Rotation Weight",
+                "The weight of the rotation applied to the Tip."
+            );
+            public static readonly GUIContent hintWeight = EditorGUIUtility.TrTextContent(
+                "Hint Weight",
+                "The amount of influence the Hint has on the configuration of the hierarchy."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_Root;
@@ -48,29 +81,29 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_Root);
-            EditorGUILayout.PropertyField(m_Mid);
-            EditorGUILayout.PropertyField(m_Tip);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_Root, Content.root);
+            EditorGUILayout.PropertyField(m_Mid, Content.mid);
+            EditorGUILayout.PropertyField(m_Tip, Content.tip);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.sourceObjects);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_Target);
-                EditorGUILayout.PropertyField(m_Hint);
+                EditorGUILayout.PropertyField(m_Target, Content.target);
+                EditorGUILayout.PropertyField(m_Hint, Content.hint);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                MaintainOffsetHelper.DoDropdown(k_MaintainTargetOffsetLabel, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
-                EditorGUILayout.PropertyField(m_TargetPositionWeight);
-                EditorGUILayout.PropertyField(m_TargetRotationWeight);
-                EditorGUILayout.PropertyField(m_HintWeight);
+                MaintainOffsetHelper.DoDropdown(CommonContent.maintainIKTargetOffset, m_MaintainTargetPositionOffset, m_MaintainTargetRotationOffset);
+                EditorGUILayout.PropertyField(m_TargetPositionWeight, Content.targetPositionWeight);
+                EditorGUILayout.PropertyField(m_TargetRotationWeight, Content.targetRotationWeight);
+                EditorGUILayout.PropertyField(m_HintWeight, Content.hintWeight);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

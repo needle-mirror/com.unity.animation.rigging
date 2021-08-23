@@ -8,8 +8,30 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class TwistChainConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
+        static class Content
+        {
+            public static readonly GUIContent root = EditorGUIUtility.TrTextContent(
+                "Root",
+                "The root GameObject of the chain hierarchy."
+            );
+            public static readonly GUIContent tip = EditorGUIUtility.TrTextContent(
+                "Tip",
+                "The final GameObject of the chain hierarchy. It must be a descendant of the Root GameObject."
+            );
+            public static readonly GUIContent sourceObjects = new GUIContent(CommonContent.sourceObjects.text);
+            public static readonly GUIContent rootTarget = EditorGUIUtility.TrTextContent(
+                "Root Target",
+                "The GameObject that specifies the desired target rotation for the chain's Root."
+            );
+            public static readonly GUIContent tipTarget = EditorGUIUtility.TrTextContent(
+                "Tip Target",
+                "The GameObject that specifies the desired target rotation for the chain's Tip."
+            );
+            public static readonly GUIContent curve = EditorGUIUtility.TrTextContent(
+                "Curve",
+                "A curve with a normalized domain and range, specifying how the twist rotation should be distributed down the length of the chain."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_Root;
@@ -37,25 +59,25 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_Root);
-            EditorGUILayout.PropertyField(m_Tip);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_Root, Content.root);
+            EditorGUILayout.PropertyField(m_Tip, Content.tip);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.sourceObjects);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_RootTarget);
-                EditorGUILayout.PropertyField(m_TipTarget);
+                EditorGUILayout.PropertyField(m_RootTarget, Content.rootTarget);
+                EditorGUILayout.PropertyField(m_TipTarget, Content.tipTarget);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_Curve);
+                EditorGUILayout.PropertyField(m_Curve, Content.curve);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

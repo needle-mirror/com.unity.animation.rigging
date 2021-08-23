@@ -9,8 +9,17 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class MultiReferentialConstraintEditor : Editor
     {
-        static readonly GUIContent k_DrivingLabel = new GUIContent("Driving");
-        static readonly GUIContent k_ReferenceObjectsLabel = new GUIContent("Reference Objects");
+        static class Content
+        {
+            public static readonly GUIContent driving = EditorGUIUtility.TrTextContent(
+                "Driving",
+                "An object from the list of Referenced Objects, whose motion drives that of all other Referenced Objects."
+            );
+            public static readonly GUIContent referenceObjects = EditorGUIUtility.TrTextContent(
+                "Reference Objects",
+                "A list of GameObjects to be driven by the specified Driving object."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_Driver;
@@ -37,18 +46,18 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
 
             Rect rect = EditorGUILayout.GetControlRect();
-            EditorGUI.BeginProperty(rect, k_DrivingLabel, m_Driver);
+            EditorGUI.BeginProperty(rect, Content.driving, m_Driver);
             EditorGUI.BeginChangeCheck();
-            var newValue = EditorGUI.Popup(rect, k_DrivingLabel, m_Driver.intValue, m_DrivingLabels);
+            var newValue = EditorGUI.Popup(rect, Content.driving, m_Driver.intValue, m_DrivingLabels);
             if (EditorGUI.EndChangeCheck())
                 m_Driver.intValue = newValue;
             EditorGUI.EndProperty();
 
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_SourceObjects, k_ReferenceObjectsLabel);
+            EditorGUILayout.PropertyField(m_SourceObjects, Content.referenceObjects);
             // also check if size has changed, because drag/drop on default control and Reset do not trigger change
             if (EditorGUI.EndChangeCheck() || m_PreviousSourceSize != m_SourceObjectsSize.intValue)
             {

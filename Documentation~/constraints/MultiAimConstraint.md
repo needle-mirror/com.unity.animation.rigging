@@ -21,7 +21,7 @@ To replicate the behavior of other 3D animation software, you should use a singl
 |Aim Axis|Specifies the local aim axis of the Constrained Object to use in order to orient its forward direction to the Source Objects.|
 |Up Axis|Specifies the local up axis of the Constrained Object to use in order to orient its upward direction (i.e., roll orientation).|
 |World Up Type|Specifies which mode to use to stabilize the upward direction (i.e., roll orientation) of the Constrained Object.|
-|World Up Axis|A vector in some reference frame that is used to stabilize the upward direction of the Constrained Object. This value is used when World Up Type is either Vector or Object Rotation Up, in which case the reference frame is either the world or another object, respectively.
+|World Up Axis|A vector in some reference frame that is used to stabilize the upward direction of the Constrained Object. This value is used when World Up Type is either Vector or Object Rotation Up. In those cases, the reference frame is either the world or another object, respectively.
 |World Up Object|A GameObject used as a reference frame for World Up Axis. This value is used when World Up Type is either Object Up or Object Rotation Up.|
 |Source Objects|The list of GameObjects that influence the Constrained Object's orientation, and the amount of weight they contribute to the final pose. The constraint calculates rotation toward each target to produce a weighted sum. _The order of Source Objects does not affect the result._|
 |Maintain Rotation Offset|Specifies whether to maintain the initial rotation offset between the Constrained Object and the Source Objects.|

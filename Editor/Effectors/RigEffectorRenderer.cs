@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEditor.Experimental.SceneManagement;
+#if SUPPORTS_SCENE_VIEW_OVERLAYS
+using UnityEditor.Overlays;
+#endif
+using UnityEditor.Experimental.SceneManagement; // required for 2020.2
 using UnityEditor.SceneManagement;
 
 namespace UnityEditor.Animations.Rigging
@@ -9,7 +12,10 @@ namespace UnityEditor.Animations.Rigging
     [InitializeOnLoad]
     static class RigEffectorRenderer
     {
-        static GUIContent s_OverlayTitle = new GUIContent("Animation Rigging");
+        const string k_OverlayId = "Scene View/Animation Rigging";
+        const string k_DisplayName = "Animation Rigging";
+
+        static GUIContent s_OverlayTitle = new GUIContent(k_DisplayName);
 
         static List<RigBuilder> s_RigBuilders = new List<RigBuilder>();
         static Dictionary<RigEffectorData, RigEffector> s_Effectors = new Dictionary<RigEffectorData, RigEffector>();
@@ -158,6 +164,7 @@ namespace UnityEditor.Animations.Rigging
                 }
             }
 
+            #if !SUPPORTS_SCENE_VIEW_OVERLAYS
             // Process overlay events.
             if (s_ActiveOverlay != null)
             {
@@ -165,6 +172,7 @@ namespace UnityEditor.Animations.Rigging
                 SceneViewOverlay.Window(s_OverlayTitle, SceneViewGUICallback, 1200);
                 SceneViewOverlay.End();
             }
+            #endif
         }
 
         static void OnAddRigBuilder(RigBuilder rigBuilder)
@@ -183,5 +191,22 @@ namespace UnityEditor.Animations.Rigging
             if (s_ActiveOverlay != null)
                 s_ActiveOverlay.OnSceneGUIOverlay();
         }
+
+        #if SUPPORTS_SCENE_VIEW_OVERLAYS
+        [Overlay(typeof(SceneView), k_OverlayId, k_DisplayName)]
+        class Overlay : IMGUIOverlay, ITransientOverlay
+        {
+            public bool visible
+            {
+                get => s_ActiveOverlay != null;
+            }
+
+            public override void OnGUI()
+            {
+                if (s_ActiveOverlay != null)
+                    s_ActiveOverlay.OnSceneGUIOverlay();
+            }
+        }
+        #endif
     }
 }

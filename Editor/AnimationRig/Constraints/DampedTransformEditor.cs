@@ -8,8 +8,25 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class DampedTransformEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectLabel = new GUIContent("Source Object");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
+        static class Content
+        {
+            public static readonly GUIContent source = EditorGUIUtility.TrTextContent(
+                "Source",
+                "The GameObject that influences the Constrained Object's transform."
+            );
+            public static readonly GUIContent dampPosition = EditorGUIUtility.TrTextContent(
+                "Damp Position",
+                "The weight of positional damping to apply to the Constrained Object."
+            );
+            public static readonly GUIContent dampRotation = EditorGUIUtility.TrTextContent(
+                "Damp Rotation",
+                "The weight of rotational damping to apply to the Constrained Object."
+            );
+            public static readonly GUIContent maintainAim = EditorGUIUtility.TrTextContent(
+                "Maintain Aim",
+                "Specifies whether to maintain the initial rotation offset between the Constrained Object and the Source Object."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
@@ -37,25 +54,25 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_ConstrainedObject);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_ConstrainedObject, CommonContent.constrainedObject);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.source);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_Source);
+                EditorGUILayout.PropertyField(m_Source, Content.source);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, CommonContent.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_DampPosition);
-                EditorGUILayout.PropertyField(m_DampRotation);
-                EditorGUILayout.PropertyField(m_MaintainAim);
+                EditorGUILayout.PropertyField(m_DampPosition, Content.dampPosition);
+                EditorGUILayout.PropertyField(m_DampRotation, Content.dampRotation);
+                EditorGUILayout.PropertyField(m_MaintainAim, Content.maintainAim);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

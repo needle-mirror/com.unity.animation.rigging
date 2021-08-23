@@ -8,11 +8,28 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class BlendConstraintEditor : Editor
     {
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
-        static readonly GUIContent k_SettingsLabel = new GUIContent("Settings");
-        static readonly GUIContent k_BlendPosLabel = new GUIContent("Blend A | B Position");
-        static readonly GUIContent k_BlendRotLabel = new GUIContent("Blend A | B Rotation");
-        static readonly GUIContent k_MaintainOffset = new GUIContent("Maintain Offset");
+        static class Content
+        {
+            public static readonly GUIContent sourceObjects = new GUIContent(CommonContent.sourceObjects.text);
+            public static readonly GUIContent sourceA = EditorGUIUtility.TrTextContent(
+                "Source A",
+                "The first source GameObject that influences the position and rotation of the Constrained Object."
+            );
+            public static readonly GUIContent sourceB = EditorGUIUtility.TrTextContent(
+                "Source B",
+                "The second source GameObject that influences the position and rotation of the Constrained Object."
+            );
+            public static readonly GUIContent settings = CommonContent.settings;
+            public static readonly GUIContent maintainOffset = CommonContent.maintainOffset;
+            public static readonly GUIContent blendPosition = EditorGUIUtility.TrTextContent(
+                "Blend A | B Position",
+                "If enabled, the constrained GameObject's position blends between those of Source A and Source B by the specified amount."
+            );
+            public static readonly GUIContent blendRotation = EditorGUIUtility.TrTextContent(
+                "Blend A | B Rotation",
+                "If enabled, the constrained GameObject's rotation blends between those of Source A and Source B by the specified amount."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_ConstrainedObject;
@@ -48,34 +65,34 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
-            EditorGUILayout.PropertyField(m_ConstrainedObject);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
+            EditorGUILayout.PropertyField(m_ConstrainedObject, CommonContent.constrainedObject);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.sourceObjects);
             if (m_SourceObjectsToggle.value)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(m_SourceA);
-                EditorGUILayout.PropertyField(m_SourceB);
+                EditorGUILayout.PropertyField(m_SourceA, Content.sourceA);
+                EditorGUILayout.PropertyField(m_SourceB, Content.sourceB);
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, k_SettingsLabel);
+            m_SettingsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SettingsToggle.value, Content.settings);
             if (m_SettingsToggle.value)
             {
                 EditorGUI.indentLevel++;
 
-                MaintainOffsetHelper.DoDropdown(k_MaintainOffset, m_MaintainPositionOffsets, m_MaintainRotationOffsets);
+                MaintainOffsetHelper.DoDropdown(Content.maintainOffset, m_MaintainPositionOffsets, m_MaintainRotationOffsets);
 
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.PropertyField(m_BlendPosition, k_BlendPosLabel);
+                EditorGUILayout.PropertyField(m_BlendPosition, Content.blendPosition);
                 using (new EditorGUI.DisabledScope(!m_BlendPosition.boolValue))
                     EditorGUILayout.PropertyField(m_PositionWeight, GUIContent.none);
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.PropertyField(m_BlendRotation, k_BlendRotLabel);
+                EditorGUILayout.PropertyField(m_BlendRotation, Content.blendRotation);
                 using (new EditorGUI.DisabledScope(!m_BlendRotation.boolValue))
                     EditorGUILayout.PropertyField(m_RotationWeight, GUIContent.none);
                 EditorGUILayout.EndHorizontal();

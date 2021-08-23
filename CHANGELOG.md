@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.1.1] - 2021-08-23
+### Patch Update of *Animation Rigging*.
+- Added missing tooltips to components (case 1265274).
+- Labels on components now support localization in supported regions.
+- Upgraded Animation Rigging overlay toolbox to use new Unity overlays.
+
 ## [1.1.0] - 2021-04-09
 ### Patch Update of *Animation Rigging*.
 - Fixed Auto Setup on TwoBoneIK throwing an ArgumentNullException instead of a warning message.

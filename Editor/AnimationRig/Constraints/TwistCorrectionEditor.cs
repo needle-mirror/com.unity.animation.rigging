@@ -8,8 +8,22 @@ namespace UnityEditor.Animations.Rigging
     [CanEditMultipleObjects]
     class TwistCorrectionEditor : Editor
     {
-        static readonly GUIContent k_TwistNodesLabel = new GUIContent("Twist Nodes");
-        static readonly GUIContent k_SourceObjectsLabel = new GUIContent("Source Objects");
+        static class Content
+        {
+            public static readonly GUIContent source = EditorGUIUtility.TrTextContent(
+                "Source",
+                "The GameObject that influences the Twist Nodes to rotate around a specific Twist Axis."
+            );
+            public static readonly GUIContent twistAxis = EditorGUIUtility.TrTextContent(
+                "Twist Axis",
+                "Specifies the axis on the Source object from which the rotation is extracted and then redistributed to the Twist Nodes."
+            );
+            public static readonly GUIContent twistNodes = EditorGUIUtility.TrTextContent(
+                "Twist Nodes",
+                "The list of GameObjects that will be influenced by the Source GameObject, and the cumulative percentage of the Source's twist rotation they should inherit. " +
+                "They are generally expected to all be leaf nodes in the hierarchy (i.e., they have a common parent and no children), and to have their twist axes oriented the same as the Source object in their initial pose."
+            );
+        }
 
         SerializedProperty m_Weight;
         SerializedProperty m_Source;
@@ -33,20 +47,20 @@ namespace UnityEditor.Animations.Rigging
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_Weight);
+            EditorGUILayout.PropertyField(m_Weight, CommonContent.weight);
 
             // by default, the first WeightedTransform element a user adds has a weight of 1
             // for this constraint, the first twist node usually should not have a value of 1
             // TODO: make drag/drop auto-distribute weights
             EditorGUI.BeginChangeCheck();
             var oldLength = m_TwistNodesLength.intValue;
-            EditorGUILayout.PropertyField(m_TwistNodes, k_TwistNodesLabel);
+            EditorGUILayout.PropertyField(m_TwistNodes, Content.twistNodes);
             if (EditorGUI.EndChangeCheck() && oldLength == 0 && m_TwistNodesLength.intValue != oldLength)
                 m_TwistNodes.FindPropertyRelative("m_Item0.weight").floatValue = 0f;
 
-            EditorGUILayout.PropertyField(m_TwistAxis);
+            EditorGUILayout.PropertyField(m_TwistAxis, Content.twistAxis);
 
-            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, k_SourceObjectsLabel);
+            m_SourceObjectsToggle.value = EditorGUILayout.BeginFoldoutHeaderGroup(m_SourceObjectsToggle.value, Content.source);
             {
                 ++EditorGUI.indentLevel;
                 EditorGUILayout.PropertyField(m_Source);
