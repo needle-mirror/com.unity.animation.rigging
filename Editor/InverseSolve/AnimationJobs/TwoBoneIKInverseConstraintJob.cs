@@ -51,41 +51,10 @@ namespace UnityEditor.Animations.Rigging
         {
             jobWeight.Set(stream, 1f);
 
-            tip.GetGlobalTR(stream, out var tipPosition, out var tipRotation);
-            target.GetGlobalTR(stream, out var targetPosition, out var targetRotation);
-
-            var positionWeight = targetPositionWeight.Get(stream);
-            targetPosition = (positionWeight > 0f) ? tipPosition + targetOffset.translation : targetPosition;
-
-            var rotationWeight = targetRotationWeight.Get(stream);
-            targetRotation = (rotationWeight > 0f) ? tipRotation * targetOffset.rotation : targetRotation;
-
-            target.SetGlobalTR(stream, targetPosition, targetRotation);
-
-            if (hint.IsValid(stream))
-            {
-                var rootPosition = root.GetPosition(stream);
-                var midPosition = mid.GetPosition(stream);
-
-                var ac = tipPosition - rootPosition;
-                var ab = midPosition - rootPosition;
-                var bc = tipPosition - midPosition;
-
-                float abLen = ab.magnitude;
-                float bcLen = bc.magnitude;
-
-                var acSqrMag = Vector3.Dot(ac, ac);
-                var projectionPoint = rootPosition;
-                if (acSqrMag > k_SqrEpsilon)
-                    projectionPoint += Vector3.Dot(ab / acSqrMag, ac) * ac;
-                var poleVectorDirection = midPosition - projectionPoint;
-
-                var weight = hintWeight.Get(stream);
-                var hintPosition = hint.GetPosition(stream);
-                var scale = abLen + bcLen;
-                hintPosition = (weight > 0f) ? projectionPoint + (poleVectorDirection.normalized * scale) : hintPosition;
-                hint.SetPosition(stream, hintPosition);
-            }
+            AnimationRuntimeUtils.InverseSolveTwoBoneIK(stream, root, mid, tip, target, hint,
+                targetPositionWeight.Get(stream),
+                targetRotationWeight.Get(stream),
+                hintWeight.Get(stream), targetOffset);
         }
     }
 

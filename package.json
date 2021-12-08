@@ -1,7 +1,7 @@
 {
   "name": "com.unity.animation.rigging",
   "displayName": "Animation Rigging",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "unity": "2020.2",
   "unityRelease": "0a16",
   "description": "Animation Rigging toolkit using Unity's Animation C# Jobs",
@@ -22,15 +22,18 @@
       "path": "Samples~/ConstraintSamples"
     }
   ],
+  "upm": {
+    "changelog": "- Updated package icons (case 1361823).,- Fixed BoneRenderer to refresh bones rendered in viewport on a mouse drag and drop event (case 1361819).,- Fixed potential performance issue with rig effectors when used in a deep hierarchy.,- Fixed NullReferenceException when previewing animation and layers were not initialized in `RigBuilder.StartPreview` (case 1367857).,- Added the function RigBuilder.SyncLayers to manually update rigs and constraints prior to PlayableGraph evaluation.,- Added the function RigBuilder.Evaluate(float) to manually update and evaluate the RigBuilder.,- Added the function RigBuilder.Build(PlayableGraph) to build the RigBuilder Playable nodes in an external PlayableGraph.,- Added effector visuals for auto setup of Two-Bone IK.,- Correctly positioned effectors for auto setup of Two-Bone IK."
+  },
   "relatedPackages": {
-    "com.unity.animation.rigging.tests": "1.1.1"
+    "com.unity.animation.rigging.tests": "1.2.0"
   },
   "upmCi": {
-    "footprint": "e7f8cba1a23dac22ff5b81253c9c32ad29750c02"
+    "footprint": "31f8a12063d8c627b9de8583698579e775c7723a"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.animation.rigging.git",
     "type": "git",
-    "revision": "10dba535768924f8d1af27adcce2a1ff06c44474"
+    "revision": "369e04522a4e08d071931bdfe8d11db2df432090"
   }
 }

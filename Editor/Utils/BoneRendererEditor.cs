@@ -60,12 +60,12 @@ namespace UnityEditor.Animations.Rigging
                 EditorGUILayout.PropertyField(m_TripodSize, GUIContent.none);
             EditorGUILayout.EndHorizontal();
 
+            bool isDragPerformed = Event.current.type == EventType.DragPerform;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_Transforms, true);
             bool boneRendererDirty = EditorGUI.EndChangeCheck();
-
-            if (Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-                boneRendererDirty = true;
+            boneRendererDirty |= Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed";
+            boneRendererDirty |= Event.current.type == EventType.Used && isDragPerformed;
 
             serializedObject.ApplyModifiedProperties();
 

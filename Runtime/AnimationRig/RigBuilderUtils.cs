@@ -74,6 +74,13 @@ namespace UnityEngine.Animations.Rigging
             PlayableGraph graph = PlayableGraph.Create(graphName);
             graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
 
+            BuildPlayableGraph(graph, animator, layers, syncSceneToStreamLayer);
+
+            return graph;
+        }
+
+        public static void BuildPlayableGraph(PlayableGraph graph, Animator animator, IList<IRigLayer> layers, SyncSceneToStreamLayer syncSceneToStreamLayer)
+        {
             IEnumerable<PlayableChain> playableChains = BuildPlayables(animator, graph, layers, syncSceneToStreamLayer);
 
             foreach(var chain in playableChains)
@@ -81,15 +88,13 @@ namespace UnityEngine.Animations.Rigging
                 if (!chain.IsValid())
                     continue;
 
-                AnimationPlayableOutput output = AnimationPlayableOutput.Create(graph, String.Format("%1-Output", chain.name), animator);
+                AnimationPlayableOutput output = AnimationPlayableOutput.Create(graph, String.Format("{0}-Output", chain.name), animator);
                 output.SetAnimationStreamSource(AnimationStreamSource.PreviousInputs);
                 output.SetSortingOrder(k_AnimationOutputPriority);
 
                 // Connect last rig playable to output
                 output.SetSourcePlayable(chain.playables[chain.playables.Length - 1]);
             }
-
-            return graph;
         }
     }
 }

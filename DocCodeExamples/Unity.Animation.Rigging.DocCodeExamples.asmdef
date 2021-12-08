@@ -1,0 +1,16 @@
+{
+    "name": "Unity.Animation.Rigging.DocCodeExamples",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Animation.Rigging"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

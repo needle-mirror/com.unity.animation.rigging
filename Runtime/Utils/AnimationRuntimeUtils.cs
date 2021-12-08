@@ -114,6 +114,99 @@ namespace UnityEngine.Animations.Rigging
             tip.SetRotation(stream, tRotation);
         }
 
+        /// <summary>
+        /// Sets the position for a hint and target given bone positions.
+        /// </summary>
+        /// <param name="stream">The animation stream to work on.</param>
+        /// <param name="root">The transform handle for the root transform.</param>
+        /// <param name="mid">The transform handle for the mid transform.</param>
+        /// <param name="tip">The transform handle for the tip transform.</param>
+        /// <param name="target">The transform handle for the target transform.</param>
+        /// <param name="hint">The transform handle for the hint transform.</param>
+        /// <param name="posWeight">The weight for which target position has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="rotWeight">The weight for which target rotation has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="hintWeight">The weight for which hint transform has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="targetOffset">The offset applied to the target transform.</param>
+        public static void InverseSolveTwoBoneIK(
+            AnimationStream stream,
+            ReadOnlyTransformHandle root,
+            ReadOnlyTransformHandle mid,
+            ReadOnlyTransformHandle tip,
+            ReadWriteTransformHandle target,
+            ReadWriteTransformHandle hint,
+            float posWeight,
+            float rotWeight,
+            float hintWeight,
+            AffineTransform targetOffset
+        )
+        {
+            Vector3 rootPosition = root.GetPosition(stream);
+            Vector3 midPosition = mid.GetPosition(stream);
+            tip.GetGlobalTR(stream, out var tipPosition, out var tipRotation);
+            target.GetGlobalTR(stream, out var targetPosition, out var targetRotation);
+            bool isHintValid = hint.IsValid(stream);
+            Vector3 hintPosition = Vector3.zero;
+            if(isHintValid)
+                hintPosition = hint.GetPosition(stream);
+
+            InverseSolveTwoBoneIK(rootPosition, midPosition, tipPosition, tipRotation, ref targetPosition,
+                ref targetRotation, ref hintPosition, isHintValid, posWeight, rotWeight, hintWeight, targetOffset);
+
+            target.SetPosition(stream, targetPosition);
+            target.SetRotation(stream, targetRotation);
+            hint.SetPosition(stream, hintPosition);
+        }
+
+        /// <summary>
+        /// Sets the position for a hint and target for given bone positions.
+        /// </summary>
+        /// <param name="rootPosition">The position of the root bone.</param>
+        /// <param name="midPosition">The position of the mid bone.</param>
+        /// <param name="tipPosition">The position of the tip bone.</param>
+        /// <param name="tipRotation">The rotation of the tip bone.</param>
+        /// <param name="targetPosition">The position of the target.</param>
+        /// <param name="targetRotation">The rotation of the target.</param>
+        /// <param name="hintPosition">The position of the hint.</param>
+        /// <param name="isHintValid">Whether the hint position should be set.</param>
+        /// <param name="posWeight">The weight for which target position has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="rotWeight">The weight for which target rotation has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="hintWeight">The weight for which hint transform has an effect on IK calculations. This is a value in between 0 and 1.</param>
+        /// <param name="targetOffset">The offset applied to the target transform.</param>
+        public static void InverseSolveTwoBoneIK(
+            Vector3 rootPosition,
+            Vector3 midPosition,
+            Vector3 tipPosition, Quaternion tipRotation,
+            ref Vector3 targetPosition, ref Quaternion targetRotation,
+            ref Vector3 hintPosition, bool isHintValid,
+            float posWeight,
+            float rotWeight,
+            float hintWeight,
+            AffineTransform targetOffset
+        )
+        {
+            targetPosition = (posWeight > 0f) ? tipPosition + targetOffset.translation : targetPosition;
+            targetRotation = (rotWeight > 0f) ? tipRotation * targetOffset.rotation : targetRotation;
+
+            if (isHintValid)
+            {
+                var ac = tipPosition - rootPosition;
+                var ab = midPosition - rootPosition;
+                var bc = tipPosition - midPosition;
+
+                float abLen = ab.magnitude;
+                float bcLen = bc.magnitude;
+
+                var acSqrMag = Vector3.Dot(ac, ac);
+                var projectionPoint = rootPosition;
+                if (acSqrMag > k_SqrEpsilon)
+                    projectionPoint += Vector3.Dot(ab / acSqrMag, ac) * ac;
+                var poleVectorDirection = midPosition - projectionPoint;
+
+                var scale = abLen + bcLen;
+                hintPosition = (hintWeight > 0f) ? projectionPoint + (poleVectorDirection.normalized * scale) : hintPosition;
+            }
+        }
+
         static float TriangleAngle(float aLen, float aLen1, float aLen2)
         {
             float c = Mathf.Clamp((aLen1 * aLen1 + aLen2 * aLen2 - aLen * aLen) / (aLen1 * aLen2) / 2.0f, -1.0f, 1.0f);

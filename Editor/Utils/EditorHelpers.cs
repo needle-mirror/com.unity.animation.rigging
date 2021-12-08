@@ -173,7 +173,8 @@ namespace UnityEditor.Animations.Rigging
 
             while (true)
             {
-                if (transform.GetComponent<T>() != null) return transform.GetComponent<T>();
+                bool gotComponent = transform.TryGetComponent<T>(out T component);
+                if (gotComponent) return component;
                 if (transform == top) break;
                 transform = transform.parent;
             }

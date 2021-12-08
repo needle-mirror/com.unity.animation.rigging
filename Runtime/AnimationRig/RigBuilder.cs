@@ -10,7 +10,7 @@ namespace UnityEngine.Animations.Rigging
     /// </summary>
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/RiggingWorkflow.html#rig-builder-component")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/RiggingWorkflow.html#rig-builder-component")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [SerializeField] private List<RigLayer> m_RigLayers;
@@ -68,9 +68,47 @@ namespace UnityEngine.Animations.Rigging
             Clear();
         }
 
+        /// <summary>
+        /// Updates the RigBuilder layers and evaluates the PlayableGraph manually.
+        /// </summary>
+        /// <param name="deltaTime">The time in seconds by which to advance the RigBuilder PlayableGraph.</param>
+        /// <example>
+        /// Manually evaluate the RigBuilder in LateUpdate.
+        /// <code source="../../DocCodeExamples/CustomRigBuilderEvaluator.cs" language="csharp" region="custom-rig-builder-evaluator"/>
+        /// </example>
+        public void Evaluate(float deltaTime)
+        {
+            if (!graph.IsValid())
+                return;
+
+            SyncLayers();
+
+            graph.Evaluate(deltaTime);
+        }
+
         void Update()
         {
             if (!graph.IsValid())
+                return;
+
+            SyncLayers();
+        }
+
+        /// <summary>
+        /// Synchronizes rigs and constraints with scene values.
+        /// This must be called before evaluating the PlayableGraph.
+        /// </summary>
+        /// <seealso cref="RigBuilder.Build(PlayableGraph)"/>
+        /// <seealso cref="SyncSceneToStreamAttribute"/>
+        /// <seealso cref="AnimationJobBinder{TJob,TData}.Update"/>
+        /// <example>
+        /// Synchronizing layers before evaluating a PlayableGraph created
+        /// outside the RigBuilder in LateUpdate.
+        /// <code source="../../DocCodeExamples/CustomPlayableGraphEvaluator.cs" language="csharp" region="custom-playable-graph-evaluator"/>
+        /// </example>
+        public void SyncLayers()
+        {
+            if (m_RuntimeRigLayers == null)
                 return;
 
             syncSceneToStreamLayer.Update(m_RuntimeRigLayers);
@@ -82,7 +120,9 @@ namespace UnityEngine.Animations.Rigging
             }
         }
 
-        /// <summary>Builds the RigBuilder PlayableGraph.</summary>
+        /// <summary>
+        /// Builds the RigBuilder PlayableGraph.
+        /// </summary>
         /// <returns>Returns true if the RigBuilder has created a valid PlayableGraph. Returns false otherwise.</returns>
         public bool Build()
         {
@@ -101,6 +141,27 @@ namespace UnityEngine.Animations.Rigging
                 return false;
 
             graph.Play();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Builds the RigBuilder playable nodes in an external PlayableGraph.
+        /// </summary>
+        /// <param name="graph">Destination PlayableGraph.</param>
+        /// <returns>Returns true if the RigBuilder has created Playable nodes. Returns false otherwise.</returns>
+        public bool Build(PlayableGraph graph)
+        {
+            Clear();
+
+            var animator = GetComponent<Animator>();
+            if (animator == null || layers.Count == 0)
+                return false;
+
+            // Make a copy of the layers list.
+            m_RuntimeRigLayers = layers.ToArray();
+
+            RigBuilderUtils.BuildPlayableGraph(graph, animator, m_RuntimeRigLayers, syncSceneToStreamLayer);
 
             return true;
         }
@@ -170,7 +231,7 @@ namespace UnityEngine.Animations.Rigging
             if (!enabled)
                 return;
 
-            if (!graph.IsValid())
+            if (!graph.IsValid() || m_RuntimeRigLayers == null)
                 return;
 
             syncSceneToStreamLayer.Update(m_RuntimeRigLayers);
@@ -193,8 +254,11 @@ namespace UnityEngine.Animations.Rigging
             if (!enabled)
                 return inputPlayable;
 
+            if (m_RuntimeRigLayers == null)
+                StartPreview();
+
             var animator = GetComponent<Animator>();
-            if (animator == null || m_RuntimeRigLayers.Length == 0)
+            if (animator == null || m_RuntimeRigLayers == null || m_RuntimeRigLayers.Length == 0)
                 return inputPlayable;
 
             var playableChains = RigBuilderUtils.BuildPlayables(animator, graph, m_RuntimeRigLayers, syncSceneToStreamLayer);

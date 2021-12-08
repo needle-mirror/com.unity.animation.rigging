@@ -72,7 +72,7 @@ namespace UnityEngine.Animations.Rigging
     /// TwoBoneIK constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Two Bone IK Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/TwoBoneIKConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/TwoBoneIKConstraint.html")]
     public class TwoBoneIKConstraint : RigConstraint<
         TwoBoneIKConstraintJob,
         TwoBoneIKConstraintData,

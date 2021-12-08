@@ -70,7 +70,7 @@ namespace UnityEngine.Animations.Rigging
     /// MultiPosition constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Position Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/MultiPositionConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/MultiPositionConstraint.html")]
     public class MultiPositionConstraint : RigConstraint<
         MultiPositionConstraintJob,
         MultiPositionConstraintData,

@@ -56,7 +56,7 @@ namespace UnityEngine.Animations.Rigging
     /// DampedTransform constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Damped Transform")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/DampedTransform.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/DampedTransform.html")]
     public class DampedTransform : RigConstraint<
         DampedTransformJob,
         DampedTransformData,

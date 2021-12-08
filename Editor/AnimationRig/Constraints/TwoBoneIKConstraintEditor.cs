@@ -230,6 +230,36 @@ namespace UnityEditor.Animations.Rigging
                 dirty = true;
             }
 
+            Vector3 rootPosition = constraint.data.root.position;
+            Vector3 midPosition = constraint.data.mid.position;
+            Vector3 tipPosition = constraint.data.tip.position;
+            Quaternion tipRotation = constraint.data.tip.rotation;
+            Vector3 targetPosition = constraint.data.target.position;
+            Quaternion targetRotation = constraint.data.target.rotation;
+            Vector3 hintPosition = constraint.data.hint.position;
+            float posWeight = constraint.data.targetPositionWeight;
+            float rotWeight = constraint.data.targetRotationWeight;
+            float hintWeight = constraint.data.hintWeight;
+            AffineTransform targetOffset = new AffineTransform(Vector3.zero, Quaternion.identity);
+
+            AnimationRuntimeUtils.InverseSolveTwoBoneIK(rootPosition, midPosition, tipPosition, tipRotation,
+                ref targetPosition, ref targetRotation, ref hintPosition, true, posWeight, rotWeight, hintWeight, targetOffset);
+
+            constraint.data.target.position = targetPosition;
+            constraint.data.target.rotation = targetRotation;
+            constraint.data.hint.position = hintPosition;
+
+            Rig rig = constraint.GetComponentInParent<Rig>();
+            if (rig != null)
+            {
+                RigEffectorData.Style targetStyle = RigEffector.defaultStyle;
+                targetStyle.shape = EditorHelper.LoadShape("BoxEffector.asset");
+                rig.AddEffector(constraint.data.target, targetStyle);
+                RigEffectorData.Style hintStyle = RigEffector.defaultStyle;
+                hintStyle.shape = EditorHelper.LoadShape("BallEffector.asset");
+                rig.AddEffector(constraint.data.hint, hintStyle);
+            }
+
             if (dirty && PrefabUtility.IsPartOfPrefabInstance(constraint))
                 EditorUtility.SetDirty(constraint);
         }

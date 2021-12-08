@@ -83,7 +83,7 @@ namespace UnityEngine.Animations.Rigging
     /// ChainIK constraint
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Chain IK Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/ChainIKConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/ChainIKConstraint.html")]
     public class ChainIKConstraint : RigConstraint<
         ChainIKConstraintJob,
         ChainIKConstraintData,

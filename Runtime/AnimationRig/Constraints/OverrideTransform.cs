@@ -77,7 +77,7 @@ namespace UnityEngine.Animations.Rigging
     /// OverrideTransform constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Override Transform")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/constraints/OverrideTransform.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/OverrideTransform.html")]
     public class OverrideTransform : RigConstraint<
         OverrideTransformJob,
         OverrideTransformData,

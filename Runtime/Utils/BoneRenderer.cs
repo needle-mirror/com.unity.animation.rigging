@@ -8,7 +8,7 @@ namespace UnityEngine.Animations.Rigging
     /// </summary>
     [ExecuteInEditMode]
     [AddComponentMenu("Animation Rigging/Setup/Bone Renderer")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/RiggingWorkflow.html#bone-renderer-component")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/RiggingWorkflow.html#bone-renderer-component")]
     public class BoneRenderer : MonoBehaviour
     {
         /// <summary>

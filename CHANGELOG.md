@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.2.0] - 2021-12-08
+- Updated package icons (case 1361823).
+- Fixed BoneRenderer to refresh bones rendered in viewport on a mouse drag and drop event (case 1361819).
+- Fixed potential performance issue with rig effectors when used in a deep hierarchy.
+- Fixed NullReferenceException when previewing animation and layers were not initialized in `RigBuilder.StartPreview` (case 1367857).
+- Added the function RigBuilder.SyncLayers to manually update rigs and constraints prior to PlayableGraph evaluation.
+- Added the function RigBuilder.Evaluate(float) to manually update and evaluate the RigBuilder.
+- Added the function RigBuilder.Build(PlayableGraph) to build the RigBuilder Playable nodes in an external PlayableGraph.
+- Added effector visuals for auto setup of Two-Bone IK.
+- Correctly positioned effectors for auto setup of Two-Bone IK.
+
 ## [1.1.1] - 2021-08-23
 ### Patch Update of *Animation Rigging*.
 - Added missing tooltips to components (case 1265274).

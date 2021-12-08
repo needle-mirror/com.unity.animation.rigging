@@ -6,7 +6,7 @@ namespace UnityEngine.Animations.Rigging
     /// The Rig component is used to group constraints under its GameObject local hierarchy.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Setup/Rig")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.1/manual/RiggingWorkflow.html#rig-component")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/RiggingWorkflow.html#rig-component")]
     public class Rig : MonoBehaviour, IRigEffectorHolder
     {
         [SerializeField, Range(0f, 1f)]
