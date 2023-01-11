@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.2.1] - 2023-01-11
+- Fixed crash when calling `RigBuilder.Build` by preventing rebuilding the PlayableGraph when in a preview context (case UUM-8599).
+
 ## [1.2.0] - 2021-12-08
 - Updated package icons (case 1361823).
 - Fixed BoneRenderer to refresh bones rendered in viewport on a mouse drag and drop event (case 1361819).

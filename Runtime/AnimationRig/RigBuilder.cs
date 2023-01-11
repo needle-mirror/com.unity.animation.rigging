@@ -20,6 +20,8 @@ namespace UnityEngine.Animations.Rigging
 
         [SerializeField] private List<RigEffectorData> m_Effectors = new List<RigEffectorData>();
 
+        private bool m_IsInPreview;
+
 #if UNITY_EDITOR
         /// <inheritdoc />
         public IEnumerable<RigEffectorData> effectors { get => m_Effectors; }
@@ -126,6 +128,9 @@ namespace UnityEngine.Animations.Rigging
         /// <returns>Returns true if the RigBuilder has created a valid PlayableGraph. Returns false otherwise.</returns>
         public bool Build()
         {
+            if (m_IsInPreview)
+                return false;
+
             Clear();
 
             var animator = GetComponent<Animator>();
@@ -152,6 +157,9 @@ namespace UnityEngine.Animations.Rigging
         /// <returns>Returns true if the RigBuilder has created Playable nodes. Returns false otherwise.</returns>
         public bool Build(PlayableGraph graph)
         {
+            if (m_IsInPreview)
+                return false;
+
             Clear();
 
             var animator = GetComponent<Animator>();
@@ -171,6 +179,9 @@ namespace UnityEngine.Animations.Rigging
         /// </summary>
         public void Clear()
         {
+            if (m_IsInPreview)
+                return;
+
             if (graph.IsValid())
                 graph.Destroy();
 
@@ -193,6 +204,8 @@ namespace UnityEngine.Animations.Rigging
         /// <remarks>This is called by the Animation Window or the Timeline Editor.</remarks>
         public void StartPreview()
         {
+            m_IsInPreview = true;
+
             if (!enabled)
                 return;
 
@@ -214,6 +227,8 @@ namespace UnityEngine.Animations.Rigging
         /// <remarks>This is called by the Animation Window or the Timeline Editor.</remarks>
         public void StopPreview()
         {
+            m_IsInPreview = false;
+
             if (!enabled)
                 return;
 
