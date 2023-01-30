@@ -74,7 +74,7 @@ namespace UnityEngine.Animations.Rigging
     /// MultiReferential constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Referential Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/MultiReferentialConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/constraints/MultiReferentialConstraint.html")]
     public class MultiReferentialConstraint : RigConstraint<
         MultiReferentialConstraintJob,
         MultiReferentialConstraintData,

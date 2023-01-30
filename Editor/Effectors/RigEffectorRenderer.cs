@@ -24,12 +24,29 @@ namespace UnityEditor.Animations.Rigging
         static List<RigEffector> s_ActiveEffectors = null;
         static IRigEffectorOverlay s_ActiveOverlay = null;
 
+        static bool s_ActiveOverlayDirtied = true;
+
         static RigEffectorRenderer()
         {
             RigBuilder.onAddRigBuilder += OnAddRigBuilder;
             RigBuilder.onRemoveRigBuilder += OnRemoveRigBuilder;
 
             SceneView.duringSceneGui += OnSceneGUI;
+            Selection.selectionChanged += OnSelectionChange;
+            ObjectFactory.componentWasAdded += OnComponentAdded;
+        }
+
+        static void OnSelectionChange()
+        {
+            s_ActiveOverlayDirtied = true;
+        }
+
+        static void OnComponentAdded(Component component)
+        {
+            if (!(component is Rig) && !(component is RigBuilder))
+                return;
+
+            s_ActiveOverlayDirtied = true;
         }
 
         static void FetchOrCreateEffectors(IRigEffectorHolder holder)
@@ -86,8 +103,13 @@ namespace UnityEditor.Animations.Rigging
 
         static IRigEffectorOverlay FetchOrCreateEffectorOverlay()
         {
+            if (!s_ActiveOverlayDirtied && s_ActiveOverlay != null && s_ActiveOverlay.IsValid())
+                return s_ActiveOverlay;
+
+            s_ActiveOverlay?.Dispose();
+
             Transform[] transforms = Selection.GetTransforms(SelectionMode.ExcludePrefab | SelectionMode.Editable);
-            var inspectedEffectors = new List<ScriptableObject>();
+            var inspectedEffectors = new List<Object>();
 
             for (int i = 0; i < s_ActiveEffectors.Count; ++i)
             {
@@ -104,7 +126,7 @@ namespace UnityEditor.Animations.Rigging
             if (inspectedEffectors.Count > 0)
             {
                 var overlay = new RigEffectorOverlay();
-                overlay.Initialize(new SerializedObject(inspectedEffectors.ToArray()));
+                overlay.Initialize(inspectedEffectors.ToArray());
 
                 s_ActiveOverlay = overlay;
             }
@@ -139,6 +161,7 @@ namespace UnityEditor.Animations.Rigging
 
             s_ActiveSelection = transforms;
 
+            s_ActiveOverlayDirtied = false;
             return s_ActiveOverlay;
         }
 

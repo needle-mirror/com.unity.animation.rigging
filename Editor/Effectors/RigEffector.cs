@@ -157,34 +157,41 @@ namespace UnityEditor.Animations.Rigging
                             highlight = Handles.selectedColor;
                         }
 
-                        Material mat = material;
-
-                        var shapeHighlight = MeshHasWireframeShapes(style.shape) ? style.color : highlight;
-                        var wireHighlight = new Color(highlight.r, highlight.g, highlight.b, 1f);
-
-                        if (style.shape.subMeshCount > 0)
+                        try
                         {
-                            //  Draw every sub meshes separately to control highlight vs shape colors.
-                            for (int i = 0; i < style.shape.subMeshCount; ++i)
+                            Material mat = material;
+
+                            var shapeHighlight = MeshHasWireframeShapes(style.shape) ? style.color : highlight;
+                            var wireHighlight = new Color(highlight.r, highlight.g, highlight.b, 1f);
+
+                            if (style.shape.subMeshCount > 0)
                             {
-                                MeshTopology topology = style.shape.GetTopology(i);
+                                //  Draw every sub meshes separately to control highlight vs shape colors.
+                                for (int i = 0; i < style.shape.subMeshCount; ++i)
+                                {
+                                    MeshTopology topology = style.shape.GetTopology(i);
+                                    bool isFilled = (topology == MeshTopology.Triangles || topology == MeshTopology.Quads);
+
+                                    mat.SetColor("_Color", isFilled ? shapeHighlight : wireHighlight);
+                                    mat.SetPass(0);
+
+                                    Graphics.DrawMeshNow(style.shape, matrix, i);
+                                }
+                            }
+                            else
+                            {
+                                MeshTopology topology = style.shape.GetTopology(0);
                                 bool isFilled = (topology == MeshTopology.Triangles || topology == MeshTopology.Quads);
 
                                 mat.SetColor("_Color", isFilled ? shapeHighlight : wireHighlight);
                                 mat.SetPass(0);
 
-                                Graphics.DrawMeshNow(style.shape, matrix, i);
+                                Graphics.DrawMeshNow(style.shape, matrix);
                             }
                         }
-                        else
+                        catch (Exception exception)
                         {
-                            MeshTopology topology = style.shape.GetTopology(0);
-                            bool isFilled = (topology == MeshTopology.Triangles || topology == MeshTopology.Quads);
-
-                            mat.SetColor("_Color", isFilled ? shapeHighlight : wireHighlight);
-                            mat.SetPass(0);
-
-                            Graphics.DrawMeshNow(style.shape, matrix);
+                            Debug.LogException(exception);
                         }
                     }
                     break;

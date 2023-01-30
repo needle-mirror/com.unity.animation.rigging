@@ -6,6 +6,7 @@ namespace UnityEditor.Animations.Rigging
     [CustomOverlay(typeof(RigEffector))]
     class RigEffectorOverlay : IRigEffectorOverlay
     {
+        private Object[] m_TargetObjects;
         private SerializedObject m_SerializedObject;
 
         private SerializedProperty m_Visible;
@@ -30,9 +31,10 @@ namespace UnityEditor.Animations.Rigging
 
         private static GUILayoutOption s_FixedWidth = GUILayout.Width(210f);
 
-        public void Initialize(SerializedObject serializedObject)
+        public void Initialize(Object[] effectors)
         {
-            m_SerializedObject = serializedObject;
+            m_TargetObjects = effectors;
+            m_SerializedObject = new SerializedObject(effectors);
 
             SerializedProperty data = m_SerializedObject.FindProperty("m_Data");
 
@@ -66,16 +68,20 @@ namespace UnityEditor.Animations.Rigging
             return null;
         }
 
+        public bool IsValid() => m_SerializedObject.targetObject != null;
+
         public void OnSceneGUIOverlay()
         {
-            GameObject targetGameObject = null;
+            if (!IsValid())
+                return;
 
             m_SerializedObject.Update();
 
+            GameObject targetGameObject = null;
             if (!m_SerializedObject.isEditingMultipleObjects)
             {
                 RigEffector rigEffector = m_SerializedObject.targetObject as RigEffector;
-                if (rigEffector.transform != null)
+                if (rigEffector != null && rigEffector.transform != null)
                 {
                     targetGameObject = rigEffector.transform.gameObject;
                 }
@@ -174,6 +180,11 @@ namespace UnityEditor.Animations.Rigging
 
                 m_SerializedObject.ApplyModifiedProperties();
             }
+        }
+
+        public void Dispose()
+        {
+            m_SerializedObject?.Dispose();
         }
     }
 }

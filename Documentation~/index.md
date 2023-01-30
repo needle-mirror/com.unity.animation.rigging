@@ -18,7 +18,7 @@ This documentation describes how to set up a simple Animation Rig for use in a v
 
 This version of Animation Rigging is compatible with the following versions of the Unity Editor:
 
-* 2020.2 and later
+* 2023.2 and later
 
 ## Document revision history
 

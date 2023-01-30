@@ -149,7 +149,7 @@ namespace UnityEngine.Animations.Rigging
             if (transform == null)
                 throw new ArgumentNullException(nameof(transform));
 
-            if (!transform.IsChildOf(animator.transform))
+            if (!transform.IsChildOf(animator.avatarRoot))
                 throw new InvalidOperationException($"Transform '{transform.name}' is not a child of the Animator hierarchy, and cannot be written to.");
 
             handle.m_Handle = animator.BindStreamTransform(transform);
@@ -206,6 +206,15 @@ namespace UnityEngine.Animations.Rigging
         }
 
         /// <summary>
+        /// Gets the matrix of the transform in local space.
+        /// </summary>
+        /// <param name="stream">The AnimationStream that holds the animated values.</param>
+        /// <returns>The matrix of the transform in local space.</returns>
+        public Matrix4x4 GetLocalToParentMatrix(AnimationStream stream) =>
+            m_InStream == 1 ? m_StreamHandle.GetLocalToParentMatrix(stream) : m_SceneHandle.GetLocalToParentMatrix(stream);
+
+
+        /// <summary>
         /// Gets the position of the transform in world space.
         /// </summary>
         /// <param name="stream">The AnimationStream that holds the animated values.</param>
@@ -234,6 +243,15 @@ namespace UnityEngine.Animations.Rigging
             else
                 m_SceneHandle.GetGlobalTR(stream, out position, out rotation);
         }
+
+        /// <summary>
+        /// Gets the matrix of the transform in world space.
+        /// </summary>
+        /// <param name="stream">The AnimationStream that holds the animated values.</param>
+        /// <returns>The matrix of the transform in world space.</returns>
+        public Matrix4x4 GetLocalToWorldMatrix(AnimationStream stream) =>
+            m_InStream == 1 ? m_StreamHandle.GetLocalToWorldMatrix(stream) : m_SceneHandle.GetLocalToWorldMatrix(stream);
+
 
         /// <summary>
         /// Returns whether this handle is resolved.
@@ -282,7 +300,7 @@ namespace UnityEngine.Animations.Rigging
             if (transform == null)
                 throw new ArgumentNullException(nameof(transform));
 
-            handle.m_InStream = (byte)(transform.IsChildOf(animator.transform) ? 1 : 0);
+            handle.m_InStream = (byte)(transform.IsChildOf(animator.avatarRoot) ? 1 : 0);
             if (handle.m_InStream == 1)
                 handle.m_StreamHandle = animator.BindStreamTransform(transform);
             else

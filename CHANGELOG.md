@@ -1,8 +1,14 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-## [1.2.1] - 2023-01-11
+## [1.3.0] - 2023-01-30
+- Added the `TransformHandle`'s function `GetLocalToParentMatrix` to get the matrix of an animation stream transform in local space.
+- Added the `TransformHandle`'s function `GetLocalToWorldMatrix` to get the matrix of an animation stream transform in world space.
+- Fixed handling negative scale in the `MultiAimConstraintJob` (case 1366549).
+- Fixed transforms in animator hierarchy, but not children of avatar root not resolving properly (case 1373387).
+- Fixed MultiAimConstraint evaluation with a world up axis (UM-1936).
 - Fixed crash when calling `RigBuilder.Build` by preventing rebuilding the PlayableGraph when in a preview context (case UUM-8599).
+- Fixed an issue where a misplaced `BoneHandles.shader` shader would cause the Scene View's Orientation Overlay to no longer render (case UUM-20874).
 
 ## [1.2.0] - 2021-12-08
 - Updated package icons (case 1361823).

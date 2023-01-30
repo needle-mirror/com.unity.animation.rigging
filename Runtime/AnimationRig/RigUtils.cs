@@ -62,14 +62,14 @@ namespace UnityEngine.Animations.Rigging
             if (fieldType == typeof(Transform))
             {
                 var value = (Transform)field.GetValue(data);
-                if (value != null && value.IsChildOf(animator.transform))
+                if (value != null && value.IsChildOf(animator.avatarRoot))
                     syncableTransforms.Add(value);
             }
             else if (fieldType == typeof(Transform[]) || fieldType == typeof(List<Transform>))
             {
                 var list = (IEnumerable<Transform>)field.GetValue(data);
                 foreach (var element in list)
-                    if (element != null && element.IsChildOf(animator.transform))
+                    if (element != null && element.IsChildOf(animator.avatarRoot))
                         syncableTransforms.Add(element);
             }
             else
@@ -108,7 +108,7 @@ namespace UnityEngine.Animations.Rigging
             if (fieldType == typeof(WeightedTransform))
             {
                 var value = ((WeightedTransform)field.GetValue(data)).transform;
-                if (value != null && value.IsChildOf(animator.transform))
+                if (value != null && value.IsChildOf(animator.avatarRoot))
                     syncableTransforms.Add(value);
 
                 syncableProperties.Add(
@@ -121,7 +121,7 @@ namespace UnityEngine.Animations.Rigging
                 int index = 0;
                 foreach (var element in list)
                 {
-                    if (element.transform != null && element.transform.IsChildOf(animator.transform))
+                    if (element.transform != null && element.transform.IsChildOf(animator.avatarRoot))
                         syncableTransforms.Add(element.transform);
 
                     syncableProperties.Add(

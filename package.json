@@ -1,9 +1,9 @@
 {
   "name": "com.unity.animation.rigging",
   "displayName": "Animation Rigging",
-  "version": "1.2.1",
-  "unity": "2020.2",
-  "unityRelease": "0a16",
+  "version": "1.3.0",
+  "unity": "2022.2",
+  "unityRelease": "0a9",
   "description": "Animation Rigging toolkit using Unity's Animation C# Jobs",
   "keywords": [
     "Animation",
@@ -23,18 +23,18 @@
     }
   ],
   "relatedPackages": {
-    "com.unity.animation.rigging.tests": "1.2.1"
+    "com.unity.animation.rigging.tests": "1.3.0"
   },
   "_upm": {
-    "changelog": "- Fixed crash when calling `RigBuilder.Build` by preventing rebuilding the PlayableGraph when in a preview context (case UUM-8599)."
+    "changelog": "- Added the `TransformHandle`'s function `GetLocalToParentMatrix` to get the matrix of an animation stream transform in local space.\n- Added the `TransformHandle`'s function `GetLocalToWorldMatrix` to get the matrix of an animation stream transform in world space.\n- Fixed handling negative scale in the `MultiAimConstraintJob` (case 1366549).\n- Fixed transforms in animator hierarchy, but not children of avatar root not resolving properly (case 1373387).\n- Fixed MultiAimConstraint evaluation with a world up axis (UM-1936).\n- Fixed crash when calling `RigBuilder.Build` by preventing rebuilding the PlayableGraph when in a preview context (case UUM-8599).\n- Fixed an issue where a misplaced `BoneHandles.shader` shader would cause the Scene View's Orientation Overlay to no longer render (case UUM-20874)."
   },
   "upmCi": {
-    "footprint": "3d79428537934290fc1e62fe27d22b978e63f29c"
+    "footprint": "0dc36645a5d298886606134fa6733d8edda70840"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.animation.rigging.git",
     "type": "git",
-    "revision": "92e94bb1e4f136ae16b8208cad0918863e16799f"
+    "revision": "56e7b7c84bac20a2a5885468b6849c14b3ef49f4"
   }
 }

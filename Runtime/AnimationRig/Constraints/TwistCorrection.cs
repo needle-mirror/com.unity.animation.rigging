@@ -82,7 +82,7 @@ namespace UnityEngine.Animations.Rigging
     /// TwistCorrection constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Twist Correction")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/TwistCorrection.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/constraints/TwistCorrection.html")]
     public class TwistCorrection : RigConstraint<
         TwistCorrectionJob,
         TwistCorrectionData,

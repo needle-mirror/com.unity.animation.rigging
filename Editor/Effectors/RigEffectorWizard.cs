@@ -21,6 +21,8 @@ namespace UnityEditor.Animations.Rigging
             m_Transforms.Add(new HolderTransformPair() { holder = holder, transform = transform });
         }
 
+        public bool IsValid() => true;
+
         public void OnSceneGUIOverlay()
         {
             string labelName = "(no selection)";
@@ -56,6 +58,11 @@ namespace UnityEditor.Animations.Rigging
             }
 
             GUILayout.EndHorizontal();
+        }
+
+        public void Dispose()
+        {
+            // nothing to do.
         }
     }
 }

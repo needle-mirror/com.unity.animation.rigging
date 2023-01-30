@@ -187,7 +187,7 @@ namespace UnityEngine.Animations.Rigging
     /// MultiAim constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Aim Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/MultiAimConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/constraints/MultiAimConstraint.html")]
     public class MultiAimConstraint : RigConstraint<
         MultiAimConstraintJob,
         MultiAimConstraintData,

@@ -69,7 +69,7 @@ namespace UnityEngine.Animations.Rigging
     /// MultiRotation constraint.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Animation Rigging/Multi-Rotation Constraint")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.2/manual/constraints/MultiRotationConstraint.html")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/constraints/MultiRotationConstraint.html")]
     public class MultiRotationConstraint : RigConstraint<
         MultiRotationConstraintJob,
         MultiRotationConstraintData,
