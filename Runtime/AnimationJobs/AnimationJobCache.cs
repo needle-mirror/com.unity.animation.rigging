@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
@@ -62,8 +62,8 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="index">CacheIndex value.</param>
         /// <param name="offset">Offset to the CacheIndex.</param>
         /// <typeparam name="T">The value type.</typeparam>
-        /// <returns></returns>
-        unsafe public T Get<T>(CacheIndex index, int offset = 0) where T : unmanaged
+        /// <returns>Returns a cached value.</returns>
+        public unsafe T Get<T>(CacheIndex index, int offset = 0) where T : unmanaged
         {
             int size = UnsafeUtility.SizeOf<T>();
             int stride = size / UnsafeUtility.SizeOf<float>();
@@ -79,8 +79,8 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="val">Value.</param>
         /// <param name="index">CacheIndex value.</param>
         /// <param name="offset">Offset to the CacheIndex.</param>
-        /// <typeparam name="T"></typeparam>
-        unsafe public void Set<T>(T val, CacheIndex index, int offset = 0) where T : unmanaged
+        /// <typeparam name="T">Type of value.</typeparam>
+        public unsafe void Set<T>(T val, CacheIndex index, int offset = 0) where T : unmanaged
         {
             int size = UnsafeUtility.SizeOf<T>();
             int stride = size / UnsafeUtility.SizeOf<float>();
@@ -94,8 +94,8 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="v">Array of values.</param>
         /// <param name="index">CacheIndex value.</param>
         /// <param name="offset">Offset to the CacheIndex.</param>
-        /// <typeparam name="T"></typeparam>
-        unsafe public void SetArray<T>(T[] v, CacheIndex index, int offset = 0) where T : unmanaged
+        /// <typeparam name="T">Type of value.</typeparam>
+        public unsafe void SetArray<T>(T[] v, CacheIndex index, int offset = 0) where T : unmanaged
         {
             int size = UnsafeUtility.SizeOf<T>();
             int stride = size / UnsafeUtility.SizeOf<float>();

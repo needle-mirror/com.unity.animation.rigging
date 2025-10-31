@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     /// <summary>
     /// Rigid transform with only translation and rotation components.

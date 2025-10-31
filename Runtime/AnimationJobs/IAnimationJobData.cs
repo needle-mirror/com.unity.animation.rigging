@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Animations.Rigging
+namespace UnityEngine.Animations.Rigging
 {
     /// <summary>
     /// This interface is used to represent all constraint data structs.

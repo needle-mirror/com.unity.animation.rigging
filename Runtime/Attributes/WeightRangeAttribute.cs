@@ -5,7 +5,7 @@ namespace UnityEngine.Animations.Rigging
     /// <summary>
     /// By default, <see cref="WeightedTransform.weight"/> appears as a numeric input field in the Inspector.
     /// Decorate <see cref="WeightedTransform"/> or <see cref="WeightedTransformArray"/> fields with this attribute to make it display using a slider with the specified range.
-    /// See also <seealso cref="WeightedTransformArray.OnValidate"/>.
+    /// See also <see cref="WeightedTransformArray.OnValidate"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class WeightRangeAttribute : PropertyAttribute

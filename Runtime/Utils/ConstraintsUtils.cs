@@ -13,7 +13,7 @@ namespace UnityEngine.Animations.Rigging
         /// </summary>
         /// <param name="root">The root Transform.</param>
         /// <param name="tip">The tip Transform.</param>
-        /// <returns></returns>
+        /// <returns>Returns an array of Transforms.</returns>
         public static Transform[] ExtractChain(Transform root, Transform tip)
         {
             if (!tip.IsChildOf(root))

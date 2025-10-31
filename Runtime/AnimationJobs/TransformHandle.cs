@@ -97,7 +97,7 @@ namespace UnityEngine.Animations.Rigging
         /// Sets the rotation of the transform in world space.
         /// </summary>
         /// <param name="stream">The AnimationStream that holds the animated values.</param>
-        /// <param name="rotation">	The rotation of the transform in world space.</param>
+        /// <param name="rotation">The rotation of the transform in world space.</param>
         public void SetRotation(AnimationStream stream, Quaternion rotation) => m_Handle.SetRotation(stream, rotation);
         /// <summary>
         /// Sets the position and rotation of the transform in world space.

@@ -47,8 +47,8 @@ namespace UnityEngine.Animations.Rigging
         /// <param name="animator">The Animator on which to bind the new handle.</param>
         /// <param name="component">The component owning the WeightedTransformArray property.</param>
         /// <param name="weightedTransformArray">The WeightedTransformArray property.</param>
-        /// <param name="name"></param>
-        /// <param name="weights"></param>
+        /// <param name="name">Name of the property.</param>
+        /// <param name="weights">Resulting NativeArray of weights.</param>
         public static void BindWeights(Animator animator, Component component, WeightedTransformArray weightedTransformArray, string name, out NativeArray<PropertyStreamHandle> weights)
         {
             weights = new NativeArray<PropertyStreamHandle>(weightedTransformArray.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);

@@ -10,7 +10,7 @@ namespace UnityEngine.Animations.Rigging
     /// </summary>
     [RequireComponent(typeof(Animator))]
     [DisallowMultipleComponent, ExecuteInEditMode, AddComponentMenu("Animation Rigging/Setup/Rig Builder")]
-    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/RiggingWorkflow.html#rig-builder-component")]
+    [HelpURL("https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.4/manual/RiggingWorkflow.html#rig-builder-component")]
     public class RigBuilder : MonoBehaviour, IAnimationWindowPreview, IRigEffectorHolder
     {
         [SerializeField] private List<RigLayer> m_RigLayers;
@@ -75,8 +75,8 @@ namespace UnityEngine.Animations.Rigging
         /// </summary>
         /// <param name="deltaTime">The time in seconds by which to advance the RigBuilder PlayableGraph.</param>
         /// <example>
-        /// Manually evaluate the RigBuilder in LateUpdate.
-        /// <code source="../../DocCodeExamples/CustomRigBuilderEvaluator.cs" language="csharp" region="custom-rig-builder-evaluator"/>
+        /// <para>Manually evaluate the RigBuilder in LateUpdate.</para>
+        /// <code source="../DocCodeExamples/CustomRigBuilderEvaluator.cs" region="custom-rig-builder-evaluator"/>
         /// </example>
         public void Evaluate(float deltaTime)
         {
@@ -104,9 +104,8 @@ namespace UnityEngine.Animations.Rigging
         /// <seealso cref="SyncSceneToStreamAttribute"/>
         /// <seealso cref="AnimationJobBinder{TJob,TData}.Update"/>
         /// <example>
-        /// Synchronizing layers before evaluating a PlayableGraph created
-        /// outside the RigBuilder in LateUpdate.
-        /// <code source="../../DocCodeExamples/CustomPlayableGraphEvaluator.cs" language="csharp" region="custom-playable-graph-evaluator"/>
+        /// <para>Synchronizing layers before evaluating a PlayableGraph created outside the RigBuilder in LateUpdate.</para>
+        /// <code source="../DocCodeExamples/CustomPlayableGraphEvaluator.cs" region="custom-playable-graph-evaluator"/>
         /// </example>
         public void SyncLayers()
         {
@@ -263,7 +262,7 @@ namespace UnityEngine.Animations.Rigging
         /// </summary>
         /// <param name="graph">The animation previewer PlayableGraph</param>
         /// <param name="inputPlayable">The current root of the PlayableGraph</param>
-        /// <returns></returns>
+        /// <returns>Returns the new root of the PlayableGraph.</returns>
         public Playable BuildPreviewGraph(PlayableGraph graph, Playable inputPlayable)
         {
             if (!enabled)

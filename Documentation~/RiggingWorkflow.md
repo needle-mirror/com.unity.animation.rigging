@@ -1,7 +1,7 @@
 
 # Rigging Workflow
 
-This document describes all of the steps and components required to create a custom Animation Rig. This [**video**](https://youtu.be/DzW_jQGO1dc) also demonstrates the process. 
+This document describes all of the steps and components required to create a custom Animation Rig. This [**video**](https://youtu.be/DzW_jQGO1dc) also demonstrates the process.
 
 ## Core Components
 
@@ -20,11 +20,11 @@ Once you have added a Rig Builder component to an animatable hierarchy's root Ga
 
 ![Rig Setup](images/rig_setup/rig_setup.gif)
 
-After you connect the Rig GameObject to the Rig Builder component, you can add rig elements (i.e., GameObjects with Constraint components) under the Rig GameObject hierarchy. Different rig elements can be organized and hierarchically structured to accommodate any rigging requirement.  
+After you connect the Rig GameObject to the Rig Builder component, you can add rig elements (i.e., GameObjects with Constraint components) under the Rig GameObject hierarchy. Different rig elements can be organized and hierarchically structured to accommodate any rigging requirement.
 
-Source objects for Constraints, such as Target Effectors or Hint Effectors, can be placed under their associated Rig GameObject. In the following illustration, _Left Leg IK_ has a **Two Bone IK Constraint** component and is acting as a rig element. It is the parent of both the _LeftFootEffector_ and _LeftLegHint_ source objects.  
+Source objects for Constraints, such as Target Effectors or Hint Effectors, can be placed under their associated Rig GameObject. In the following illustration, _Left Leg IK_ has a **Two Bone IK Constraint** component and is acting as a rig element. It is the parent of both the _LeftFootEffector_ and _LeftLegHint_ source objects.
 
-![Source Object Example](images/rig_setup/source_object_example.png) 
+![Source Object Example](images/rig_setup/source_object_example.png)
 
 
 ### Rig Builder Component

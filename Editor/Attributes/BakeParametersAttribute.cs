@@ -50,14 +50,14 @@ namespace UnityEditor.Animations.Rigging
         /// </summary>
         /// <param name="rigBuilder">The RigBuilder which the constraint is part of.</param>
         /// <param name="constraint">The RigConstraint for which the bindings should be collected.</param>
-        /// <returns></returns>
+        /// <returns>Returns a collection of editor curve bindings.</returns>
         public abstract IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, T constraint);
         /// <summary>
         /// Collects the editor curve bindings for all the properties that this RigConstraint modifies when transferring motion to this constraint.
         /// </summary>
         /// <param name="rigBuilder">The RigBuilder which the constraint is part of.</param>
         /// <param name="constraint">The RigConstraint for which the bindings should be collected.</param>
-        /// <returns></returns>
+        /// <returns>Returns a collection of editor curve bindings.</returns>
         public abstract IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, T constraint);
 
 
@@ -102,14 +102,14 @@ namespace UnityEditor.Animations.Rigging
         /// </summary>
         /// <param name="rigBuilder">The RigBuilder which the constraint is part of.</param>
         /// <param name="constraint">The RigConstraint for which the bindings should be collected.</param>
-        /// <returns></returns>
+        /// <returns>Returns a collection of editor curve bindings.</returns>
         IEnumerable<EditorCurveBinding> GetSourceCurveBindings(RigBuilder rigBuilder, IRigConstraint constraint);
         /// <summary>
         /// Collects the editor curve bindings for all the properties that this RigConstraint modifies when transferring motion to this constraint.
         /// </summary>
         /// <param name="rigBuilder">The RigBuilder which the constraint is part of.</param>
         /// <param name="constraint">The RigConstraint for which the bindings should be collected.</param>
-        /// <returns></returns>
+        /// <returns>Returns a collection of editor curve bindings.</returns>
         IEnumerable<EditorCurveBinding> GetConstrainedCurveBindings(RigBuilder rigBuilder, IRigConstraint constraint);
     }
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace UnityEditor.Animations.Rigging

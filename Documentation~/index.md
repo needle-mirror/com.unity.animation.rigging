@@ -7,7 +7,7 @@ Use Animation Rigging to create and organize **animation rigs**, or sets of cons
 
 This documentation describes how to set up a simple Animation Rig for use in a variety of workflows. It also includes detailed information on the constraints included in the Animation Rigging package.
 
-* The [Rigging Workflow](RiggingWorkflow.md) topic is the best place to get started. It describes the main components necessary for defining and using an animation rig. It includes suggestions on additional components and constraints that you can define for props, accessories, or other rig controls. 
+* The [Rigging Workflow](RiggingWorkflow.md) topic is the best place to get started. It describes the main components necessary for defining and using an animation rig. It includes suggestions on additional components and constraints that you can define for props, accessories, or other rig controls.
 * The [Animation Rigging Menu](AnimationRiggingMenu.md) topic describes utilities that help with the rigging workflow.
 * The [Bidirectional Motion Transfer](BidirectionalMotionTransfer.md) topic describes an additional workflow option for transferring motion back and forth between an animation rig and a skeleton.
 * The [Constraint Components](ConstraintComponents.md) topic contains detailed information on all of the built-in Constraint components.

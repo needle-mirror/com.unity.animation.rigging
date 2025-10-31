@@ -53,13 +53,13 @@ namespace UnityEngine.Animations.Rigging
         /// <summary>
         /// Frees the specified job memory.
         /// </summary>
-        /// <param name="job"></param>
+        /// <param name="job">Job to destroy.</param>
         public void DestroyJob(IAnimationJob job) => s_Binder.Destroy((TJob)job);
 
         /// <summary>
         /// Updates the specified job data.
         /// </summary>
-        /// <param name="job"></param>
+        /// <param name="job">Job to update.</param>
         public void UpdateJob(IAnimationJob job)
         {
             IAnimationJobBinder binder = (IAnimationJobBinder)s_Binder;

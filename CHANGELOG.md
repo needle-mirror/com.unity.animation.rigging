@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.4.0] - 2025-10-31
+- Updated samples to use SRP materials.
+
 ## [1.3.0] - 2023-01-30
 - Added the `TransformHandle`'s function `GetLocalToParentMatrix` to get the matrix of an animation stream transform in local space.
 - Added the `TransformHandle`'s function `GetLocalToWorldMatrix` to get the matrix of an animation stream transform in world space.
@@ -38,16 +41,16 @@ All notable changes to this package will be documented in this file.
 - Built-in RigConstraint components now support multi-object editing in the Inspector.
 - Fixed bug causing multi-target constraints to add a new target simply by viewing them in the Inspector.
 - Fixed collapsing Source Objects and Settings foldouts in the Inspector going on the undo stack.
-	- Appearance of foldout groups now matches other Unity components.
+    - Appearance of foldout groups now matches other Unity components.
 - Appearance of WeightedTransformArray in the Inspector now matches default array control.
-	- Header now supports dragging and dropping Transforms.
+    - Header now supports dragging and dropping Transforms.
 - Validate constraint weights and source object weights are within supported range when deserializing built-in constraints in the Editor.
 - Improvements to help when creating custom constraints:
     - RigConstraint m_Data field no longer displays nested under a foldout in the Inspector by default.
     - RigConstraint.OnValidate() is now overridable in sub-classes.
-	- Added WeightedTransformArray.OnValidate().
-	- Added default PropertyDrawer for WeightedTransformArray that supports multi-select.
-	- Added optional WeightRangeAttribute. It should now be used in conjunction with WeightedTransformArray fields instead of RangeAttribute to specify the control should use a slider.
+    - Added WeightedTransformArray.OnValidate().
+    - Added default PropertyDrawer for WeightedTransformArray that supports multi-select.
+    - Added optional WeightRangeAttribute. It should now be used in conjunction with WeightedTransformArray fields instead of RangeAttribute to specify the control should use a slider.
 - Updated samples to standard Samples/PackageName/Version/SampleName structure (case 1276329).
 - Fixed BoneRenderer and RigEffectors not respecting layer visibility flags (case 1238204).
 - Added support for nested struct properties tagged with the SyncSceneToStream attribute.
@@ -115,7 +118,7 @@ All notable changes to this package will be documented in this file.
 - Fixed NullReferenceException in RigEffectorRenderer.
 - Fixed TwoBoneIK evaluation when used on straight limbs by using hint target to define a valid IK plane.
 - Fixed Multi-Parent, Multi-Rotation and Multi-Aim constraints to perform order independent rotation blending. [AAA-17]
-- Fixed RigTransform component to work on all objects of an animator hierarchy not only specific to sub rig hierarchies. [AAA-18] 
+- Fixed RigTransform component to work on all objects of an animator hierarchy not only specific to sub rig hierarchies. [AAA-18]
 - Fixed crash in RigSyncSceneToStreamJob when rebuilding jobs after having deleted all valid rigs (case 1167624).
 - Fixed undo/redo issues with Rig Effectors set on Prefab instances (case 1162002).
 - Fixed missing links to package documentation for MonoBehaviour scripts. [AAA-16]
@@ -132,11 +135,11 @@ All notable changes to this package will be documented in this file.
 ### Patch Update of *Animation Rigging*.
 - Added Burst support to existing constraints.  The Animation Rigging package now depends on com.unity.burst.
 - Upgraded weighted transform arrays in order for weights to be animatable.  The following constraints were modified and will require a manual update:
-	- MultiAimConstraint
-	- MultiParentConstraint
-	- MultiPositionConstraint
-	- MultiReferentialConstraint
-	- TwistCorrection
+    - MultiAimConstraint
+    - MultiParentConstraint
+    - MultiPositionConstraint
+    - MultiReferentialConstraint
+    - TwistCorrection
 
 ## [0.2.0] - 2019-02-12
 
@@ -147,7 +150,7 @@ All notable changes to this package will be documented in this file.
 - Fixed issue where constraint parameters were evaluated one frame late when animated.
 - Added attribute [DisallowMultipleComponent] to constraints to avoid use of multiple constraints per Game Object.
 - Updated constraints to use new AnimationStream API to reduce engine to script conversion.
-- Added IAnimatableProperty helpers for Bool/Int/Float/Vector2/Vector3/Vector4 properties. 
+- Added IAnimatableProperty helpers for Bool/Int/Float/Vector2/Vector3/Vector4 properties.
 - Added ReadOnlyTransformHandle and ReadWriteTransformHandle.
 
 ## [0.1.4] - 2018-12-21
@@ -186,7 +189,7 @@ All notable changes to this package will be documented in this file.
 - Added passthrough conditions in animation jobs for proper stream values to be passed downstream when job weights are zero. Fixes a few major issues when character did not have a controller.
 - Fixed bug in ChainIK causing chain to not align to full extent when target is out of reach
 - Fixed TwoBoneIK bend normal strategy when limbs are collinear
-- Reworked AnimationJobData classes to be declared as structs in order for their serialized members to be keyable within the Animation Window. 
+- Reworked AnimationJobData classes to be declared as structs in order for their serialized members to be keyable within the Animation Window.
 - Renamed component section and menu item "Runtime Rigging" to "Animation Rigging"
 - Added check in SyncToStreamJob to make sure StreamHandle is still valid prior to reading it's values.
 - Adding first draft of package documentation.
@@ -198,11 +201,11 @@ All notable changes to this package will be documented in this file.
 - RigBuilder component.
 - Rig component.
 - The following RuntimeRigConstraint components:
-	- BlendConstraint
-	- ChainIKConstraint
-	- MultiAimConstraint
-	- MultiParentConstraint
-	- MultiPositionConstraint
-	- MultiReferentialConstraint
-	- OverrideTransform
-	- TwistCorrection
+    - BlendConstraint
+    - ChainIKConstraint
+    - MultiAimConstraint
+    - MultiParentConstraint
+    - MultiPositionConstraint
+    - MultiReferentialConstraint
+    - OverrideTransform
+    - TwistCorrection

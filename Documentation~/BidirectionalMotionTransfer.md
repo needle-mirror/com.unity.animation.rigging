@@ -1,7 +1,7 @@
 
 # Bidirectional Motion Transfer
 
-Bidirectional motion transfer is an authoring workflow that lets you transfer existing motion onto active constraints, and inversely, transfer the motion from active constraints back to the original motion source while preserving visual fidelity of the motion. 
+Bidirectional motion transfer is an authoring workflow that lets you transfer existing motion onto active constraints, and inversely, transfer the motion from active constraints back to the original motion source while preserving visual fidelity of the motion.
 
 This workflow makes use of the Animation Window to select the desired clip and preview the constrained result in the Scene View.
 
@@ -11,7 +11,7 @@ Both **“Transfer motion to skeleton”** and **“Transfer motion to constrain
 
 Bidirectional motion transfer can be used on generic character hierarchies. Humanoid is not supported at the moment.
 
-Not all constraints can Transfer motion to constraints. Physics-based constraints like Damped Transform cannot be inferred from existing motion. 
+Not all constraints can Transfer motion to constraints. Physics-based constraints like Damped Transform cannot be inferred from existing motion.
 
 Other constraints can be transferred but with limitations. For example, the Twist Chain constraint constrains rotations. It overrides positions and in-between chain rotations. The result of transferring motion does not precisely represent the source animation.
 
