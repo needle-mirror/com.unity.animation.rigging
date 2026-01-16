@@ -27,13 +27,13 @@ namespace UnityEngine.Animations.Rigging
 
     internal struct RigProperties
     {
-        public static string s_Weight = "m_Weight";
+        public const string k_Weight = "m_Weight";
         public Component component;
     }
 
     internal struct ConstraintProperties
     {
-        public static string s_Weight = "m_Weight";
+        public const string k_Weight = "m_Weight";
         public Component component;
         public Property[] properties;
     }

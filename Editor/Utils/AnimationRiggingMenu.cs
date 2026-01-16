@@ -6,15 +6,26 @@ namespace UnityEditor.Animations.Rigging
     {
         static bool FilterSourceAndDestinationFromSelection(out Transform source, out Transform destination)
         {
+#if UNITY_6000_3_OR_NEWER
+            var selected = Selection.entityIds;
+#else
             var selected = Selection.instanceIDs;
+#endif
+
             if (selected == null || selected.Length != 2)
             {
                 source = destination = null;
                 return false;
             }
 
+#if UNITY_6000_3_OR_NEWER
+            var srcGameObject = EditorUtility.EntityIdToObject(selected[1]) as GameObject;
+            var dstGameObject = EditorUtility.EntityIdToObject(selected[0]) as GameObject;
+#else
             var srcGameObject = EditorUtility.InstanceIDToObject(selected[1]) as GameObject;
             var dstGameObject = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+#endif
+
             if (srcGameObject == null || dstGameObject == null)
             {
                 source = destination = null;

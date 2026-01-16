@@ -69,7 +69,7 @@ namespace UnityEngine.Animations.Rigging
             // Bind constraint job weight property
             job.jobWeight = FloatProperty.BindCustom(
                 animator,
-                ConstraintsUtils.ConstructCustomPropertyName(this, ConstraintProperties.s_Weight)
+                ConstraintsUtils.ConstructCustomPropertyName(this, ConstraintProperties.k_Weight)
                 );
 
             return job;

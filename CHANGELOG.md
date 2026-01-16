@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
+## [1.4.1] - 2026-01-16
+- Removed deprecated InstanceID API usage (UUM-132062).
+- Ensure static properties support fast enter play mode (UUM-131013).
+- Fixed NullReferenceException when removing elements from the Animation Rigging Scene Overlay (ARB-68).
+
 ## [1.4.0] - 2025-10-31
 - Updated samples to use SRP materials.
 

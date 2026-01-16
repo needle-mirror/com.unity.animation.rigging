@@ -26,6 +26,24 @@ namespace UnityEditor.Animations.Rigging
 
         static bool s_ActiveOverlayDirtied = true;
 
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod]
+        static void ResetStaticsOnLoad()
+        {
+            RigBuilder.onAddRigBuilder -= OnAddRigBuilder;
+            RigBuilder.onAddRigBuilder += OnAddRigBuilder;
+            RigBuilder.onRemoveRigBuilder -= OnRemoveRigBuilder;
+            RigBuilder.onRemoveRigBuilder += OnRemoveRigBuilder;
+
+            SceneView.duringSceneGui -= OnSceneGUI;
+            SceneView.duringSceneGui += OnSceneGUI;
+            Selection.selectionChanged -= OnSelectionChange;
+            Selection.selectionChanged += OnSelectionChange;
+            ObjectFactory.componentWasAdded -= OnComponentAdded;
+            ObjectFactory.componentWasAdded += OnComponentAdded;
+        }
+#endif
+
         static RigEffectorRenderer()
         {
             RigBuilder.onAddRigBuilder += OnAddRigBuilder;
@@ -70,6 +88,7 @@ namespace UnityEditor.Animations.Rigging
 
         static void FetchOrCreateEffectors()
         {
+            int previousActiveEffectorCount = s_ActiveEffectors?.Count??0;
             s_ActiveEffectors = new List<RigEffector>();
 
             PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
@@ -99,6 +118,8 @@ namespace UnityEditor.Animations.Rigging
                     }
                 }
             }
+
+            s_ActiveOverlayDirtied |= s_ActiveEffectors.Count != previousActiveEffectorCount;
         }
 
         static IRigEffectorOverlay FetchOrCreateEffectorOverlay()
@@ -201,12 +222,14 @@ namespace UnityEditor.Animations.Rigging
         static void OnAddRigBuilder(RigBuilder rigBuilder)
         {
             s_RigBuilders.Add(rigBuilder);
+            s_ActiveOverlayDirtied = true;
         }
 
         static void OnRemoveRigBuilder(RigBuilder rigBuilder)
         {
             s_RigBuilders.Remove(rigBuilder);
             s_Effectors.Clear();
+            s_ActiveOverlayDirtied = true;
         }
 
         private static void SceneViewGUICallback(UnityEngine.Object target, SceneView sceneView)

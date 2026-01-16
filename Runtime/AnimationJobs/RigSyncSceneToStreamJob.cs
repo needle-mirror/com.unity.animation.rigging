@@ -149,11 +149,14 @@ namespace UnityEngine.Animations.Rigging
         bool[] rigStates { get; }
     }
 
+    static class RigSyncSceneToStreamJobBinderConstants
+    {
+        internal static readonly string[] s_PropertyElementNames = new string[] {".x", ".y", ".z", ".w"};
+    }
+
     internal class RigSyncSceneToStreamJobBinder<T> : AnimationJobBinder<RigSyncSceneToStreamJob, T>
         where T : struct, IAnimationJobData, IRigSyncSceneToStreamData
     {
-        internal static string[] s_PropertyElementNames = new string[] {".x", ".y", ".z", ".w"};
-
         public override RigSyncSceneToStreamJob Create(Animator animator, ref T data, Component component)
         {
             var job = new RigSyncSceneToStreamJob();
@@ -188,7 +191,7 @@ namespace UnityEngine.Animations.Rigging
                 int constraintIdx = 0, propertyIdx = 0;
                 for (int i = 0; i < properties.Length; ++i)
                 {
-                    job.rigWeightSyncer.BindAt(i, animator, properties[i].rig.component, RigProperties.s_Weight);
+                    job.rigWeightSyncer.BindAt(i, animator, properties[i].rig.component, RigProperties.k_Weight);
                     job.rigStates[i] = data.rigStates[i] ? 1f : 0f;
 
                     var constraints = properties[i].constraints;
@@ -196,9 +199,9 @@ namespace UnityEngine.Animations.Rigging
                     {
                         ref var constraint = ref constraints[j];
 
-                        job.constraintWeightSyncer.BindAt(constraintIdx, animator, constraint.component, ConstraintProperties.s_Weight);
+                        job.constraintWeightSyncer.BindAt(constraintIdx, animator, constraint.component, ConstraintProperties.k_Weight);
                         job.modulatedConstraintWeights[constraintIdx++] = animator.BindCustomStreamProperty(
-                            ConstraintsUtils.ConstructCustomPropertyName(constraint.component, ConstraintProperties.s_Weight),
+                            ConstraintsUtils.ConstructCustomPropertyName(constraint.component, ConstraintProperties.k_Weight),
                             CustomStreamPropertyType.Float
                             );
 
@@ -211,7 +214,11 @@ namespace UnityEngine.Animations.Rigging
                             {
                                 Debug.Assert(property.descriptor.size <= 4);
                                 for (int l = 0; l < property.descriptor.size; ++l)
-                                    job.propertySyncer.BindAt(propertyIdx++, animator, constraint.component, property.name + s_PropertyElementNames[l]);
+                                    job.propertySyncer.BindAt(
+                                        propertyIdx++,
+                                        animator,
+                                        constraint.component,
+                                        property.name + RigSyncSceneToStreamJobBinderConstants.s_PropertyElementNames[l]);
                             }
                         }
                     }

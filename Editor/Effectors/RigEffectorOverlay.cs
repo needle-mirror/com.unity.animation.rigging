@@ -56,11 +56,11 @@ namespace UnityEditor.Animations.Rigging
             var rigBuilder = EditorHelper.GetClosestComponent<RigBuilder>(transform);
             var rig = EditorHelper.GetClosestComponent<Rig>(transform, (rigBuilder != null) ? rigBuilder.transform : null);
 
-            if (rigBuilder.ContainsEffector(transform))
+            if (rigBuilder != null && rigBuilder.ContainsEffector(transform))
             {
                 return rigBuilder;
             }
-            else if (rig.ContainsEffector(transform))
+            if (rig !=null && rig.ContainsEffector(transform))
             {
                 return rig;
             }

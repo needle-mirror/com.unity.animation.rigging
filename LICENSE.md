@@ -1,4 +1,4 @@
-Animation Rigging copyright © 2025 Unity Technologies ApS
+Animation Rigging copyright © 2026 Unity Technologies ApS
 
 Licensed under the Unity Companion License for Unity-dependent projects--see [Unity Companion License](http://www.unity3d.com/legal/licenses/Unity_Companion_License).
 

@@ -151,6 +151,27 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
+
+        static GameObject GetSingleSelectionGameObject()
+        {
+#if UNITY_6000_3_OR_NEWER
+            var selected = Selection.entityIds;
+#else
+            var selected = Selection.instanceIDs;
+#endif
+
+            if (selected.Length != 1)
+                return null;
+
+#if UNITY_6000_3_OR_NEWER
+            var selectedGO = EditorUtility.EntityIdToObject(selected[0]) as GameObject;
+#else
+            var selectedGO = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+#endif
+
+            return selectedGO;
+        }
+
         /// <summary>
         /// Validates if the Editor and the provided RigBuilder are in a correct state to do motion transfer.
         /// </summary>
@@ -161,11 +182,7 @@ namespace UnityEditor.Animations.Rigging
             if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
-            var selected = Selection.instanceIDs;
-            if (selected.Length != 1)
-                return false;
-
-            var selectedGO = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+            var selectedGO = GetSingleSelectionGameObject();
             if (selectedGO != rigBuilder.gameObject)
                 return false;
 
@@ -186,11 +203,7 @@ namespace UnityEditor.Animations.Rigging
             if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
-            var selected = Selection.instanceIDs;
-            if (selected.Length != 1)
-                return false;
-
-            var selectedGO = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+            var selectedGO = GetSingleSelectionGameObject();
             if (selectedGO != rig.gameObject)
                 return false;
 
@@ -225,11 +238,7 @@ namespace UnityEditor.Animations.Rigging
             if (!AnimationWindowUtils.isPreviewing || AnimationWindowUtils.activeAnimationClip == null)
                 return false;
 
-            var selected = Selection.instanceIDs;
-            if (selected.Length != 1)
-                return false;
-
-            var selectedGO = EditorUtility.InstanceIDToObject(selected[0]) as GameObject;
+            var selectedGO = GetSingleSelectionGameObject();
             if (selectedGO != constraint.gameObject)
                 return false;
 
@@ -806,7 +815,7 @@ namespace UnityEditor.Animations.Rigging
         private static EditorCurveBinding GetWeightCurveBinding(RigBuilder rigBuilder, Rig rig)
         {
             var path = AnimationUtility.CalculateTransformPath(rig.transform, rigBuilder.transform);
-            var binding = EditorCurveBinding.FloatCurve(path, typeof(Rig), ConstraintProperties.s_Weight);
+            var binding = EditorCurveBinding.FloatCurve(path, typeof(Rig), ConstraintProperties.k_Weight);
             return binding;
         }
 
@@ -814,7 +823,7 @@ namespace UnityEditor.Animations.Rigging
             where T : MonoBehaviour, IRigConstraint
         {
             var path = AnimationUtility.CalculateTransformPath(constraint.transform, rigBuilder.transform);
-            var binding = EditorCurveBinding.FloatCurve(path, typeof(T), ConstraintProperties.s_Weight);
+            var binding = EditorCurveBinding.FloatCurve(path, typeof(T), ConstraintProperties.k_Weight);
             return binding;
         }
 

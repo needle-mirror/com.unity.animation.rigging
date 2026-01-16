@@ -99,7 +99,11 @@ namespace UnityEngine.Animations.Rigging
         /// <returns>Returns a custom property name.</returns>
         public static string ConstructCustomPropertyName(Component component, string property)
         {
+#if UNITY_6000_3_OR_NEWER
+            return component.transform.GetEntityId() + "/" + component.GetType() + "/" + property;
+#else
             return component.transform.GetInstanceID() + "/" + component.GetType() + "/" + property;
+#endif
         }
 
     }

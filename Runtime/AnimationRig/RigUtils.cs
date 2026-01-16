@@ -298,12 +298,24 @@ namespace UnityEngine.Animations.Rigging
                 if (transforms == null || transforms.Length == 0)
                     return null;
 
-                HashSet<int> instanceIDs = new HashSet<int>();
+#if UNITY_6000_3_OR_NEWER
+                HashSet<EntityId> ids = new HashSet<EntityId>();
+#else
+                HashSet<int> ids = new HashSet<int>();
+#endif
                 List<int> unique = new List<int>(transforms.Length);
 
                 for (int i = 0; i < transforms.Length; ++i)
-                    if (instanceIDs.Add(transforms[i].GetInstanceID()))
+                {
+#if UNITY_6000_3_OR_NEWER
+                    var id = transforms[i].GetEntityId();
+#else
+                    var id = transforms[i].GetInstanceID();
+#endif
+
+                    if (ids.Add(id))
                         unique.Add(i);
+                }
 
                 return unique.ToArray();
             }

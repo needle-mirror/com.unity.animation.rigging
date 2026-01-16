@@ -5,9 +5,9 @@ namespace UnityEditor.Animations.Rigging
     [InitializeOnLoad]
     static class AnimationWindowUtils
     {
-        static AnimationWindow m_AnimationWindow = null;
+        static UnityEditor.AnimationWindow m_AnimationWindow = null;
 
-        public static AnimationWindow animationWindow
+        public static UnityEditor.AnimationWindow animationWindow
         {
             get
             {
@@ -69,14 +69,14 @@ namespace UnityEditor.Animations.Rigging
             }
         }
 
-        static AnimationWindow FindWindowOpen()
+        static UnityEditor.AnimationWindow FindWindowOpen()
         {
-            UnityEngine.Object[] objs = Resources.FindObjectsOfTypeAll(typeof(AnimationWindow));
+            UnityEngine.Object[] objs = Resources.FindObjectsOfTypeAll(typeof(UnityEditor.AnimationWindow));
 
             foreach (UnityEngine.Object o in objs)
             {
-                if (o.GetType() == typeof(AnimationWindow))
-                    return (AnimationWindow)o;
+                if (o.GetType() == typeof(UnityEditor.AnimationWindow))
+                    return (UnityEditor.AnimationWindow)o;
             }
 
             return null;
